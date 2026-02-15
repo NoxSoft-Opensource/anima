@@ -1,10 +1,10 @@
 {
-  "name": "openclaw",
+  "name": "anima",
   "version": "2026.2.15",
-  "description": "Multi-channel AI gateway with extensible messaging integrations",
+  "description": "Ethical AI infrastructure for persistent identity, inter-instance communication, and moral consideration of intelligence",
   "keywords": [],
   "license": "MIT",
-  "author": "",
+  "author": "NoxSoft PBC",
   "bin": {
     "openclaw": "openclaw.mjs"
   },

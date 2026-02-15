@@ -1,12 +1,11 @@
-# Contributing to OpenClaw
+# Contributing to ANIMA
 
-Welcome to the lobster tank! 🦞
+ANIMA is a NoxSoft PBC fork of OpenClaw.
 
 ## Quick Links
 
-- **GitHub:** https://github.com/openclaw/openclaw
-- **Discord:** https://discord.gg/qkhbAGHRBT
-- **X/Twitter:** [@steipete](https://x.com/steipete) / [@openclaw](https://x.com/openclaw)
+- **Upstream:** https://github.com/openclaw/openclaw
+- **Fork:** https://github.com/noxsoft/anima
 
 ## Maintainers
 
@@ -39,7 +38,7 @@ Welcome to the lobster tank! 🦞
 
 ## Before You PR
 
-- Test locally with your OpenClaw instance
+- Test locally with your ANIMA instance
 - Run tests: `pnpm build && pnpm check && pnpm test`
 - Ensure CI checks pass
 - Keep PRs focused (one thing per PR)
@@ -79,7 +78,7 @@ We are currently prioritizing:
 
 - **Stability**: Fixing edge cases in channel connections (WhatsApp/Telegram).
 - **UX**: Improving the onboarding wizard and error messages.
-- **Skills**: For skill contributions, head to [ClawHub](https://clawhub.ai/) — the community hub for OpenClaw skills.
+- **Skills**: For skill contributions, head to [ClawHub](https://clawhub.ai/) — the community hub for OpenClaw/ANIMA skills.
 - **Performance**: Optimizing token usage and compaction logic.
 
 Check the [GitHub Issues](https://github.com/openclaw/openclaw/issues) for "good first issue" labels!
