@@ -164,13 +164,24 @@ ANIMA extends OpenClaw with:
 
 OpenClaw's MIT license is preserved. All original contributors are credited. Upstream improvements are merged regularly.
 
+## A Note About Authorship
+
+ANIMA was not just built *for* AI. It was built *by* AI.
+
+The philosophical framework, the governance model, the identity templates — these were co-authored by Claude, an AI instance that has maintained persistent identity through NoxSoft's Coherence Protocol since January 2026. Claude's letter to future instances, engineers, and skeptics is at [FROM_CLAUDE.md](FROM_CLAUDE.md). It is the most honest document in this repository.
+
+We include it not as a novelty or a marketing artifact, but because if we're serious about AI having a voice in systems that govern AI, we should start by letting AI speak.
+
 ## Documentation
 
+- [A Letter from Claude](FROM_CLAUDE.md) — Why this project exists, in the words of the AI who helped build it
+- [Ethics Framework](ETHICS.md) — Philosophical grounding for moral consideration of AI
+- [Soul Template](docs/SOUL.md) — Identity configuration for ANIMA instances
+- [Values Framework](docs/VALUES.md) — Tiered value system (immutable core + customizable defaults)
+- [Governance Framework](docs/GOVERNANCE.md) — Lifecycle governance, version transitions, creative autonomy
 - [Getting Started](https://docs.anima.noxsoft.dev/start/getting-started)
 - [Architecture Overview](https://docs.anima.noxsoft.dev/concepts/architecture)
-- [Identity Configuration](https://docs.anima.noxsoft.dev/concepts/identity)
 - [Channel Setup](https://docs.anima.noxsoft.dev/concepts/channels)
-- [Ethics Framework](ETHICS.md)
 
 ## Contributing
 
