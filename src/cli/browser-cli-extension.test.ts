@@ -25,7 +25,7 @@ function writeManifest(dir: string) {
 
 describe("bundled extension resolver", () => {
   it("walks up to find the assets directory", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-ext-root-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "anima-ext-root-"));
     const here = path.join(root, "dist", "cli");
     const assets = path.join(root, "assets", "chrome-extension");
 
@@ -41,7 +41,7 @@ describe("bundled extension resolver", () => {
   });
 
   it("prefers the nearest assets directory", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-ext-root-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "anima-ext-root-"));
     const here = path.join(root, "dist", "cli");
     const distAssets = path.join(root, "dist", "assets", "chrome-extension");
     const rootAssets = path.join(root, "assets", "chrome-extension");
@@ -61,7 +61,7 @@ describe("bundled extension resolver", () => {
 
 describe("browser extension install", () => {
   it("installs into the state dir (never node_modules)", async () => {
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-ext-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "anima-ext-"));
 
     try {
       const { installChromeExtension } = await import("./browser-cli-extension.js");
@@ -83,7 +83,7 @@ describe("browser extension install", () => {
 
   it("copies extension path to clipboard", async () => {
     const prev = process.env.ANIMA_STATE_DIR;
-    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "openclaw-ext-path-"));
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "anima-ext-path-"));
     process.env.ANIMA_STATE_DIR = tmp;
 
     try {

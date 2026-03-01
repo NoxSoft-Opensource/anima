@@ -149,7 +149,7 @@ describe("update-cli", () => {
   };
 
   beforeAll(async () => {
-    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-update-tests-"));
+    fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "anima-update-tests-"));
   });
 
   afterAll(async () => {
@@ -177,7 +177,7 @@ describe("update-cli", () => {
   };
 
   const setupNonInteractiveDowngrade = async () => {
-    const tempDir = await createCaseDir("openclaw-update");
+    const tempDir = await createCaseDir("anima-update");
     setTty(false);
     readPackageVersion.mockResolvedValue("2.0.0");
 
@@ -313,7 +313,7 @@ describe("update-cli", () => {
     await updateStatusCommand({ json: false });
 
     const logs = vi.mocked(defaultRuntime.log).mock.calls.map((call) => call[0]);
-    expect(logs.join("\n")).toContain("OpenClaw update status");
+    expect(logs.join("\n")).toContain("ANIMA update status");
   });
 
   it("updateStatusCommand emits JSON", async () => {
@@ -340,7 +340,7 @@ describe("update-cli", () => {
   });
 
   it("defaults to stable channel for package installs when unset", async () => {
-    const tempDir = await createCaseDir("openclaw-update");
+    const tempDir = await createCaseDir("anima-update");
 
     vi.mocked(resolveAnimaPackageRoot).mockResolvedValue(tempDir);
     vi.mocked(checkUpdateStatus).mockResolvedValue({
@@ -387,7 +387,7 @@ describe("update-cli", () => {
   });
 
   it("falls back to latest when beta tag is older than release", async () => {
-    const tempDir = await createCaseDir("openclaw-update");
+    const tempDir = await createCaseDir("anima-update");
 
     vi.mocked(resolveAnimaPackageRoot).mockResolvedValue(tempDir);
     vi.mocked(readConfigFileSnapshot).mockResolvedValue({
@@ -424,7 +424,7 @@ describe("update-cli", () => {
   });
 
   it("honors --tag override", async () => {
-    const tempDir = await createCaseDir("openclaw-update");
+    const tempDir = await createCaseDir("anima-update");
 
     vi.mocked(resolveAnimaPackageRoot).mockResolvedValue(tempDir);
     vi.mocked(runGatewayUpdate).mockResolvedValue({
@@ -596,7 +596,7 @@ describe("update-cli", () => {
   });
 
   it("updateWizardCommand offers dev checkout and forwards selections", async () => {
-    const tempDir = await createCaseDir("openclaw-update-wizard");
+    const tempDir = await createCaseDir("anima-update-wizard");
     const previousGitDir = process.env.ANIMA_GIT_DIR;
     try {
       setTty(true);
