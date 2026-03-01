@@ -103,7 +103,9 @@ export async function probeGateway(opts: {
         settle({
           ok: false,
           connectLatencyMs,
-          error: connectError ? `connect failed: ${connectError}` : "timeout",
+          error: connectError
+            ? `ANIMA Gateway connect failed: ${connectError}`
+            : "ANIMA Gateway probe timeout",
           close,
           health: null,
           status: null,

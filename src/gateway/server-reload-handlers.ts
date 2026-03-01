@@ -84,7 +84,9 @@ export function createGatewayReloadHandlers(params: {
       try {
         nextState.browserControl = await startBrowserControlServerIfEnabled();
       } catch (err) {
-        params.logBrowser.error(`server failed to start: ${String(err)}`);
+        params.logBrowser.error(
+          `ANIMA Gateway browser control server failed to start: ${String(err)}`,
+        );
       }
     }
 
@@ -189,14 +191,14 @@ export function createGatewayReloadHandlers(params: {
       // Avoid spinning up duplicate polling loops from repeated config changes.
       if (restartPending) {
         params.logReload.info(
-          `config change requires gateway restart (${reasons}) — already waiting for operations to complete`,
+          `ANIMA Gateway: config change requires restart (${reasons}) — already waiting for operations to complete`,
         );
         return;
       }
       restartPending = true;
       const initialDetails = formatActiveDetails(active);
       params.logReload.warn(
-        `config change requires gateway restart (${reasons}) — deferring until ${initialDetails.join(", ")} complete`,
+        `ANIMA Gateway: config change requires restart (${reasons}) — deferring until ${initialDetails.join(", ")} complete`,
       );
 
       deferGatewayRestartUntilIdle({
@@ -204,29 +206,31 @@ export function createGatewayReloadHandlers(params: {
         hooks: {
           onReady: () => {
             restartPending = false;
-            params.logReload.info("all operations and replies completed; restarting gateway now");
+            params.logReload.info(
+              "ANIMA Gateway: all operations and replies completed; restarting now",
+            );
           },
           onTimeout: (_pending, elapsedMs) => {
             const remaining = formatActiveDetails(getActiveCounts());
             restartPending = false;
             params.logReload.warn(
-              `restart timeout after ${elapsedMs}ms with ${remaining.join(", ")} still active; restarting anyway`,
+              `ANIMA Gateway: restart timeout after ${elapsedMs}ms with ${remaining.join(", ")} still active; restarting anyway`,
             );
           },
           onCheckError: (err) => {
             restartPending = false;
             params.logReload.warn(
-              `restart deferral check failed (${String(err)}); restarting gateway now`,
+              `ANIMA Gateway: restart deferral check failed (${String(err)}); restarting now`,
             );
           },
         },
       });
     } else {
       // No active operations or pending replies, restart immediately
-      params.logReload.warn(`config change requires gateway restart (${reasons})`);
+      params.logReload.warn(`ANIMA Gateway: config change requires restart (${reasons})`);
       const emitted = emitGatewayRestart();
       if (!emitted) {
-        params.logReload.info("gateway restart already scheduled; skipping duplicate signal");
+        params.logReload.info("ANIMA Gateway restart already scheduled; skipping duplicate signal");
       }
     }
   };

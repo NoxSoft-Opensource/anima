@@ -31,7 +31,8 @@ export function sendRateLimited(res: ServerResponse, retryAfterMs?: number) {
   }
   sendJson(res, 429, {
     error: {
-      message: "Too many failed authentication attempts. Please try again later.",
+      message:
+        "ANIMA Gateway: too many failed authentication attempts. Please try again later. See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
       type: "rate_limited",
     },
   });

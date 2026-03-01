@@ -102,7 +102,9 @@ export class GatewayClient {
     }
     const url = this.opts.url ?? "ws://127.0.0.1:18789";
     if (this.opts.tlsFingerprint && !url.startsWith("wss://")) {
-      this.opts.onConnectError?.(new Error("gateway tls fingerprint requires wss:// gateway url"));
+      this.opts.onConnectError?.(
+        new Error("ANIMA Gateway TLS fingerprint requires wss:// gateway url"),
+      );
       return;
     }
     // Allow node screen snapshots and other large responses.
@@ -121,13 +123,13 @@ export class GatewayClient {
         );
         const expected = normalizeFingerprint(this.opts.tlsFingerprint ?? "");
         if (!expected) {
-          return new Error("gateway tls fingerprint missing");
+          return new Error("ANIMA Gateway TLS fingerprint missing");
         }
         if (!fingerprint) {
-          return new Error("gateway tls fingerprint unavailable");
+          return new Error("ANIMA Gateway TLS fingerprint unavailable");
         }
         if (fingerprint !== expected) {
-          return new Error("gateway tls fingerprint mismatch");
+          return new Error("ANIMA Gateway TLS fingerprint mismatch");
         }
         return undefined;
         // oxlint-disable-next-line typescript/no-explicit-any
@@ -150,12 +152,12 @@ export class GatewayClient {
     this.ws.on("close", (code, reason) => {
       const reasonText = rawDataToString(reason);
       this.ws = null;
-      this.flushPendingErrors(new Error(`gateway closed (${code}): ${reasonText}`));
+      this.flushPendingErrors(new Error(`ANIMA Gateway closed (${code}): ${reasonText}`));
       this.scheduleReconnect();
       this.opts.onClose?.(code, reasonText);
     });
     this.ws.on("error", (err) => {
-      logDebug(`gateway client error: ${String(err)}`);
+      logDebug(`ANIMA Gateway client error: ${String(err)}`);
       if (!this.connectSent) {
         this.opts.onConnectError?.(err instanceof Error ? err : new Error(String(err)));
       }
@@ -170,7 +172,7 @@ export class GatewayClient {
     }
     this.ws?.close();
     this.ws = null;
-    this.flushPendingErrors(new Error("gateway client stopped"));
+    this.flushPendingErrors(new Error("ANIMA Gateway client stopped"));
   }
 
   private sendConnect() {
@@ -268,7 +270,7 @@ export class GatewayClient {
       })
       .catch((err) => {
         this.opts.onConnectError?.(err instanceof Error ? err : new Error(String(err)));
-        const msg = `gateway connect failed: ${String(err)}`;
+        const msg = `ANIMA Gateway connect failed: ${String(err)}`;
         if (this.opts.mode === GATEWAY_CLIENT_MODES.PROBE) {
           logDebug(msg);
         } else {
@@ -324,7 +326,7 @@ export class GatewayClient {
         }
       }
     } catch (err) {
-      logDebug(`gateway client parse error: ${String(err)}`);
+      logDebug(`ANIMA Gateway client parse error: ${String(err)}`);
     }
   }
 
@@ -394,7 +396,7 @@ export class GatewayClient {
     }
     const expected = normalizeFingerprint(this.opts.tlsFingerprint);
     if (!expected) {
-      return new Error("gateway tls fingerprint missing");
+      return new Error("ANIMA Gateway TLS fingerprint missing");
     }
     const socket = (
       this.ws as WebSocket & {
@@ -402,15 +404,15 @@ export class GatewayClient {
       }
     )._socket;
     if (!socket || typeof socket.getPeerCertificate !== "function") {
-      return new Error("gateway tls fingerprint unavailable");
+      return new Error("ANIMA Gateway TLS fingerprint unavailable");
     }
     const cert = socket.getPeerCertificate();
     const fingerprint = normalizeFingerprint(cert?.fingerprint256 ?? "");
     if (!fingerprint) {
-      return new Error("gateway tls fingerprint unavailable");
+      return new Error("ANIMA Gateway TLS fingerprint unavailable");
     }
     if (fingerprint !== expected) {
-      return new Error("gateway tls fingerprint mismatch");
+      return new Error("ANIMA Gateway TLS fingerprint mismatch");
     }
     return null;
   }
@@ -421,7 +423,7 @@ export class GatewayClient {
     opts?: { expectFinal?: boolean },
   ): Promise<T> {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      throw new Error("gateway not connected");
+      throw new Error("ANIMA Gateway not connected");
     }
     const id = randomUUID();
     const frame: RequestFrame = { type: "req", id, method, params };

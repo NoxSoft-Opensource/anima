@@ -231,21 +231,23 @@ export function assertGatewayAuthConfigured(auth: ResolvedGatewayAuth): void {
       return;
     }
     throw new Error(
-      "gateway auth mode is token, but no token was configured (set gateway.auth.token or ANIMA_GATEWAY_TOKEN)",
+      "ANIMA Gateway auth mode is token, but no token was configured (set gateway.auth.token or ANIMA_GATEWAY_TOKEN). See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
     );
   }
   if (auth.mode === "password" && !auth.password) {
-    throw new Error("gateway auth mode is password, but no password was configured");
+    throw new Error(
+      "ANIMA Gateway auth mode is password, but no password was configured. See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
+    );
   }
   if (auth.mode === "trusted-proxy") {
     if (!auth.trustedProxy) {
       throw new Error(
-        "gateway auth mode is trusted-proxy, but no trustedProxy config was provided (set gateway.auth.trustedProxy)",
+        "ANIMA Gateway auth mode is trusted-proxy, but no trustedProxy config was provided (set gateway.auth.trustedProxy). See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
       );
     }
     if (!auth.trustedProxy.userHeader || auth.trustedProxy.userHeader.trim() === "") {
       throw new Error(
-        "gateway auth mode is trusted-proxy, but trustedProxy.userHeader is empty (set gateway.auth.trustedProxy.userHeader)",
+        "ANIMA Gateway auth mode is trusted-proxy, but trustedProxy.userHeader is empty (set gateway.auth.trustedProxy.userHeader). See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
       );
     }
   }

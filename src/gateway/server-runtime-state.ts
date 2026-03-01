@@ -158,13 +158,13 @@ export async function createGatewayRuntimeState(params: {
         throw err;
       }
       params.log.warn(
-        `gateway: failed to bind loopback alias ${host}:${params.port} (${String(err)})`,
+        `ANIMA Gateway: failed to bind loopback alias ${host}:${params.port} (${String(err)})`,
       );
     }
   }
   const httpServer = httpServers[0];
   if (!httpServer) {
-    throw new Error("Gateway HTTP server failed to start");
+    throw new Error("ANIMA Gateway HTTP server failed to start");
   }
 
   const wss = new WebSocketServer({

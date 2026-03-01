@@ -192,7 +192,7 @@ export async function startGatewayServer(
     await writeConfigFile(migrated);
     if (changes.length > 0) {
       log.info(
-        `gateway: migrated legacy config entries:\n${changes
+        `ANIMA Gateway: migrated legacy config entries:\n${changes
           .map((entry) => `- ${entry}`)
           .join("\n")}`,
       );
@@ -217,12 +217,12 @@ export async function startGatewayServer(
     try {
       await writeConfigFile(autoEnable.config);
       log.info(
-        `gateway: auto-enabled plugins:\n${autoEnable.changes
+        `ANIMA Gateway: auto-enabled plugins:\n${autoEnable.changes
           .map((entry) => `- ${entry}`)
           .join("\n")}`,
       );
     } catch (err) {
-      log.warn(`gateway: failed to persist plugin auto-enable changes: ${String(err)}`);
+      log.warn(`ANIMA Gateway: failed to persist plugin auto-enable changes: ${String(err)}`);
     }
   }
 
@@ -312,7 +312,7 @@ export async function startGatewayServer(
       ? { kind: "resolved", path: resolvedOverride }
       : { kind: "invalid", path: resolvedOverridePath };
     if (!resolvedOverride) {
-      log.warn(`gateway: controlUi.root not found at ${resolvedOverridePath}`);
+      log.warn(`ANIMA Gateway: controlUi.root not found at ${resolvedOverridePath}`);
     }
   } else if (controlUiEnabled) {
     let resolvedRoot = resolveControlUiRootSync({
@@ -323,7 +323,7 @@ export async function startGatewayServer(
     if (!resolvedRoot) {
       const ensureResult = await ensureControlUiAssetsBuilt(gatewayRuntime);
       if (!ensureResult.ok && ensureResult.message) {
-        log.warn(`gateway: ${ensureResult.message}`);
+        log.warn(`ANIMA Gateway: ${ensureResult.message}`);
       }
       resolvedRoot = resolveControlUiRootSync({
         moduleUrl: import.meta.url,
@@ -343,7 +343,7 @@ export async function startGatewayServer(
   let canvasHostServer: CanvasHostServer | null = null;
   const gatewayTls = await loadGatewayTlsRuntime(cfgAtStart.gateway?.tls, log.child("tls"));
   if (cfgAtStart.gateway?.tls?.enabled && !gatewayTls.enabled) {
-    throw new Error(gatewayTls.error ?? "gateway tls: failed to enable");
+    throw new Error(gatewayTls.error ?? "ANIMA Gateway TLS: failed to enable");
   }
   const {
     canvasHost,
@@ -531,7 +531,7 @@ export async function startGatewayServer(
         log: logRecovery,
         cfg: cfgAtStart,
       });
-    })().catch((err) => log.error(`Delivery recovery failed: ${String(err)}`));
+    })().catch((err) => log.error(`ANIMA Gateway: delivery recovery failed: ${String(err)}`));
   }
 
   const execApprovalManager = new ExecApprovalManager();
@@ -644,7 +644,7 @@ export async function startGatewayServer(
     const hookRunner = getGlobalHookRunner();
     if (hookRunner?.hasHooks("gateway_start")) {
       void hookRunner.runGatewayStart({ port }, { port }).catch((err) => {
-        log.warn(`gateway_start hook failed: ${String(err)}`);
+        log.warn(`ANIMA Gateway: gateway_start hook failed: ${String(err)}`);
       });
     }
   }
@@ -721,7 +721,7 @@ export async function startGatewayServer(
     close: async (opts) => {
       // Run gateway_stop plugin hook before shutdown
       await runGlobalGatewayStopSafely({
-        event: { reason: opts?.reason ?? "gateway stopping" },
+        event: { reason: opts?.reason ?? "ANIMA Gateway stopping" },
         ctx: { port },
         onError: (err) => log.warn(`gateway_stop hook failed: ${String(err)}`),
       });

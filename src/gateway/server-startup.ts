@@ -44,7 +44,7 @@ export async function startGatewaySidecars(params: {
   try {
     browserControl = await startBrowserControlServerIfEnabled();
   } catch (err) {
-    params.logBrowser.error(`server failed to start: ${String(err)}`);
+    params.logBrowser.error(`ANIMA Gateway browser control server failed to start: ${String(err)}`);
   }
 
   // Start Gmail watcher if configured (hooks.gmail.account).
@@ -148,11 +148,11 @@ export async function startGatewaySidecars(params: {
       workspaceDir: params.defaultWorkspaceDir,
     });
   } catch (err) {
-    params.log.warn(`plugin services failed to start: ${String(err)}`);
+    params.log.warn(`ANIMA Gateway plugin services failed to start: ${String(err)}`);
   }
 
   void startGatewayMemoryBackend({ cfg: params.cfg, log: params.log }).catch((err) => {
-    params.log.warn(`qmd memory startup initialization failed: ${String(err)}`);
+    params.log.warn(`ANIMA Gateway: memory backend initialization failed: ${String(err)}`);
   });
 
   if (shouldWakeFromRestartSentinel()) {

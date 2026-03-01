@@ -73,7 +73,7 @@ export async function runBootOnce(params: {
     result = await loadBootFile(params.workspaceDir);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    log.error(`boot: failed to read ${BOOT_FILENAME}: ${message}`);
+    log.error(`ANIMA Gateway boot: failed to read ${BOOT_FILENAME}: ${message}`);
     return { status: "failed", reason: message };
   }
 
@@ -99,7 +99,7 @@ export async function runBootOnce(params: {
     return { status: "ran" };
   } catch (err) {
     const messageText = err instanceof Error ? err.message : String(err);
-    log.error(`boot: agent run failed: ${messageText}`);
+    log.error(`ANIMA Gateway boot: agent run failed: ${messageText}`);
     return { status: "failed", reason: messageText };
   }
 }

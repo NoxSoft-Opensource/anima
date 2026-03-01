@@ -25,12 +25,12 @@ export async function listenGatewayHttpServer(params: {
     const code = (err as NodeJS.ErrnoException).code;
     if (code === "EADDRINUSE") {
       throw new GatewayLockError(
-        `another gateway instance is already listening on ws://${bindHost}:${port}`,
+        `another ANIMA Gateway instance is already listening on ws://${bindHost}:${port}`,
         err,
       );
     }
     throw new GatewayLockError(
-      `failed to bind gateway socket on ws://${bindHost}:${port}: ${String(err)}`,
+      `ANIMA Gateway failed to bind socket on ws://${bindHost}:${port}: ${String(err)}`,
       err,
     );
   }

@@ -32,7 +32,7 @@ export function createGatewayCloseHandler(params: {
 }) {
   return async (opts?: { reason?: string; restartExpectedMs?: number | null }) => {
     const reasonRaw = typeof opts?.reason === "string" ? opts.reason.trim() : "";
-    const reason = reasonRaw || "gateway stopping";
+    const reason = reasonRaw || "ANIMA Gateway stopping";
     const restartExpectedMs =
       typeof opts?.restartExpectedMs === "number" && Number.isFinite(opts.restartExpectedMs)
         ? Math.max(0, Math.floor(opts.restartExpectedMs))

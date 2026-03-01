@@ -80,7 +80,7 @@ export function ensureExplicitGatewayAuth(params: {
     return;
   }
   const message = [
-    "gateway url override requires explicit credentials",
+    "ANIMA Gateway url override requires explicit credentials",
     params.errorHint,
     params.configPath ? `Config: ${params.configPath}` : undefined,
   ]
@@ -131,11 +131,11 @@ export function buildGatewayConnectionDetails(
             ? `local lan ${lanIPv4}`
             : "local loopback";
   const remoteFallbackNote = remoteMisconfigured
-    ? "Warn: gateway.mode=remote but gateway.remote.url is missing; set gateway.remote.url or switch gateway.mode=local."
+    ? "ANIMA Gateway: gateway.mode=remote but gateway.remote.url is missing; set gateway.remote.url or switch gateway.mode=local."
     : undefined;
   const bindDetail = !urlOverride && !remoteUrl ? `Bind: ${bindMode}` : undefined;
   const message = [
-    `Gateway target: ${url}`,
+    `ANIMA Gateway target: ${url}`,
     `Source: ${urlSource}`,
     `Config: ${configPath}`,
     bindDetail,
@@ -178,7 +178,7 @@ export async function callGateway<T = Record<string, unknown>>(
       opts.configPath ?? resolveConfigPath(process.env, resolveStateDir(process.env));
     throw new Error(
       [
-        "gateway remote mode misconfigured: gateway.remote.url missing",
+        "ANIMA Gateway remote mode misconfigured: gateway.remote.url missing",
         `Config: ${configPath}`,
         "Fix: set gateway.remote.url, or set gateway.mode=local.",
       ].join("\n"),
@@ -237,10 +237,10 @@ export async function callGateway<T = Record<string, unknown>>(
     const hint =
       code === 1006 ? "abnormal closure (no close frame)" : code === 1000 ? "normal closure" : "";
     const suffix = hint ? ` ${hint}` : "";
-    return `gateway closed (${code}${suffix}): ${reasonText}\n${connectionDetails.message}`;
+    return `ANIMA Gateway closed (${code}${suffix}): ${reasonText}\n${connectionDetails.message}`;
   };
   const formatTimeoutError = () =>
-    `gateway timeout after ${timeoutMs}ms\n${connectionDetails.message}`;
+    `ANIMA Gateway timeout after ${timeoutMs}ms\n${connectionDetails.message}`;
   return await new Promise<T>((resolve, reject) => {
     let settled = false;
     let ignoreClose = false;

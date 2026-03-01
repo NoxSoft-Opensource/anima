@@ -172,7 +172,8 @@ function writeUpgradeAuthFailure(
         "",
         JSON.stringify({
           error: {
-            message: "Too many failed authentication attempts. Please try again later.",
+            message:
+              "ANIMA Gateway: too many failed authentication attempts. Please try again later. See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
             type: "rate_limited",
           },
         }),
@@ -265,7 +266,7 @@ export function createHooksRequestHandler(
       res.statusCode = 400;
       res.setHeader("Content-Type", "text/plain; charset=utf-8");
       res.end(
-        "Hook token must be provided via Authorization: Bearer <token> or X-Anima-Token header (query parameters are not allowed).",
+        "ANIMA Gateway: hook token must be provided via Authorization: Bearer <token> or X-Anima-Token header (query parameters are not allowed). See NoxSoft security docs: https://docs.noxsoft.net/anima/security",
       );
       return true;
     }

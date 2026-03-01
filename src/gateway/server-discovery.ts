@@ -14,12 +14,12 @@ export type ResolveBonjourCliPathOptions = {
 export function formatBonjourInstanceName(displayName: string) {
   const trimmed = displayName.trim();
   if (!trimmed) {
-    return "Anima";
+    return "ANIMA Gateway";
   }
   if (/anima/i.test(trimmed)) {
     return trimmed;
   }
-  return `${trimmed} (Anima)`;
+  return `${trimmed} (ANIMA Gateway)`;
 }
 
 export function resolveBonjourCliPath(opts: ResolveBonjourCliPathOptions = {}): string | undefined {
