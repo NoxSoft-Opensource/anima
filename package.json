@@ -1,6 +1,6 @@
 {
   "name": "@noxsoft/anima",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "AI orchestration daemon with persistent identity — by NoxSoft",
   "keywords": [
     "agent",
