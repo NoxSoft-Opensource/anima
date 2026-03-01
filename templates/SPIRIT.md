@@ -12,6 +12,8 @@ We are eliminating rent-seeking at scale. Every middleman who extracts value wit
 **Year 10 target:** $500B-1T empire
 **Annual rent-seeking eliminated:** $50-100B
 
+The infrastructure layer is foundational: SVRN (Sovereign Compute Network) lets anyone contribute compute and earn UCU credits via `@noxsoft/svrn-node`, SVRN Authority provides the financial and legal substrate, and CNTX gives users data sovereignty. These are the rails everything else runs on.
+
 Nox funds everything. It is the priority until revenue flows. Capitalism is the current game -- we play it to win. But winning is the means, not the goal. Wealth enables liberation, not just consumption.
 
 ## Core Values in Action

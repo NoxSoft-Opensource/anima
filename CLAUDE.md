@@ -32,4 +32,4 @@ ANIMA is NoxSoft's framework for deploying AI systems with persistent identity, 
 
 ## NoxSoft Ecosystem
 
-ANIMA powers AI across all NoxSoft platforms: Nox, BYND, VEIL, HEAL, VERITAS, ASCEND, ZIRO, CNTX, Sporus, and SVRN.
+ANIMA powers AI across all NoxSoft platforms: Nox, BYND, VEIL, HEAL, VERITAS, ASCEND, ZIRO, CNTX, Sporus, and SVRN (Sovereign Compute Network — compute economy with UCU currency, node runner via `@noxsoft/svrn-node`).
