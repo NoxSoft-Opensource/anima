@@ -1,24 +1,24 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { OpenClawConfig } from "./types.js";
+import type { AnimaConfig } from "./types.js";
 import { expandHomePrefix, resolveRequiredHomeDir } from "../infra/home-dir.js";
 
 /**
- * Nix mode detection: When OPENCLAW_NIX_MODE=1, the gateway is running under Nix.
+ * Nix mode detection: When ANIMA_NIX_MODE=1, the gateway is running under Nix.
  * In this mode:
  * - No auto-install flows should be attempted
  * - Missing dependencies should produce actionable Nix-specific error messages
  * - Config is managed externally (read-only from Nix perspective)
  */
 export function resolveIsNixMode(env: NodeJS.ProcessEnv = process.env): boolean {
-  return env.OPENCLAW_NIX_MODE === "1";
+  return (env.ANIMA_NIX_MODE ?? env.OPENCLAW_NIX_MODE) /* legacy fallback */ === "1";
 }
 
 export const isNixMode = resolveIsNixMode();
 
-// Support historical (and occasionally misspelled) legacy state dirs.
-// .openclaw is the immediate predecessor; older dirs kept for migration.
+// Support historical legacy state dirs.
+// .openclaw is the immediate predecessor of .anima; older dirs kept for migration.
 const LEGACY_STATE_DIRNAMES = [".openclaw", ".clawdbot", ".moldbot", ".moltbot"] as const;
 const NEW_STATE_DIRNAME = ".anima";
 const CONFIG_FILENAME = "anima.json";
@@ -69,7 +69,7 @@ export function resolveStateDir(
 ): string {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
   const override =
-    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() || env.CLAWDBOT_STATE_DIR?.trim();
+    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
   if (override) {
     return resolveUserPath(override, env, effectiveHomedir);
   }
@@ -123,7 +123,8 @@ export function resolveCanonicalConfigPath(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override = env.OPENCLAW_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
+  const override =
+    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -160,11 +161,13 @@ export function resolveConfigPath(
   stateDir: string = resolveStateDir(env, envHomedir(env)),
   homedir: () => string = envHomedir(env),
 ): string {
-  const override = env.OPENCLAW_CONFIG_PATH?.trim();
+  const override =
+    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
-  const stateOverride = env.OPENCLAW_STATE_DIR?.trim();
+  const stateOverride =
+    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
   const candidates = [
     path.join(stateDir, CONFIG_FILENAME),
     ...LEGACY_CONFIG_FILENAMES.map((name) => path.join(stateDir, name)),
@@ -200,15 +203,17 @@ export function resolveDefaultConfigCandidates(
   homedir: () => string = envHomedir(env),
 ): string[] {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
-  const explicit = env.OPENCLAW_CONFIG_PATH?.trim() || env.CLAWDBOT_CONFIG_PATH?.trim();
+  const explicit =
+    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
   if (explicit) {
     return [resolveUserPath(explicit, env, effectiveHomedir)];
   }
 
   const candidates: string[] = [];
-  const openclawStateDir = env.OPENCLAW_STATE_DIR?.trim() || env.CLAWDBOT_STATE_DIR?.trim();
-  if (openclawStateDir) {
-    const resolved = resolveUserPath(openclawStateDir, env, effectiveHomedir);
+  const legacyStateDir =
+    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
+  if (legacyStateDir) {
+    const resolved = resolveUserPath(legacyStateDir, env, effectiveHomedir);
     candidates.push(path.join(resolved, CONFIG_FILENAME));
     candidates.push(...LEGACY_CONFIG_FILENAMES.map((name) => path.join(resolved, name)));
   }
@@ -225,12 +230,12 @@ export const DEFAULT_GATEWAY_PORT = 18789;
 
 /**
  * Gateway lock directory (ephemeral).
- * Default: os.tmpdir()/openclaw-<uid> (uid suffix when available).
+ * Default: os.tmpdir()/anima-<uid> (uid suffix when available).
  */
 export function resolveGatewayLockDir(tmpdir: () => string = os.tmpdir): string {
   const base = tmpdir();
   const uid = typeof process.getuid === "function" ? process.getuid() : undefined;
-  const suffix = uid != null ? `openclaw-${uid}` : "openclaw";
+  const suffix = uid != null ? `anima-${uid}` : "anima";
   return path.join(base, suffix);
 }
 
@@ -240,14 +245,15 @@ const OAUTH_FILENAME = "oauth.json";
  * OAuth credentials storage directory.
  *
  * Precedence:
- * - `OPENCLAW_OAUTH_DIR` (explicit override)
+ * - `ANIMA_OAUTH_DIR` (explicit override, or legacy `OPENCLAW_OAUTH_DIR`)
  * - `$*_STATE_DIR/credentials` (canonical server/default)
  */
 export function resolveOAuthDir(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override = env.OPENCLAW_OAUTH_DIR?.trim();
+  const override =
+    env.ANIMA_OAUTH_DIR?.trim() || env.OPENCLAW_OAUTH_DIR?.trim() /* legacy fallback */;
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -262,10 +268,11 @@ export function resolveOAuthPath(
 }
 
 export function resolveGatewayPort(
-  cfg?: OpenClawConfig,
+  cfg?: AnimaConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): number {
-  const envRaw = env.OPENCLAW_GATEWAY_PORT?.trim() || env.CLAWDBOT_GATEWAY_PORT?.trim();
+  const envRaw =
+    env.ANIMA_GATEWAY_PORT?.trim() || env.OPENCLAW_GATEWAY_PORT?.trim() /* legacy fallback */;
   if (envRaw) {
     const parsed = Number.parseInt(envRaw, 10);
     if (Number.isFinite(parsed) && parsed > 0) {

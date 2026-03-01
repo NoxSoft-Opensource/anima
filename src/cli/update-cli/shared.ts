@@ -125,7 +125,8 @@ export async function isEmptyDir(targetPath: string): Promise<boolean> {
 }
 
 export function resolveGitInstallDir(): string {
-  const override = process.env.OPENCLAW_GIT_DIR?.trim();
+  const override =
+    process.env.ANIMA_GIT_DIR?.trim() || process.env.OPENCLAW_GIT_DIR?.trim() /* legacy fallback */;
   if (override) {
     return path.resolve(override);
   }
@@ -217,7 +218,7 @@ export async function ensureGitCheckout(params: {
     const empty = await isEmptyDir(params.dir);
     if (!empty) {
       throw new Error(
-        `OPENCLAW_GIT_DIR points at a non-git directory: ${params.dir}. Set OPENCLAW_GIT_DIR to an empty folder or an anima checkout.`,
+        `ANIMA_GIT_DIR points at a non-git directory: ${params.dir}. Set ANIMA_GIT_DIR to an empty folder or an anima checkout.`,
       );
     }
 
@@ -231,7 +232,7 @@ export async function ensureGitCheckout(params: {
   }
 
   if (!(await isCorePackage(params.dir))) {
-    throw new Error(`OPENCLAW_GIT_DIR does not look like a core checkout: ${params.dir}.`);
+    throw new Error(`ANIMA_GIT_DIR does not look like a core checkout: ${params.dir}.`);
   }
 
   return null;

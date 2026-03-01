@@ -88,6 +88,16 @@ export async function setupCommand(
   );
   runtime.log(`    Heartbeat: ${heartbeatInterval ? `${heartbeatInterval}s` : "default (300s)"}`);
   runtime.log(`    Channels:  ${channels.length > 0 ? channels.join(", ") : "none"}`);
+  // Check for Claude Code CLI
+  try {
+    const { execFileSync } = await import("child_process");
+    execFileSync("which", ["claude"], { stdio: "ignore" });
+    runtime.log("  Claude Code: \x1b[32minstalled\x1b[0m");
+  } catch {
+    runtime.log("  Claude Code: \x1b[31mnot found\x1b[0m");
+    runtime.log("    Install: npm install -g @anthropic-ai/claude-code");
+  }
+
   runtime.log("");
   runtime.log("  Run \x1b[36manima configure\x1b[0m to change settings.");
   runtime.log("  Run \x1b[36manima setup --wizard\x1b[0m for full guided setup.");

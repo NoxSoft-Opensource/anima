@@ -2,7 +2,7 @@ import type { Command } from "commander";
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/config.js";
+import type { AnimaConfig } from "../config/config.js";
 import type { HookEntry } from "../hooks/types.js";
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { loadConfig, writeConfigFile } from "../config/io.js";
@@ -57,7 +57,7 @@ function mergeHookEntries(pluginEntries: HookEntry[], workspaceEntries: HookEntr
   return Array.from(merged.values());
 }
 
-function buildHooksReport(config: OpenClawConfig): HookStatusReport {
+function buildHooksReport(config: AnimaConfig): HookStatusReport {
   const workspaceDir = resolveAgentWorkspaceDir(config, resolveDefaultAgentId(config));
   const workspaceEntries = loadWorkspaceHookEntries(workspaceDir, { config });
   const pluginReport = buildPluginStatusReport({ config, workspaceDir });
@@ -120,7 +120,7 @@ async function readInstalledPackageVersion(dir: string): Promise<string | undefi
 
 type HookInternalEntryLike = Record<string, unknown> & { enabled?: boolean };
 
-function enableInternalHookEntries(config: OpenClawConfig, hookNames: string[]): OpenClawConfig {
+function enableInternalHookEntries(config: AnimaConfig, hookNames: string[]): AnimaConfig {
   const entries = { ...config.hooks?.internal?.entries } as Record<string, HookInternalEntryLike>;
 
   for (const hookName of hookNames) {
@@ -575,7 +575,7 @@ export function registerHooksCli(program: Command): void {
             process.exit(1);
           }
 
-          let next: OpenClawConfig = {
+          let next: AnimaConfig = {
             ...cfg,
             hooks: {
               ...cfg.hooks,

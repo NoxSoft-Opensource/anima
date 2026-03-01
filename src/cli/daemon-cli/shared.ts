@@ -54,6 +54,12 @@ export function pickProbeHostForBind(
 }
 
 const SAFE_DAEMON_ENV_KEYS = [
+  "ANIMA_PROFILE",
+  "ANIMA_STATE_DIR",
+  "ANIMA_CONFIG_PATH",
+  "ANIMA_GATEWAY_PORT",
+  "ANIMA_NIX_MODE",
+  // Legacy fallbacks
   "OPENCLAW_PROFILE",
   "OPENCLAW_STATE_DIR",
   "OPENCLAW_CONFIG_PATH",
