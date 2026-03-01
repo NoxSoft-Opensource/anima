@@ -1,0 +1,84 @@
+# Source code (built output is in dist/)
+src/
+ui/
+apps/
+vendor/
+packages/
+scripts/
+patches/
+
+# Tests
+test/
+__tests__/
+*.test.*
+*.spec.*
+vitest.*.ts
+coverage/
+
+# Dev configs
+tsconfig*.json
+tsdown.config.ts
+.oxfmtrc.jsonc
+.oxlintrc.json
+.markdownlint-cli2.jsonc
+.shellcheckrc
+.swiftformat
+.swiftlint.yml
+.detect-secrets.cfg
+.secrets.baseline
+.pre-commit-config.yaml
+zizmor.yml
+
+# CI/CD and VCS
+.github/
+.gitlab-ci.yml
+.git/
+git-hooks/
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+docker-setup.sh
+setup-podman.sh
+.dockerignore
+anima.podman.env
+fly.toml
+fly.private.toml
+render.yaml
+
+# IDE and local
+.vscode/
+.idea/
+.claude/
+.agents/
+.agent/
+.pi/
+.local/
+.serena/
+.worktrees/
+.DS_Store
+
+# Documentation internals (keep README.md/CHANGELOG.md via files field)
+docs/
+CLAUDE.md
+AGENTS.md
+CONTRIBUTING.md
+SECURITY.md
+ETHICS.md
+FROM_CLAUDE.md
+docs.acp.md
+README-header.png
+
+# Build artifacts and assets not needed in package
+assets/
+appcast.xml
+Swabble/
+
+# Workspace
+pnpm-workspace.yaml
+pnpm-lock.yaml
+
+# Misc
+*.tgz
+memory/
+local/
