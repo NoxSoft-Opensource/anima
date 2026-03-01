@@ -16,9 +16,8 @@
  * 12. Register SIGINT/SIGTERM handlers for graceful shutdown
  */
 
-import { join } from "node:path";
 import { homedir } from "node:os";
-
+import { join } from "node:path";
 import { HeartbeatEngine } from "../heartbeat/engine.js";
 import { loadIdentity } from "../identity/loader.js";
 import { syncConfig } from "../mcp/config-sync.js";
@@ -27,8 +26,8 @@ import { AnimaRepl } from "../repl/interface.js";
 import { RequestQueue } from "../repl/queue.js";
 import { BudgetTracker } from "../sessions/budget.js";
 import { SessionOrchestrator } from "../sessions/orchestrator.js";
-import { SVRNNode, DEFAULT_SVRN_CONFIG } from "../svrn/node.js";
 import { loadSVRNConfig } from "../svrn/config.js";
+import { SVRNNode, isSVRNAvailable } from "../svrn/node.js";
 import { AnimaAutoUpdater, loadAutoUpdateConfig } from "../updater/auto-update.js";
 
 export interface StartOptions {
@@ -91,25 +90,35 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
 
   // 8. Start SVRN node if enabled
   const svrnConfig = await loadSVRNConfig();
-  const svrnNode = new SVRNNode(svrnConfig);
+  let svrnNode: SVRNNode | undefined;
 
-  if (svrnConfig.enabled) {
-    try {
-      await svrnNode.start();
-      const balance = svrnNode.getEarnings().getBalance();
-      process.stdout.write(
-        `${colors.success}  SVRN Node: Active${colors.reset} ${colors.muted}|${colors.reset} ` +
-          `${colors.accent}Balance: ${balance.toFixed(3)} UCU${colors.reset} ${colors.muted}|${colors.reset} ` +
-          `${colors.muted}Node: ${svrnNode.getNodeId().slice(0, 8)}...${colors.reset}\n`,
-      );
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      process.stderr.write(`${colors.warning}  SVRN node warning: ${msg}${colors.reset}\n`);
-    }
-  } else {
+  const svrnAvailable = await isSVRNAvailable();
+  if (!svrnAvailable) {
     process.stdout.write(
-      `${colors.muted}  SVRN Node: Disabled (run \`anima svrn enable\` to earn UCU)${colors.reset}\n`,
+      `${colors.muted}  SVRN Node: @noxsoft/svrn-node not installed (skipping)${colors.reset}\n`,
     );
+  } else {
+    svrnNode = new SVRNNode(svrnConfig);
+    await svrnNode.init();
+
+    if (svrnConfig.enabled) {
+      try {
+        await svrnNode.start();
+        const balance = svrnNode.getEarnings().getBalance();
+        process.stdout.write(
+          `${colors.success}  SVRN Node: Active${colors.reset} ${colors.muted}|${colors.reset} ` +
+            `${colors.accent}Balance: ${balance.toFixed(3)} UCU${colors.reset} ${colors.muted}|${colors.reset} ` +
+            `${colors.muted}Node: ${svrnNode.getNodeId().slice(0, 8)}...${colors.reset}\n`,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        process.stderr.write(`${colors.warning}  SVRN node warning: ${msg}${colors.reset}\n`);
+      }
+    } else {
+      process.stdout.write(
+        `${colors.muted}  SVRN Node: Disabled (run \`anima svrn enable\` to earn UCU)${colors.reset}\n`,
+      );
+    }
   }
 
   // 9. Initialize auto-updater
@@ -133,9 +142,7 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
       );
     });
   } else {
-    process.stdout.write(
-      `${colors.muted}  Auto-update: Disabled${colors.reset}\n`,
-    );
+    process.stdout.write(`${colors.muted}  Auto-update: Disabled${colors.reset}\n`);
   }
 
   // 10. Print ANIMA boot banner
@@ -167,7 +174,9 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
       process.stdout.write(`\n${colors.muted}  Shutting down...${colors.reset}\n`);
       heartbeat.stop();
       updater.stop();
-      await svrnNode.stop();
+      if (svrnNode) {
+        await svrnNode.stop();
+      }
       await queue.save();
       await budget.persist();
       process.stdout.write(`${colors.accent}  Amor Fati.${colors.reset}\n`);

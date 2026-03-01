@@ -2,14 +2,15 @@
  * ANIMA-specific SVRN config management.
  *
  * Reads/writes SVRN configuration within the ANIMA config file (~/.anima/anima.json).
- * The underlying SVRNNode comes from @noxsoft/svrn-node.
+ * The underlying SVRNNode comes from @noxsoft/svrn-node (optional dependency).
  */
 
-import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
-import { resolveConfig, type SVRNNodeConfig } from "@noxsoft/svrn-node";
+import type { SVRNNodeConfig } from "./node.js";
 import { resolveStateDir } from "../config/paths.js";
+import { DEFAULT_SVRN_CONFIG } from "./node.js";
 
 const CONFIG_FILENAME = "anima.json";
 
@@ -40,16 +41,47 @@ async function writeAnimaConfig(config: AnimaConfig, configPath: string): Promis
 }
 
 /**
+ * Try to dynamically load resolveConfig from @noxsoft/svrn-node.
+ * Returns null if the package is not installed.
+ */
+async function loadResolveConfig(): Promise<
+  ((partial: Partial<SVRNNodeConfig>) => SVRNNodeConfig) | null
+> {
+  try {
+    const mod = await import("@noxsoft/svrn-node");
+    return mod.resolveConfig;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Load SVRN config from ANIMA config file, merging with defaults.
  */
 export async function loadSVRNConfig(): Promise<SVRNNodeConfig> {
   const { config } = await readAnimaConfig();
   const stateDir = resolveStateDir();
 
-  return resolveConfig({
+  const partial = {
     ...config.svrn,
     dataDir: config.svrn?.dataDir ?? join(stateDir, "svrn"),
-  });
+  };
+
+  // If @noxsoft/svrn-node is available, use its resolveConfig for validation.
+  // Otherwise, merge with our inline defaults.
+  const resolveConfig = await loadResolveConfig();
+  if (resolveConfig) {
+    return resolveConfig(partial);
+  }
+
+  return {
+    ...DEFAULT_SVRN_CONFIG,
+    ...partial,
+    resources: {
+      ...DEFAULT_SVRN_CONFIG.resources,
+      ...partial.resources,
+    },
+  } as SVRNNodeConfig;
 }
 
 /**
@@ -80,8 +112,8 @@ export async function updateSVRNLimits(
   config.svrn = {
     ...config.svrn,
     resources: {
-      ...(config.svrn?.resources ?? {}),
-      ...(limits.resources ?? {}),
+      ...config.svrn?.resources,
+      ...limits.resources,
     },
   };
   await writeAnimaConfig(config, path);

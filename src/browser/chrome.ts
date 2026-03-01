@@ -18,10 +18,7 @@ import {
   ensureProfileCleanExit,
   isProfileDecorated,
 } from "./chrome.profile-decoration.js";
-import {
-  DEFAULT_ANIMA_BROWSER_COLOR,
-  DEFAULT_ANIMA_BROWSER_PROFILE_NAME,
-} from "./constants.js";
+import { DEFAULT_ANIMA_BROWSER_COLOR, DEFAULT_ANIMA_BROWSER_PROFILE_NAME } from "./constants.js";
 
 const log = createSubsystemLogger("browser").child("chrome");
 
@@ -267,7 +264,7 @@ export async function launchAnimaChrome(
         name: profile.name,
         color: profile.color,
       });
-      log.info(`🦞 anima browser profile decorated (${profile.color})`);
+      log.info(`✦ anima browser profile decorated (${profile.color})`);
     } catch (err) {
       log.warn(`anima browser profile decoration failed: ${String(err)}`);
     }
@@ -302,7 +299,7 @@ export async function launchAnimaChrome(
 
   const pid = proc.pid ?? -1;
   log.info(
-    `🦞 anima browser started (${exe.kind}) profile "${profile.name}" on 127.0.0.1:${profile.cdpPort} (pid ${pid})`,
+    `✦ anima browser started (${exe.kind}) profile "${profile.name}" on 127.0.0.1:${profile.cdpPort} (pid ${pid})`,
   );
 
   return {

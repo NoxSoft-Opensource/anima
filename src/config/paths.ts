@@ -33,7 +33,7 @@ function resolveDefaultHomeDir(): string {
   return resolveRequiredHomeDir(process.env, os.homedir);
 }
 
-/** Build a homedir thunk that respects OPENCLAW_HOME for the given env. */
+/** Build a homedir thunk that respects ANIMA_HOME (or legacy OPENCLAW_HOME) for the given env. */
 function envHomedir(env: NodeJS.ProcessEnv): () => string {
   return () => resolveRequiredHomeDir(env, os.homedir);
 }
@@ -116,8 +116,8 @@ export const STATE_DIR = resolveStateDir();
 
 /**
  * Config file path (JSON5).
- * Can be overridden via OPENCLAW_CONFIG_PATH.
- * Default: ~/.openclaw/openclaw.json (or $OPENCLAW_STATE_DIR/openclaw.json)
+ * Can be overridden via ANIMA_CONFIG_PATH (or legacy OPENCLAW_CONFIG_PATH).
+ * Default: ~/.anima/anima.json (or $ANIMA_STATE_DIR/anima.json)
  */
 export function resolveCanonicalConfigPath(
   env: NodeJS.ProcessEnv = process.env,

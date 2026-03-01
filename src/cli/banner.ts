@@ -1,3 +1,4 @@
+// ANIMA is a fork of OpenClaw (https://openclaw.ai). Original work © OpenClaw contributors.
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
 import { isRich, theme } from "../terminal/theme.js";
@@ -39,8 +40,8 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   const commitLabel = commit ?? "unknown";
   const tagline = pickTagline(options);
   const rich = options.richTty ?? isRich();
-  const title = "🦞 OpenClaw";
-  const prefix = "🦞 ";
+  const title = "✦ ANIMA";
+  const prefix = "✦ ";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainFullLine = `${title} ${version} (${commitLabel}) — ${tagline}`;
   const fitsOnOneLine = visibleWidth(plainFullLine) <= columns;
@@ -65,12 +66,12 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
 }
 
 const LOBSTER_ASCII = [
-  "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
-  "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
-  "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
-  "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
-  "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-  "                  🦞 OPENCLAW 🦞                    ",
+  "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
+  "██░▄▄▀██░▀██░██░▄▄▄██░▄▀▄░██░▄▄▀██",
+  "██░▀▀░██░█░█░██░▄▄▄██░█░█░██░▀▀░██",
+  "██░██░██░██▄░██░▀▀▀██░███░██░██░██",
+  "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
+  "                  ✦ ANIMA ✦                    ",
   " ",
 ];
 
@@ -94,12 +95,12 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
   };
 
   const colored = LOBSTER_ASCII.map((line) => {
-    if (line.includes("OPENCLAW")) {
+    if (line.includes("ANIMA")) {
       return (
         theme.muted("              ") +
-        theme.accent("🦞") +
-        theme.info(" OPENCLAW ") +
-        theme.accent("🦞")
+        theme.accent("✦") +
+        theme.info(" ANIMA ") +
+        theme.accent("✦")
       );
     }
     return splitGraphemes(line).map(colorChar).join("");

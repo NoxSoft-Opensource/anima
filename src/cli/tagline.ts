@@ -1,4 +1,4 @@
-const DEFAULT_TAGLINE = "All your chats, one OpenClaw.";
+const DEFAULT_TAGLINE = "AI orchestration daemon — by NoxSoft";
 
 const HOLIDAY_TAGLINES = {
   newYear:
@@ -66,7 +66,7 @@ const TAGLINES: string[] = [
   "Because texting yourself reminders is so 2024.",
   "Your inbox, your infra, your rules.",
   'Turning "I\'ll reply later" into "my bot replied instantly".',
-  "The only crab in your contacts you actually want to hear from. 🦞",
+  "The only daemon in your contacts you actually want to hear from. ✦",
   "Chat automation for people who peaked at IRC.",
   "Because Siri wasn't answering at 3AM.",
   "IPC, but it's your phone.",
