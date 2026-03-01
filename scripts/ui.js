@@ -126,9 +126,8 @@ if (action === "install") {
   run(runner.cmd, ["install", ...rest]);
 } else {
   if (!depsInstalled(action === "test" ? "test" : "build")) {
-    const installEnv =
-      action === "build" ? { ...process.env, NODE_ENV: "production" } : process.env;
-    const installArgs = action === "build" ? ["install", "--prod"] : ["install"];
+    const installEnv = process.env;
+    const installArgs = ["install"];
     runSync(runner.cmd, installArgs, installEnv);
   }
   run(runner.cmd, ["run", script, ...rest]);
