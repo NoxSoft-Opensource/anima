@@ -232,7 +232,7 @@ export async function maybeRepairSandboxImages(
   }
 
   if (changes.length > 0) {
-    note(changes.join("\n"), "Doctor changes");
+    note(changes.join("\n"), "ANIMA changes");
   }
 
   return next;

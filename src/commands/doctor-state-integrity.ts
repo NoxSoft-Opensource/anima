@@ -373,7 +373,7 @@ export async function noteStateIntegrity(
     note(warnings.join("\n"), "State integrity");
   }
   if (changes.length > 0) {
-    note(changes.join("\n"), "Doctor changes");
+    note(changes.join("\n"), "ANIMA changes");
   }
 }
 
@@ -389,7 +389,7 @@ export function noteWorkspaceBackupTip(workspaceDir: string) {
     [
       "- Tip: back up the workspace in a private git repo (GitHub or GitLab).",
       "- Keep ~/.anima out of git; it contains credentials and session history.",
-      "- Details: /concepts/agent-workspace#git-backup-recommended",
+      "- Details: https://docs.noxsoft.net/anima/concepts/agent-workspace#git-backup-recommended",
     ].join("\n"),
     "Workspace",
   );

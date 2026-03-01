@@ -393,7 +393,7 @@ export async function statusCommand(
     },
   ];
 
-  runtime.log(theme.heading("Anima status"));
+  runtime.log(theme.heading("ANIMA status"));
   runtime.log("");
   runtime.log(theme.heading("Overview"));
   runtime.log(

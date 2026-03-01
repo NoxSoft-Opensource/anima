@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
-import "./test-helpers/fast-core-tools.js";
 import { createAnimaTools } from "./anima-tools.js";
+import "./test-helpers/fast-core-tools.js";
+import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
 import { resetSubagentRegistryForTests } from "./subagent-registry.js";
 
 type SessionsSpawnTestConfig = ReturnType<(typeof import("../config/config.js"))["loadConfig"]>;

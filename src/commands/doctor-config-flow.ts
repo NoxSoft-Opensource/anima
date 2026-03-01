@@ -464,15 +464,15 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
   const shouldRepair = params.options.repair === true || params.options.yes === true;
   const stateDirResult = await autoMigrateLegacyStateDir({ env: process.env });
   if (stateDirResult.changes.length > 0) {
-    note(stateDirResult.changes.map((entry) => `- ${entry}`).join("\n"), "Doctor changes");
+    note(stateDirResult.changes.map((entry) => `- ${entry}`).join("\n"), "ANIMA changes");
   }
   if (stateDirResult.warnings.length > 0) {
-    note(stateDirResult.warnings.map((entry) => `- ${entry}`).join("\n"), "Doctor warnings");
+    note(stateDirResult.warnings.map((entry) => `- ${entry}`).join("\n"), "ANIMA warnings");
   }
 
   const legacyConfigChanges = await maybeMigrateLegacyConfig();
   if (legacyConfigChanges.length > 0) {
-    note(legacyConfigChanges.map((entry) => `- ${entry}`).join("\n"), "Doctor changes");
+    note(legacyConfigChanges.map((entry) => `- ${entry}`).join("\n"), "ANIMA changes");
   }
 
   let snapshot = await readConfigFileSnapshot();
@@ -498,7 +498,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
     );
     const { config: migrated, changes } = migrateLegacyConfig(snapshot.parsed);
     if (changes.length > 0) {
-      note(changes.join("\n"), "Doctor changes");
+      note(changes.join("\n"), "ANIMA changes");
     }
     if (migrated) {
       candidate = migrated;
@@ -510,15 +510,13 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
         cfg = migrated;
       }
     } else {
-      fixHints.push(
-        `Run "${formatCliCommand("anima doctor --fix")}" to apply legacy migrations.`,
-      );
+      fixHints.push(`Run "${formatCliCommand("anima doctor --fix")}" to apply legacy migrations.`);
     }
   }
 
   const normalized = normalizeLegacyConfigValues(candidate);
   if (normalized.changes.length > 0) {
-    note(normalized.changes.join("\n"), "Doctor changes");
+    note(normalized.changes.join("\n"), "ANIMA changes");
     candidate = normalized.config;
     pendingChanges = true;
     if (shouldRepair) {
@@ -530,7 +528,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
 
   const autoEnable = applyPluginAutoEnable({ config: candidate, env: process.env });
   if (autoEnable.changes.length > 0) {
-    note(autoEnable.changes.join("\n"), "Doctor changes");
+    note(autoEnable.changes.join("\n"), "ANIMA changes");
     candidate = autoEnable.config;
     pendingChanges = true;
     if (shouldRepair) {
@@ -543,7 +541,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
   if (shouldRepair) {
     const repair = await maybeRepairTelegramAllowFromUsernames(candidate);
     if (repair.changes.length > 0) {
-      note(repair.changes.join("\n"), "Doctor changes");
+      note(repair.changes.join("\n"), "ANIMA changes");
       candidate = repair.config;
       pendingChanges = true;
       cfg = repair.config;
@@ -556,7 +554,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
           `- Telegram allowFrom contains ${hits.length} non-numeric entries (e.g. ${hits[0]?.entry ?? "@"}); Telegram authorization requires numeric sender IDs.`,
           `- Run "${formatCliCommand("anima doctor --fix")}" to auto-resolve @username entries to numeric IDs (requires a Telegram bot token).`,
         ].join("\n"),
-        "Doctor warnings",
+        "ANIMA warnings",
       );
     }
   }
@@ -568,7 +566,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
     pendingChanges = true;
     if (shouldRepair) {
       cfg = unknown.config;
-      note(lines, "Doctor changes");
+      note(lines, "ANIMA changes");
     } else {
       note(lines, "Unknown config keys");
       fixHints.push('Run "anima doctor --fix" to remove these keys.');
@@ -584,7 +582,7 @@ export async function loadAndMaybeMigrateDoctorConfig(params: {
       cfg = candidate;
       shouldWriteConfig = true;
     } else if (fixHints.length > 0) {
-      note(fixHints.join("\n"), "Doctor");
+      note(fixHints.join("\n"), "ANIMA");
     }
   }
 

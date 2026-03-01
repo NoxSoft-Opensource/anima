@@ -262,7 +262,7 @@ export async function maybeScanExtraGatewayServices(
         note(failed.map((line) => `- ${line}`).join("\n"), "Legacy gateway cleanup skipped");
       }
       if (removed.length > 0) {
-        runtime.log("Legacy gateway services removed. Installing Anima gateway next.");
+        runtime.log("Legacy gateway services removed. Installing ANIMA gateway next.");
       }
     }
   }
@@ -276,7 +276,7 @@ export async function maybeScanExtraGatewayServices(
     [
       "Recommendation: run a single gateway per machine for most setups.",
       "One gateway supports multiple agents.",
-      "If you need multiple gateways (e.g., a rescue bot on the same host), isolate ports + config/state (see docs: /gateway#multiple-gateways-same-host).",
+      "If you need multiple gateways (e.g., a rescue bot on the same host), isolate ports + config/state (see docs: https://docs.noxsoft.net/anima/gateway#multiple-gateways-same-host).",
     ].join("\n"),
     "Gateway recommendation",
   );

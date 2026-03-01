@@ -45,7 +45,7 @@ export async function maybeOfferUpdateBeforeDoctor(params: {
   const git = await detectAnimaGitCheckout(params.root);
   if (git === "git") {
     const shouldUpdate = await params.confirm({
-      message: "Update Anima from git before running doctor?",
+      message: "Update ANIMA from git before running diagnostics?",
       initialValue: true,
     });
     if (!shouldUpdate) {
@@ -68,7 +68,7 @@ export async function maybeOfferUpdateBeforeDoctor(params: {
       "Update result",
     );
     if (result.status === "ok") {
-      params.outro("Update completed (doctor already ran as part of the update).");
+      params.outro("Update completed (ANIMA diagnostics already ran as part of the update).");
       return { updated: true, handled: true };
     }
     return { updated: true, handled: false };
@@ -78,7 +78,7 @@ export async function maybeOfferUpdateBeforeDoctor(params: {
     note(
       [
         "This install is not a git checkout.",
-        `Run \`${formatCliCommand("anima update")}\` to update via your package manager (npm/pnpm), then rerun doctor.`,
+        `Run \`${formatCliCommand("anima update")}\` to update via your package manager (npm/pnpm), then rerun diagnostics.`,
       ].join("\n"),
       "Update",
     );

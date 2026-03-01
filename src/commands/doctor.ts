@@ -69,7 +69,7 @@ export async function doctorCommand(
 ) {
   const prompter = createDoctorPrompter({ runtime, options });
   printWizardHeader(runtime);
-  intro("Anima doctor");
+  intro("ANIMA diagnostics");
 
   const root = await resolveAnimaPackageRoot({
     moduleUrl: import.meta.url,
@@ -175,10 +175,10 @@ export async function doctorCommand(
         detected: legacyState,
       });
       if (migrated.changes.length > 0) {
-        note(migrated.changes.join("\n"), "Doctor changes");
+        note(migrated.changes.join("\n"), "ANIMA changes");
       }
       if (migrated.warnings.length > 0) {
-        note(migrated.warnings.join("\n"), "Doctor warnings");
+        note(migrated.warnings.join("\n"), "ANIMA warnings");
       }
     }
   }
@@ -311,5 +311,5 @@ export async function doctorCommand(
     }
   }
 
-  outro("Doctor complete.");
+  outro("ANIMA diagnostics complete.");
 }
