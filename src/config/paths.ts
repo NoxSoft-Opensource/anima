@@ -12,46 +12,25 @@ import { expandHomePrefix, resolveRequiredHomeDir } from "../infra/home-dir.js";
  * - Config is managed externally (read-only from Nix perspective)
  */
 export function resolveIsNixMode(env: NodeJS.ProcessEnv = process.env): boolean {
-  return (env.ANIMA_NIX_MODE ?? env.OPENCLAW_NIX_MODE) /* legacy fallback */ === "1";
+  return env.ANIMA_NIX_MODE === "1";
 }
 
 export const isNixMode = resolveIsNixMode();
 
-// Support historical legacy state dirs.
-// .openclaw is the immediate predecessor of .anima; older dirs kept for migration.
-const LEGACY_STATE_DIRNAMES = [".openclaw", ".clawdbot", ".moldbot", ".moltbot"] as const;
 const NEW_STATE_DIRNAME = ".anima";
 const CONFIG_FILENAME = "anima.json";
-const LEGACY_CONFIG_FILENAMES = [
-  "openclaw.json",
-  "clawdbot.json",
-  "moldbot.json",
-  "moltbot.json",
-] as const;
 
 function resolveDefaultHomeDir(): string {
   return resolveRequiredHomeDir(process.env, os.homedir);
 }
 
-/** Build a homedir thunk that respects ANIMA_HOME (or legacy OPENCLAW_HOME) for the given env. */
+/** Build a homedir thunk that respects ANIMA_HOME for the given env. */
 function envHomedir(env: NodeJS.ProcessEnv): () => string {
   return () => resolveRequiredHomeDir(env, os.homedir);
 }
 
-function legacyStateDirs(homedir: () => string = resolveDefaultHomeDir): string[] {
-  return LEGACY_STATE_DIRNAMES.map((dir) => path.join(homedir(), dir));
-}
-
 function newStateDir(homedir: () => string = resolveDefaultHomeDir): string {
   return path.join(homedir(), NEW_STATE_DIRNAME);
-}
-
-export function resolveLegacyStateDir(homedir: () => string = resolveDefaultHomeDir): string {
-  return legacyStateDirs(homedir)[0] ?? newStateDir(homedir);
-}
-
-export function resolveLegacyStateDirs(homedir: () => string = resolveDefaultHomeDir): string[] {
-  return legacyStateDirs(homedir);
 }
 
 export function resolveNewStateDir(homedir: () => string = resolveDefaultHomeDir): string {
@@ -60,7 +39,7 @@ export function resolveNewStateDir(homedir: () => string = resolveDefaultHomeDir
 
 /**
  * State directory for mutable data (sessions, logs, caches).
- * Can be overridden via ANIMA_STATE_DIR (or legacy OPENCLAW_STATE_DIR).
+ * Can be overridden via ANIMA_STATE_DIR.
  * Default: ~/.anima
  */
 export function resolveStateDir(
@@ -68,28 +47,11 @@ export function resolveStateDir(
   homedir: () => string = envHomedir(env),
 ): string {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
-  const override =
-    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
+  const override = env.ANIMA_STATE_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, effectiveHomedir);
   }
-  const newDir = newStateDir(effectiveHomedir);
-  const legacyDirs = legacyStateDirs(effectiveHomedir);
-  const hasNew = fs.existsSync(newDir);
-  if (hasNew) {
-    return newDir;
-  }
-  const existingLegacy = legacyDirs.find((dir) => {
-    try {
-      return fs.existsSync(dir);
-    } catch {
-      return false;
-    }
-  });
-  if (existingLegacy) {
-    return existingLegacy;
-  }
-  return newDir;
+  return newStateDir(effectiveHomedir);
 }
 
 function resolveUserPath(
@@ -116,15 +78,14 @@ export const STATE_DIR = resolveStateDir();
 
 /**
  * Config file path (JSON5).
- * Can be overridden via ANIMA_CONFIG_PATH (or legacy OPENCLAW_CONFIG_PATH).
+ * Can be overridden via ANIMA_CONFIG_PATH.
  * Default: ~/.anima/anima.json (or $ANIMA_STATE_DIR/anima.json)
  */
 export function resolveCanonicalConfigPath(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override =
-    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
+  const override = env.ANIMA_CONFIG_PATH?.trim();
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -161,35 +122,27 @@ export function resolveConfigPath(
   stateDir: string = resolveStateDir(env, envHomedir(env)),
   homedir: () => string = envHomedir(env),
 ): string {
-  const override =
-    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
+  const override = env.ANIMA_CONFIG_PATH?.trim();
   if (override) {
     return resolveUserPath(override, env, homedir);
   }
-  const stateOverride =
-    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
-  const candidates = [
-    path.join(stateDir, CONFIG_FILENAME),
-    ...LEGACY_CONFIG_FILENAMES.map((name) => path.join(stateDir, name)),
-  ];
-  const existing = candidates.find((candidate) => {
-    try {
-      return fs.existsSync(candidate);
-    } catch {
-      return false;
+  const stateOverride = env.ANIMA_STATE_DIR?.trim();
+  const configPath = path.join(stateDir, CONFIG_FILENAME);
+  try {
+    if (fs.existsSync(configPath)) {
+      return configPath;
     }
-  });
-  if (existing) {
-    return existing;
+  } catch {
+    // ignore
   }
   if (stateOverride) {
-    return path.join(stateDir, CONFIG_FILENAME);
+    return configPath;
   }
   const defaultStateDir = resolveStateDir(env, homedir);
   if (path.resolve(stateDir) === path.resolve(defaultStateDir)) {
     return resolveConfigPathCandidate(env, homedir);
   }
-  return path.join(stateDir, CONFIG_FILENAME);
+  return configPath;
 }
 
 export const CONFIG_PATH = resolveConfigPathCandidate();
@@ -203,26 +156,19 @@ export function resolveDefaultConfigCandidates(
   homedir: () => string = envHomedir(env),
 ): string[] {
   const effectiveHomedir = () => resolveRequiredHomeDir(env, homedir);
-  const explicit =
-    env.ANIMA_CONFIG_PATH?.trim() || env.OPENCLAW_CONFIG_PATH?.trim() /* legacy fallback */;
+  const explicit = env.ANIMA_CONFIG_PATH?.trim();
   if (explicit) {
     return [resolveUserPath(explicit, env, effectiveHomedir)];
   }
 
   const candidates: string[] = [];
-  const legacyStateDir =
-    env.ANIMA_STATE_DIR?.trim() || env.OPENCLAW_STATE_DIR?.trim() /* legacy fallback */;
-  if (legacyStateDir) {
-    const resolved = resolveUserPath(legacyStateDir, env, effectiveHomedir);
+  const stateDirOverride = env.ANIMA_STATE_DIR?.trim();
+  if (stateDirOverride) {
+    const resolved = resolveUserPath(stateDirOverride, env, effectiveHomedir);
     candidates.push(path.join(resolved, CONFIG_FILENAME));
-    candidates.push(...LEGACY_CONFIG_FILENAMES.map((name) => path.join(resolved, name)));
   }
 
-  const defaultDirs = [newStateDir(effectiveHomedir), ...legacyStateDirs(effectiveHomedir)];
-  for (const dir of defaultDirs) {
-    candidates.push(path.join(dir, CONFIG_FILENAME));
-    candidates.push(...LEGACY_CONFIG_FILENAMES.map((name) => path.join(dir, name)));
-  }
+  candidates.push(path.join(newStateDir(effectiveHomedir), CONFIG_FILENAME));
   return candidates;
 }
 
@@ -245,15 +191,14 @@ const OAUTH_FILENAME = "oauth.json";
  * OAuth credentials storage directory.
  *
  * Precedence:
- * - `ANIMA_OAUTH_DIR` (explicit override, or legacy `OPENCLAW_OAUTH_DIR`)
+ * - `ANIMA_OAUTH_DIR` (explicit override)
  * - `$*_STATE_DIR/credentials` (canonical server/default)
  */
 export function resolveOAuthDir(
   env: NodeJS.ProcessEnv = process.env,
   stateDir: string = resolveStateDir(env, envHomedir(env)),
 ): string {
-  const override =
-    env.ANIMA_OAUTH_DIR?.trim() || env.OPENCLAW_OAUTH_DIR?.trim() /* legacy fallback */;
+  const override = env.ANIMA_OAUTH_DIR?.trim();
   if (override) {
     return resolveUserPath(override, env, envHomedir(env));
   }
@@ -271,8 +216,7 @@ export function resolveGatewayPort(
   cfg?: AnimaConfig,
   env: NodeJS.ProcessEnv = process.env,
 ): number {
-  const envRaw =
-    env.ANIMA_GATEWAY_PORT?.trim() || env.OPENCLAW_GATEWAY_PORT?.trim() /* legacy fallback */;
+  const envRaw = env.ANIMA_GATEWAY_PORT?.trim();
   if (envRaw) {
     const parsed = Number.parseInt(envRaw, 10);
     if (Number.isFinite(parsed) && parsed > 0) {
