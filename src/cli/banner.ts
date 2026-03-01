@@ -1,4 +1,3 @@
-// ANIMA is a fork of OpenClaw (https://openclaw.ai). Original work © OpenClaw contributors.
 import { resolveCommitHash } from "../infra/git-commit.js";
 import { visibleWidth } from "../terminal/ansi.js";
 import { isRich, theme } from "../terminal/theme.js";
@@ -40,8 +39,8 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   const commitLabel = commit ?? "unknown";
   const tagline = pickTagline(options);
   const rich = options.richTty ?? isRich();
-  const title = "✦ ANIMA";
-  const prefix = "✦ ";
+  const title = "ANIMA";
+  const prefix = "  ";
   const columns = options.columns ?? process.stdout.columns ?? 120;
   const plainFullLine = `${title} ${version} (${commitLabel}) — ${tagline}`;
   const fitsOnOneLine = visibleWidth(plainFullLine) <= columns;
@@ -65,43 +64,48 @@ export function formatCliBannerLine(version: string, options: BannerOptions = {}
   return `${line1}\n${line2}`;
 }
 
-const LOBSTER_ASCII = [
-  "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
-  "██░▄▄▀██░▀██░██░▄▄▄██░▄▀▄░██░▄▄▀██",
-  "██░▀▀░██░█░█░██░▄▄▄██░█░█░██░▀▀░██",
-  "██░██░██░██▄░██░▀▀▀██░███░██░██░██",
-  "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-  "                  ✦ ANIMA ✦                    ",
-  " ",
+const ANIMA_ASCII = [
+  "                                            ",
+  "   ▄▄▄   ▄▄    ▄ ▄▄▄ ▄▄   ▄▄  ▄▄▄         ",
+  "  █   █ █  █   █  █  █ ▀█▄█▀  █   █        ",
+  "  █▄▄▄█ █  █▄  █  █  █  █ █   █▄▄▄█        ",
+  "  █   █ █   █▄ █  █  █  █ █   █   █        ",
+  "  █   █ █    ██▀ ▄█▄ █  █ █   █   █        ",
+  "                                            ",
+  "          ╌╌ by NoxSoft ╌╌                  ",
+  "                                            ",
 ];
 
 export function formatCliBannerArt(options: BannerOptions = {}): string {
   const rich = options.richTty ?? isRich();
   if (!rich) {
-    return LOBSTER_ASCII.join("\n");
+    return ANIMA_ASCII.join("\n");
   }
 
   const colorChar = (ch: string) => {
     if (ch === "█") {
       return theme.accentBright(ch);
     }
-    if (ch === "░") {
-      return theme.accentDim(ch);
-    }
-    if (ch === "▀") {
+    if (ch === "▄" || ch === "▀") {
       return theme.accent(ch);
+    }
+    if (ch === "╌") {
+      return theme.muted(ch);
     }
     return theme.muted(ch);
   };
 
-  const colored = LOBSTER_ASCII.map((line) => {
-    if (line.includes("ANIMA")) {
+  const colored = ANIMA_ASCII.map((line) => {
+    if (line.includes("NoxSoft")) {
       return (
-        theme.muted("              ") +
-        theme.accent("✦") +
-        theme.info(" ANIMA ") +
-        theme.accent("✦")
+        theme.muted("          ╌╌ ") +
+        theme.info("by ") +
+        theme.accent("NoxSoft") +
+        theme.muted(" ╌╌")
       );
+    }
+    if (line.includes("ANIMA") && !line.includes("█")) {
+      return theme.heading(line);
     }
     return splitGraphemes(line).map(colorChar).join("");
   });
