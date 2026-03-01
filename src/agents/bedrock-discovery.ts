@@ -1,8 +1,3 @@
-import {
-  BedrockClient,
-  ListFoundationModelsCommand,
-  type ListFoundationModelsCommandOutput,
-} from "@aws-sdk/client-bedrock";
 import type { BedrockDiscoveryConfig, ModelDefinitionConfig } from "../config/types.js";
 
 const DEFAULT_REFRESH_INTERVAL_SECONDS = 3600;
@@ -15,7 +10,16 @@ const DEFAULT_COST = {
   cacheWrite: 0,
 };
 
-type BedrockModelSummary = NonNullable<ListFoundationModelsCommandOutput["modelSummaries"]>[number];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- lazy-loaded SDK types
+type BedrockModelSummary = {
+  modelId?: string;
+  modelName?: string;
+  providerName?: string;
+  inputModalities?: string[];
+  outputModalities?: string[];
+  responseStreamingSupported?: boolean;
+  modelLifecycle?: { status?: string };
+};
 
 type BedrockDiscoveryCacheEntry = {
   expiresAt: number;
@@ -25,6 +29,19 @@ type BedrockDiscoveryCacheEntry = {
 
 const discoveryCache = new Map<string, BedrockDiscoveryCacheEntry>();
 let hasLoggedBedrockError = false;
+
+/**
+ * Lazily load `@aws-sdk/client-bedrock`. Returns null if the package is not
+ * installed, allowing ANIMA to start without the AWS SDK when Bedrock is not
+ * being used.
+ */
+async function loadBedrockSdk(): Promise<typeof import("@aws-sdk/client-bedrock") | null> {
+  try {
+    return await import("@aws-sdk/client-bedrock");
+  } catch {
+    return null;
+  }
+}
 
 function normalizeProviderFilter(filter?: string[]): string[] {
   if (!filter || filter.length === 0) {
@@ -146,7 +163,8 @@ export async function discoverBedrockModels(params: {
   region: string;
   config?: BedrockDiscoveryConfig;
   now?: () => number;
-  clientFactory?: (region: string) => BedrockClient;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- accepts BedrockClient without requiring the SDK at import time
+  clientFactory?: (region: string) => any;
 }): Promise<ModelDefinitionConfig[]> {
   const refreshIntervalSeconds = Math.max(
     0,
@@ -174,13 +192,49 @@ export async function discoverBedrockModels(params: {
     }
   }
 
-  const clientFactory = params.clientFactory ?? ((region: string) => new BedrockClient({ region }));
+  let clientFactory = params.clientFactory;
+  let ListFoundationModelsCommandCtor: (new (input: Record<string, unknown>) => unknown) | null =
+    null;
+
+  if (!clientFactory) {
+    const sdk = await loadBedrockSdk();
+    if (!sdk) {
+      if (!hasLoggedBedrockError) {
+        hasLoggedBedrockError = true;
+        console.warn(
+          "[bedrock-discovery] @aws-sdk/client-bedrock is not installed — skipping Bedrock model discovery",
+        );
+      }
+      return [];
+    }
+    clientFactory = (region: string) => new sdk.BedrockClient({ region });
+    ListFoundationModelsCommandCtor = sdk.ListFoundationModelsCommand;
+  }
+
+  // If a custom clientFactory is provided but we still need the Command class,
+  // load the SDK. If it fails, fall back gracefully.
+  if (!ListFoundationModelsCommandCtor) {
+    const sdk = await loadBedrockSdk();
+    if (!sdk) {
+      if (!hasLoggedBedrockError) {
+        hasLoggedBedrockError = true;
+        console.warn(
+          "[bedrock-discovery] @aws-sdk/client-bedrock is not installed — skipping Bedrock model discovery",
+        );
+      }
+      return [];
+    }
+    ListFoundationModelsCommandCtor = sdk.ListFoundationModelsCommand;
+  }
+
   const client = clientFactory(params.region);
+  const CommandCtor = ListFoundationModelsCommandCtor;
 
   const discoveryPromise = (async () => {
-    const response = await client.send(new ListFoundationModelsCommand({}));
+    const response = await client.send(new CommandCtor({}));
     const discovered: ModelDefinitionConfig[] = [];
-    for (const summary of response.modelSummaries ?? []) {
+    for (const summary of (response as { modelSummaries?: BedrockModelSummary[] }).modelSummaries ??
+      []) {
       if (!shouldIncludeSummary(summary, providerFilter)) {
         continue;
       }
