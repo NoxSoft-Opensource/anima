@@ -177,7 +177,7 @@ export async function agentsAddCommand(
 
   const prompter = createClackPrompter();
   try {
-    await prompter.intro("Add Anima agent");
+    await prompter.intro("Add a new Anima agent to your NoxSoft deployment");
     const name =
       nameInput ??
       (await prompter.text({
@@ -333,7 +333,7 @@ export async function agentsAddCommand(
         await prompter.note(
           [
             "Routing unchanged. Add bindings when you're ready.",
-            "Docs: https://docs.noxsoft.net/anima/concepts/multi-agent",
+            "Multi-agent docs: https://docs.noxsoft.net/anima/concepts/multi-agent",
           ].join("\n"),
           "Routing",
         );

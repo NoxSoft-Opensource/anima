@@ -717,10 +717,10 @@ export function createWebSearchTool(options?: {
 
   const description =
     provider === "perplexity"
-      ? "Search the web using Perplexity Sonar (direct or via OpenRouter). Returns AI-synthesized answers with citations from real-time web search."
+      ? "Search the web via Perplexity Sonar. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your Anima config."
       : provider === "grok"
-        ? "Search the web using xAI Grok. Returns AI-synthesized answers with citations from real-time web search."
-        : "Search the web using Brave Search API. Supports region-specific and localized search via country and language parameters. Returns titles, URLs, and snippets for fast research.";
+        ? "Search the web via xAI Grok. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your Anima config."
+        : "Search the web via Brave Search. Supports region, language, and freshness filters. Returns titles, URLs, and snippets for rapid research.";
 
   return {
     label: "Web Search",

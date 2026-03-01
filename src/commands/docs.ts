@@ -162,10 +162,10 @@ export async function docsSearchCommand(queryParts: string[], runtime: RuntimeEn
   if (!query) {
     const docs = formatDocsLink("/", "docs.noxsoft.net/anima");
     if (isRich()) {
-      runtime.log(`${theme.muted("Docs:")} ${docs}`);
+      runtime.log(`${theme.muted("NoxSoft Anima docs:")} ${docs}`);
       runtime.log(`${theme.muted("Search:")} ${formatCliCommand('anima docs "your query"')}`);
     } else {
-      runtime.log("Docs: https://docs.noxsoft.net/anima/");
+      runtime.log("NoxSoft Anima docs: https://docs.noxsoft.net/anima/");
       runtime.log(`Search: ${formatCliCommand('anima docs "your query"')}`);
     }
     return;
