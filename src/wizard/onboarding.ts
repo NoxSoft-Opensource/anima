@@ -1,14 +1,8 @@
-import type {
-  GatewayAuthChoice,
-  OnboardMode,
-  OnboardOptions,
-  ResetScope,
-} from "../commands/onboard-types.js";
+import type { GatewayAuthChoice, OnboardMode, OnboardOptions } from "../commands/onboard-types.js";
 import type { AnimaConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { QuickstartGatewayDefaults, WizardFlow } from "./onboarding.types.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
-import { listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { promptAuthChoiceGrouped } from "../commands/auth-choice-prompt.js";
 import {
@@ -17,26 +11,16 @@ import {
   warnIfModelConfigLooksOff,
 } from "../commands/auth-choice.js";
 import { applyPrimaryModel, promptDefaultModel } from "../commands/model-picker.js";
-import { setupChannels } from "../commands/onboard-channels.js";
 import { promptCustomApiConfig } from "../commands/onboard-custom.js";
 import {
   applyWizardMetadata,
   DEFAULT_WORKSPACE,
   ensureWorkspaceAndSessions,
-  handleReset,
   printWizardHeader,
-  probeGatewayReachable,
   summarizeExistingConfig,
 } from "../commands/onboard-helpers.js";
 import { setupInternalHooks } from "../commands/onboard-hooks.js";
-import { promptRemoteGatewayConfig } from "../commands/onboard-remote.js";
-import { setupSkills } from "../commands/onboard-skills.js";
-import {
-  DEFAULT_GATEWAY_PORT,
-  readConfigFileSnapshot,
-  resolveGatewayPort,
-  writeConfigFile,
-} from "../config/config.js";
+import { readConfigFileSnapshot, resolveGatewayPort, writeConfigFile } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
 import { defaultRuntime } from "../runtime.js";
 import { resolveUserPath } from "../utils.js";
@@ -54,32 +38,15 @@ async function requireRiskAcknowledgement(params: {
 
   await params.prompter.note(
     [
-      "Security warning — please read.",
-      "",
-      "Anima is a hobby project and still in beta. Expect sharp edges.",
-      "This bot can read files and run actions if tools are enabled.",
-      "A bad prompt can trick it into doing unsafe things.",
-      "",
-      "If you’re not comfortable with basic security and access control, don’t run Anima.",
-      "Ask someone experienced to help before enabling tools or exposing it to the internet.",
-      "",
-      "Recommended baseline:",
-      "- Pairing/allowlists + mention gating.",
-      "- Sandbox + least-privilege tools.",
-      "- Keep secrets out of the agent’s reachable filesystem.",
-      "- Use the strongest available model for any bot with tools or untrusted inboxes.",
-      "",
-      "Run regularly:",
-      "anima security audit --deep",
-      "anima security audit --fix",
-      "",
-      "Must read: https://docs.anima.ai/gateway/security",
+      "ANIMA runs AI agents with tool access on your machine.",
+      "Misconfigured agents can execute unsafe actions.",
+      "Use allowlists, sandboxing, and least-privilege tools.",
     ].join("\n"),
     "Security",
   );
 
   const ok = await params.prompter.confirm({
-    message: "I understand this is powerful and inherently risky. Continue?",
+    message: "I understand the risks. Continue?",
     initialValue: false,
   });
   if (!ok) {
@@ -93,99 +60,109 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   printWizardHeader(runtime);
-  await prompter.intro("Anima onboarding");
+  await prompter.intro("ANIMA Setup");
   await requireRiskAcknowledgement({ opts, prompter });
 
+  // --- Step 1: Load existing config (merge, never prompt) ---
   const snapshot = await readConfigFileSnapshot();
-  let baseConfig: AnimaConfig = snapshot.valid ? snapshot.config : {};
+  const baseConfig: AnimaConfig = snapshot.valid ? snapshot.config : {};
 
   if (snapshot.exists && !snapshot.valid) {
     await prompter.note(summarizeExistingConfig(baseConfig), "Invalid config");
     if (snapshot.issues.length > 0) {
       await prompter.note(
-        [
-          ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
-          "",
-          "Docs: https://docs.anima.ai/gateway/configuration",
-        ].join("\n"),
+        snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`).join("\n"),
         "Config issues",
       );
     }
     await prompter.outro(
-      `Config invalid. Run \`${formatCliCommand("anima doctor")}\` to repair it, then re-run onboarding.`,
+      `Config invalid. Run \`${formatCliCommand("anima doctor")}\` to repair it, then re-run setup.`,
     );
     runtime.exit(1);
     return;
   }
 
-  const quickstartHint = `Configure details later via ${formatCliCommand("anima configure")}.`;
-  const manualHint = "Configure port, network, Tailscale, and auth options.";
-  const explicitFlowRaw = opts.flow?.trim();
-  const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
-  if (
-    normalizedExplicitFlow &&
-    normalizedExplicitFlow !== "quickstart" &&
-    normalizedExplicitFlow !== "advanced"
-  ) {
-    runtime.error("Invalid --flow (use quickstart, manual, or advanced).");
-    runtime.exit(1);
-    return;
-  }
-  const explicitFlow: WizardFlow | undefined =
-    normalizedExplicitFlow === "quickstart" || normalizedExplicitFlow === "advanced"
-      ? normalizedExplicitFlow
-      : undefined;
-  let flow: WizardFlow =
-    explicitFlow ??
-    (await prompter.select({
-      message: "Onboarding mode",
-      options: [
-        { value: "quickstart", label: "QuickStart", hint: quickstartHint },
-        { value: "advanced", label: "Manual", hint: manualHint },
-      ],
-      initialValue: "quickstart",
+  // Always quickstart, always local
+  const flow: WizardFlow = "quickstart";
+  const mode: OnboardMode = "local";
+
+  // Use default workspace (or existing config value)
+  const workspaceDir = resolveUserPath(
+    opts.workspace?.trim() || baseConfig.agents?.defaults?.workspace || DEFAULT_WORKSPACE,
+  );
+
+  let nextConfig: AnimaConfig = {
+    ...baseConfig,
+    agents: {
+      ...baseConfig.agents,
+      defaults: {
+        ...baseConfig.agents?.defaults,
+        workspace: workspaceDir,
+      },
+    },
+    gateway: {
+      ...baseConfig.gateway,
+      mode: "local",
+    },
+  };
+
+  // --- Step 2: Auth provider selection ---
+  const authStore = ensureAuthProfileStore(undefined, {
+    allowKeychainPrompt: false,
+  });
+  const authChoiceFromPrompt = opts.authChoice === undefined;
+  const authChoice =
+    opts.authChoice ??
+    (await promptAuthChoiceGrouped({
+      prompter,
+      store: authStore,
+      includeSkip: true,
     }));
 
-  if (opts.mode === "remote" && flow === "quickstart") {
-    await prompter.note(
-      "QuickStart only supports local gateways. Switching to Manual mode.",
-      "QuickStart",
-    );
-    flow = "advanced";
+  if (authChoice === "custom-api-key") {
+    const customResult = await promptCustomApiConfig({
+      prompter,
+      runtime,
+      config: nextConfig,
+    });
+    nextConfig = customResult.config;
+  } else {
+    const authResult = await applyAuthChoice({
+      authChoice,
+      config: nextConfig,
+      prompter,
+      runtime,
+      setDefaultModel: true,
+      opts: {
+        tokenProvider: opts.tokenProvider,
+        token: opts.authChoice === "apiKey" && opts.token ? opts.token : undefined,
+      },
+    });
+    nextConfig = authResult.config;
   }
 
-  if (snapshot.exists) {
-    await prompter.note(summarizeExistingConfig(baseConfig), "Existing config detected");
-
-    const action = await prompter.select({
-      message: "Config handling",
-      options: [
-        { value: "keep", label: "Use existing values" },
-        { value: "modify", label: "Update values" },
-        { value: "reset", label: "Reset" },
-      ],
+  // --- Step 3: Model selection ---
+  if (authChoiceFromPrompt && authChoice !== "custom-api-key") {
+    const modelSelection = await promptDefaultModel({
+      config: nextConfig,
+      prompter,
+      allowKeep: true,
+      ignoreAllowlist: true,
+      includeVllm: true,
+      preferredProvider: resolvePreferredProviderForAuthChoice(authChoice),
     });
-
-    if (action === "reset") {
-      const workspaceDefault = baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE;
-      const resetScope = (await prompter.select({
-        message: "Reset scope",
-        options: [
-          { value: "config", label: "Config only" },
-          {
-            value: "config+creds+sessions",
-            label: "Config + creds + sessions",
-          },
-          {
-            value: "full",
-            label: "Full reset (config + creds + sessions + workspace)",
-          },
-        ],
-      })) as ResetScope;
-      await handleReset(resetScope, resolveUserPath(workspaceDefault), runtime);
-      baseConfig = {};
+    if (modelSelection.config) {
+      nextConfig = modelSelection.config;
+    }
+    if (modelSelection.model) {
+      nextConfig = applyPrimaryModel(nextConfig, modelSelection.model);
     }
   }
+
+  await warnIfModelConfigLooksOff(nextConfig, prompter);
+
+  // --- Step 4: Auto-configure gateway with quickstart defaults ---
+  const localPort = resolveGatewayPort(baseConfig);
 
   const quickstartGateway: QuickstartGatewayDefaults = (() => {
     const hasExisting =
@@ -238,188 +215,6 @@ export async function runOnboardingWizard(
     };
   })();
 
-  if (flow === "quickstart") {
-    const formatBind = (value: "loopback" | "lan" | "auto" | "custom" | "tailnet") => {
-      if (value === "loopback") {
-        return "Loopback (127.0.0.1)";
-      }
-      if (value === "lan") {
-        return "LAN";
-      }
-      if (value === "custom") {
-        return "Custom IP";
-      }
-      if (value === "tailnet") {
-        return "Tailnet (Tailscale IP)";
-      }
-      return "Auto";
-    };
-    const formatAuth = (value: GatewayAuthChoice) => {
-      if (value === "token") {
-        return "Token (default)";
-      }
-      return "Password";
-    };
-    const formatTailscale = (value: "off" | "serve" | "funnel") => {
-      if (value === "off") {
-        return "Off";
-      }
-      if (value === "serve") {
-        return "Serve";
-      }
-      return "Funnel";
-    };
-    const quickstartLines = quickstartGateway.hasExisting
-      ? [
-          "Keeping your current gateway settings:",
-          `Gateway port: ${quickstartGateway.port}`,
-          `Gateway bind: ${formatBind(quickstartGateway.bind)}`,
-          ...(quickstartGateway.bind === "custom" && quickstartGateway.customBindHost
-            ? [`Gateway custom IP: ${quickstartGateway.customBindHost}`]
-            : []),
-          `Gateway auth: ${formatAuth(quickstartGateway.authMode)}`,
-          `Tailscale exposure: ${formatTailscale(quickstartGateway.tailscaleMode)}`,
-          "Direct to chat channels.",
-        ]
-      : [
-          `Gateway port: ${DEFAULT_GATEWAY_PORT}`,
-          "Gateway bind: Loopback (127.0.0.1)",
-          "Gateway auth: Token (default)",
-          "Tailscale exposure: Off",
-          "Direct to chat channels.",
-        ];
-    await prompter.note(quickstartLines.join("\n"), "QuickStart");
-  }
-
-  const localPort = resolveGatewayPort(baseConfig);
-  const localUrl = `ws://127.0.0.1:${localPort}`;
-  const localProbe = await probeGatewayReachable({
-    url: localUrl,
-    token: baseConfig.gateway?.auth?.token ?? process.env.ANIMA_GATEWAY_TOKEN,
-    password: baseConfig.gateway?.auth?.password ?? process.env.ANIMA_GATEWAY_PASSWORD,
-  });
-  const remoteUrl = baseConfig.gateway?.remote?.url?.trim() ?? "";
-  const remoteProbe = remoteUrl
-    ? await probeGatewayReachable({
-        url: remoteUrl,
-        token: baseConfig.gateway?.remote?.token,
-      })
-    : null;
-
-  const mode =
-    opts.mode ??
-    (flow === "quickstart"
-      ? "local"
-      : ((await prompter.select({
-          message: "What do you want to set up?",
-          options: [
-            {
-              value: "local",
-              label: "Local gateway (this machine)",
-              hint: localProbe.ok
-                ? `Gateway reachable (${localUrl})`
-                : `No gateway detected (${localUrl})`,
-            },
-            {
-              value: "remote",
-              label: "Remote gateway (info-only)",
-              hint: !remoteUrl
-                ? "No remote URL configured yet"
-                : remoteProbe?.ok
-                  ? `Gateway reachable (${remoteUrl})`
-                  : `Configured but unreachable (${remoteUrl})`,
-            },
-          ],
-        })) as OnboardMode));
-
-  if (mode === "remote") {
-    let nextConfig = await promptRemoteGatewayConfig(baseConfig, prompter);
-    nextConfig = applyWizardMetadata(nextConfig, { command: "onboard", mode });
-    await writeConfigFile(nextConfig);
-    logConfigUpdated(runtime);
-    await prompter.outro("Remote gateway configured.");
-    return;
-  }
-
-  const workspaceInput =
-    opts.workspace ??
-    (flow === "quickstart"
-      ? (baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE)
-      : await prompter.text({
-          message: "Workspace directory",
-          initialValue: baseConfig.agents?.defaults?.workspace ?? DEFAULT_WORKSPACE,
-        }));
-
-  const workspaceDir = resolveUserPath(workspaceInput.trim() || DEFAULT_WORKSPACE);
-
-  let nextConfig: AnimaConfig = {
-    ...baseConfig,
-    agents: {
-      ...baseConfig.agents,
-      defaults: {
-        ...baseConfig.agents?.defaults,
-        workspace: workspaceDir,
-      },
-    },
-    gateway: {
-      ...baseConfig.gateway,
-      mode: "local",
-    },
-  };
-
-  const authStore = ensureAuthProfileStore(undefined, {
-    allowKeychainPrompt: false,
-  });
-  const authChoiceFromPrompt = opts.authChoice === undefined;
-  const authChoice =
-    opts.authChoice ??
-    (await promptAuthChoiceGrouped({
-      prompter,
-      store: authStore,
-      includeSkip: true,
-    }));
-
-  if (authChoice === "custom-api-key") {
-    const customResult = await promptCustomApiConfig({
-      prompter,
-      runtime,
-      config: nextConfig,
-    });
-    nextConfig = customResult.config;
-  } else {
-    const authResult = await applyAuthChoice({
-      authChoice,
-      config: nextConfig,
-      prompter,
-      runtime,
-      setDefaultModel: true,
-      opts: {
-        tokenProvider: opts.tokenProvider,
-        token: opts.authChoice === "apiKey" && opts.token ? opts.token : undefined,
-      },
-    });
-    nextConfig = authResult.config;
-  }
-
-  if (authChoiceFromPrompt && authChoice !== "custom-api-key") {
-    const modelSelection = await promptDefaultModel({
-      config: nextConfig,
-      prompter,
-      allowKeep: true,
-      ignoreAllowlist: true,
-      includeVllm: true,
-      preferredProvider: resolvePreferredProviderForAuthChoice(authChoice),
-    });
-    if (modelSelection.config) {
-      nextConfig = modelSelection.config;
-    }
-    if (modelSelection.model) {
-      nextConfig = applyPrimaryModel(nextConfig, modelSelection.model);
-    }
-  }
-
-  await warnIfModelConfigLooksOff(nextConfig, prompter);
-
   const gateway = await configureGatewayForOnboarding({
     flow,
     baseConfig,
@@ -432,35 +227,12 @@ export async function runOnboardingWizard(
   nextConfig = gateway.nextConfig;
   const settings = gateway.settings;
 
-  if (opts.skipChannels ?? opts.skipProviders) {
-    await prompter.note("Skipping channel setup.", "Channels");
-  } else {
-    const quickstartAllowFromChannels =
-      flow === "quickstart"
-        ? listChannelPlugins()
-            .filter((plugin) => plugin.meta.quickstartAllowFrom)
-            .map((plugin) => plugin.id)
-        : [];
-    nextConfig = await setupChannels(nextConfig, runtime, prompter, {
-      allowSignalInstall: true,
-      forceAllowFromChannels: quickstartAllowFromChannels,
-      skipDmPolicyPrompt: flow === "quickstart",
-      skipConfirm: flow === "quickstart",
-      quickstartDefaults: flow === "quickstart",
-    });
-  }
-
+  // --- Step 5: Write config, setup workspace, hooks, finalize ---
   await writeConfigFile(nextConfig);
   logConfigUpdated(runtime);
   await ensureWorkspaceAndSessions(workspaceDir, runtime, {
     skipBootstrap: Boolean(nextConfig.agents?.defaults?.skipBootstrap),
   });
-
-  if (opts.skipSkills) {
-    await prompter.note("Skipping skills setup.", "Skills");
-  } else {
-    nextConfig = await setupSkills(nextConfig, workspaceDir, runtime, prompter);
-  }
 
   // Setup hooks (session memory on /new)
   nextConfig = await setupInternalHooks(nextConfig, runtime, prompter);
