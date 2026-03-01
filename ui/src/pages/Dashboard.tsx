@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { getStatus, getQueue, type DaemonStatus, type QueueItem } from '../api'
+import { getStatus, getQueue, getSVRNStatus, type DaemonStatus, type QueueItem, type SVRNStatus } from '../api'
 
 function HeartbeatPulse({ running, beatCount }: { running: boolean; beatCount: number }) {
   return (
@@ -113,9 +113,128 @@ function QueueDisplay({ items }: { items: QueueItem[] }) {
   )
 }
 
+function SVRNCard({ svrn }: { svrn: SVRNStatus | null }) {
+  if (!svrn) {
+    return (
+      <div className="card">
+        <div className="card-header">
+          <span className="card-title">SVRN Node</span>
+          <span className="card-subtitle">Loading...</span>
+        </div>
+      </div>
+    )
+  }
+
+  const statusColor = svrn.running
+    ? svrn.paused
+      ? 'var(--color-warning)'
+      : 'var(--color-success)'
+    : 'var(--color-muted)'
+
+  const statusText = svrn.running
+    ? svrn.paused
+      ? 'Paused'
+      : 'Active'
+    : svrn.enabled
+      ? 'Stopped'
+      : 'Disabled'
+
+  const cpuRatio = svrn.resources
+    ? Math.min(svrn.resources.cpuPercent / svrn.limits.maxCpuPercent, 1)
+    : 0
+
+  const ramRatio = svrn.resources
+    ? Math.min(svrn.resources.ramUsedMB / svrn.limits.maxRamMB, 1)
+    : 0
+
+  return (
+    <div className="card">
+      <div className="card-header" style={{ marginBottom: '12px' }}>
+        <span className="card-title">SVRN Node</span>
+        <span style={{
+          fontSize: '12px',
+          fontWeight: 600,
+          color: statusColor,
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+        }}>
+          {statusText}
+        </span>
+      </div>
+
+      {/* Balance */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
+        <span style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-accent)', fontFamily: 'var(--font-heading)' }}>
+          {svrn.balance.toFixed(3)}
+        </span>
+        <span style={{ fontSize: '12px', color: 'var(--color-muted)' }}>
+          UCU (~${svrn.earnings.balanceValueUSD.toFixed(2)})
+        </span>
+      </div>
+
+      {/* Session + today */}
+      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', marginBottom: '12px' }}>
+        <span style={{ color: 'var(--color-success)' }}>
+          Session: +{svrn.sessionEarnings.toFixed(3)} UCU
+        </span>
+        <span style={{ color: 'var(--color-muted)' }}>
+          Today: {svrn.earnings.todayEarned.toFixed(3)} UCU ({svrn.earnings.todayTasks} tasks)
+        </span>
+      </div>
+
+      {/* Resource bars */}
+      {svrn.running && svrn.resources && (
+        <div style={{ marginTop: '8px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--color-muted)', marginBottom: '4px' }}>
+            CPU ({svrn.resources.cpuPercent.toFixed(1)}% / {svrn.limits.maxCpuPercent}%)
+          </div>
+          <div className="progress-bar" style={{ marginBottom: '8px', height: '4px' }}>
+            <motion.div
+              className="progress-fill"
+              initial={{ width: 0 }}
+              animate={{ width: `${cpuRatio * 100}%` }}
+              style={{ background: cpuRatio > 0.8 ? 'var(--color-warning)' : 'var(--color-accent)' }}
+            />
+          </div>
+
+          <div style={{ fontSize: '11px', color: 'var(--color-muted)', marginBottom: '4px' }}>
+            RAM ({svrn.resources.ramUsedMB}MB / {svrn.limits.maxRamMB}MB)
+          </div>
+          <div className="progress-bar" style={{ height: '4px' }}>
+            <motion.div
+              className="progress-fill"
+              initial={{ width: 0 }}
+              animate={{ width: `${ramRatio * 100}%` }}
+              style={{ background: ramRatio > 0.8 ? 'var(--color-warning)' : 'var(--color-accent)' }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Tasks stats */}
+      <div style={{ display: 'flex', gap: '16px', fontSize: '12px', marginTop: '12px', color: 'var(--color-muted)' }}>
+        <span>Completed: {svrn.tasksCompleted}</span>
+        <span style={{ color: svrn.tasksFailed > 0 ? 'var(--color-error)' : undefined }}>
+          Failed: {svrn.tasksFailed}
+        </span>
+        <span>All-time: {svrn.earnings.allTimeEarned.toFixed(3)} UCU</span>
+      </div>
+
+      {!svrn.enabled && (
+        <div style={{ marginTop: '12px', padding: '8px', borderRadius: '4px', background: 'rgba(255, 102, 0, 0.05)', fontSize: '12px', color: 'var(--color-muted)' }}>
+          Enable SVRN to earn UCU by contributing idle compute.
+          <br />
+          Run: <span className="mono">anima svrn enable</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function Dashboard(): React.ReactElement {
   const [status, setStatus] = useState<DaemonStatus | null>(null)
   const [queue, setQueue] = useState<QueueItem[]>([])
+  const [svrn, setSvrn] = useState<SVRNStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -128,6 +247,13 @@ export default function Dashboard(): React.ReactElement {
           setStatus(s)
           setQueue(q)
           setError(null)
+        }
+        // SVRN status is non-critical — fetch separately
+        try {
+          const sv = await getSVRNStatus()
+          if (active) setSvrn(sv)
+        } catch {
+          // SVRN endpoint may not exist yet
         }
       } catch {
         if (active) {
@@ -231,7 +357,10 @@ export default function Dashboard(): React.ReactElement {
         </div>
       </div>
 
-      <QueueDisplay items={queue} />
+      <div className="grid grid-2" style={{ marginBottom: '16px' }}>
+        <QueueDisplay items={queue} />
+        <SVRNCard svrn={svrn} />
+      </div>
     </div>
   )
 }

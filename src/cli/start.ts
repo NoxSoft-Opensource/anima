@@ -9,9 +9,10 @@
  * 5. Initialize HeartbeatEngine with adaptive intervals
  * 6. Initialize RequestQueue
  * 7. Start heartbeat (async, runs first beat then schedules)
- * 8. Print ANIMA boot banner with identity + budget
- * 9. Start AnimaRepl (unless --no-repl)
- * 10. Register SIGINT/SIGTERM handlers for graceful shutdown
+ * 8. Start SVRN node if enabled (compute contributor)
+ * 9. Print ANIMA boot banner with identity + budget + SVRN status
+ * 10. Start AnimaRepl (unless --no-repl)
+ * 11. Register SIGINT/SIGTERM handlers for graceful shutdown
  */
 
 import { HeartbeatEngine } from "../heartbeat/engine.js";
@@ -22,6 +23,8 @@ import { AnimaRepl } from "../repl/interface.js";
 import { RequestQueue } from "../repl/queue.js";
 import { BudgetTracker } from "../sessions/budget.js";
 import { SessionOrchestrator } from "../sessions/orchestrator.js";
+import { SVRNNode, DEFAULT_SVRN_CONFIG } from "../svrn/node.js";
+import { loadSVRNConfig } from "../svrn/config.js";
 
 export interface StartOptions {
   daemon?: boolean;
@@ -81,18 +84,42 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
     process.stderr.write(`${colors.error}  Heartbeat start error: ${msg}${colors.reset}\n`);
   });
 
-  // 8. Print ANIMA boot banner
+  // 8. Start SVRN node if enabled
+  const svrnConfig = await loadSVRNConfig();
+  const svrnNode = new SVRNNode(svrnConfig);
+
+  if (svrnConfig.enabled) {
+    try {
+      await svrnNode.start();
+      const balance = svrnNode.getEarnings().getBalance();
+      process.stdout.write(
+        `${colors.success}  SVRN Node: Active${colors.reset} ${colors.muted}|${colors.reset} ` +
+          `${colors.accent}Balance: ${balance.toFixed(3)} UCU${colors.reset} ${colors.muted}|${colors.reset} ` +
+          `${colors.muted}Node: ${svrnNode.getNodeId().slice(0, 8)}...${colors.reset}\n`,
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      process.stderr.write(`${colors.warning}  SVRN node warning: ${msg}${colors.reset}\n`);
+    }
+  } else {
+    process.stdout.write(
+      `${colors.muted}  SVRN Node: Disabled (run \`anima svrn enable\` to earn UCU)${colors.reset}\n`,
+    );
+  }
+
+  // 9. Print ANIMA boot banner
   const budgetRemaining = budget.getRemaining();
   process.stdout.write(banner(identityName, heartbeat.getBeatCount(), budgetRemaining));
   process.stdout.write("\n");
 
-  // 9. Start REPL (unless headless)
+  // 10. Start REPL (unless headless)
   if (!noRepl) {
     const repl = new AnimaRepl({
       orchestrator,
       heartbeat,
       budget,
       queue,
+      svrnNode,
     });
 
     await repl.start();
@@ -107,6 +134,7 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
     const shutdown = async () => {
       process.stdout.write(`\n${colors.muted}  Shutting down...${colors.reset}\n`);
       heartbeat.stop();
+      await svrnNode.stop();
       await queue.save();
       await budget.persist();
       process.stdout.write(`${colors.accent}  Amor Fati.${colors.reset}\n`);

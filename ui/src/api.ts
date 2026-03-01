@@ -124,6 +124,59 @@ export async function addToQueue(
   })
 }
 
+// --- SVRN Types ---
+
+export interface SVRNStatus {
+  enabled: boolean
+  running: boolean
+  paused: boolean
+  nodeId: string
+  uptimeMs: number
+  tasksCompleted: number
+  tasksFailed: number
+  balance: number
+  sessionEarnings: number
+  limits: {
+    maxCpuPercent: number
+    maxRamMB: number
+    maxBandwidthMbps: number
+  }
+  resources: {
+    cpuPercent: number
+    ramUsedMB: number
+    bandwidthMbps: number
+  } | null
+  earnings: {
+    allTimeEarned: number
+    allTimeApplied: number
+    balanceValueUSD: number
+    todayEarned: number
+    todayTasks: number
+  }
+}
+
+export async function getSVRNStatus(): Promise<SVRNStatus> {
+  return request<SVRNStatus>('/api/svrn/status')
+}
+
+export async function setSVRNEnabled(enabled: boolean): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>('/api/svrn/toggle', {
+    method: 'POST',
+    body: JSON.stringify({ enabled }),
+  })
+}
+
+export async function updateSVRNLimits(limits: {
+  maxCpuPercent?: number
+  maxRamMB?: number
+  maxBandwidthMbps?: number
+}): Promise<{ success: boolean }> {
+  return request<{ success: boolean }>('/api/svrn/limits', {
+    method: 'POST',
+    body: JSON.stringify(limits),
+  })
+}
+
 // --- WebSocket ---
 
 export function connectWebSocket(

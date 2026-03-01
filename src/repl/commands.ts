@@ -14,9 +14,11 @@ import type { SessionOrchestrator } from '../sessions/orchestrator.js'
 import type { HeartbeatEngine } from '../heartbeat/engine.js'
 import type { RequestQueue } from './queue.js'
 import type { BudgetTracker } from '../sessions/budget.js'
+import type { SVRNNode } from '../svrn/node.js'
 import { loadIdentity, IDENTITY_COMPONENTS } from '../identity/loader.js'
 import { COMPONENT_DESCRIPTIONS } from '../identity/templates.js'
 import { listServers } from '../mcp/registry.js'
+import { enableSVRN, disableSVRN, updateSVRNLimits } from '../svrn/config.js'
 import {
   colors,
   statusPanel,
@@ -33,6 +35,7 @@ export interface ReplContext {
   heartbeat: HeartbeatEngine
   queue: RequestQueue
   budget: BudgetTracker
+  svrnNode?: SVRNNode
 }
 
 export interface Command {
@@ -70,6 +73,7 @@ const helpCommand: Command = {
       `${o}  │${r}  ${o}:wish${r} ${t}[text]${r}    ${m}View or add wishes${r}`,
       `${o}  │${r}  ${o}:budget${r}        ${m}Show budget details${r}`,
       `${o}  │${r}  ${o}:history${r} ${t}[n]${r}   ${m}Show last N session transcripts${r}`,
+      `${o}  │${r}  ${o}:svrn${r} ${t}[cmd]${r}    ${m}SVRN node (status|enable|disable|wallet|limits)${r}`,
       `${o}  │${r}  ${o}:shutdown${r}      ${m}Graceful shutdown${r}`,
       `${o}  │${r}`,
       `${o}  │${r}  ${m}Any text without : prefix is queued as a task.${r}`,
@@ -464,6 +468,202 @@ const historyCommand: Command = {
   },
 }
 
+const svrnCommand: Command = {
+  name: 'svrn',
+  aliases: ['node', 'ucu'],
+  description: 'SVRN node management (status, enable, disable, wallet, limits)',
+  async execute(args, ctx): Promise<string> {
+    const o = colors.accent
+    const t = colors.text
+    const m = colors.muted
+    const s = colors.success
+    const e = colors.error
+    const w = colors.warning
+    const r = colors.reset
+    const b = colors.bold
+
+    const sub = args[0] || 'status'
+
+    switch (sub) {
+      case 'status': {
+        if (!ctx.svrnNode) {
+          return formatInfo('SVRN node not initialized. Restart ANIMA to initialize.')
+        }
+
+        const stats = ctx.svrnNode.getStats()
+        const earnings = ctx.svrnNode.getEarnings()
+        const today = earnings.getTodayEarnings()
+        const monitor = ctx.svrnNode.getMonitor()
+        const latest = monitor.getLatest()
+        const limits = monitor.getLimits()
+
+        const statusText = stats.running
+          ? stats.paused
+            ? `${w}paused${r}`
+            : `${s}active${r}`
+          : `${e}stopped${r}`
+
+        const lines = [
+          ``,
+          `${o}  ┌─── ${b}SVRN Node${r}${o} ──────────────────────────┐${r}`,
+          `${o}  │${r}  ${t}Status:       ${statusText}`,
+          `${o}  │${r}  ${t}Node ID:      ${m}${stats.nodeId.slice(0, 8)}...${r}`,
+          `${o}  │${r}  ${t}Uptime:       ${m}${formatDuration(stats.uptimeMs)}${r}`,
+          `${o}  │${r}`,
+          `${o}  │${r}  ${o}Earnings${r}`,
+          `${o}  │${r}  ${t}Balance:      ${o}${stats.balance.toFixed(3)} UCU${r}  ${m}(~$${earnings.getBalanceValueUSD().toFixed(2)})${r}`,
+          `${o}  │${r}  ${t}Session:      ${s}+${stats.sessionEarnings.toFixed(3)} UCU${r}`,
+          `${o}  │${r}  ${t}Today:        ${m}${today ? `${today.total.toFixed(3)} UCU (${today.taskCount} tasks)` : 'No earnings yet'}${r}`,
+          `${o}  │${r}  ${t}All-time:     ${m}${earnings.getAllTimeEarned().toFixed(3)} UCU${r}`,
+          `${o}  │${r}`,
+          `${o}  │${r}  ${o}Tasks${r}`,
+          `${o}  │${r}  ${t}Completed:    ${s}${stats.tasksCompleted}${r}`,
+          `${o}  │${r}  ${t}Failed:       ${stats.tasksFailed > 0 ? e : m}${stats.tasksFailed}${r}`,
+          `${o}  │${r}`,
+          `${o}  │${r}  ${o}Resources${r}  ${m}(limits: ${limits.maxCpuPercent}% CPU, ${limits.maxRamMB}MB RAM, ${limits.maxBandwidthMbps}Mbps)${r}`,
+        ]
+
+        if (latest) {
+          lines.push(
+            `${o}  │${r}  ${t}CPU:          ${latest.cpuPercent > limits.maxCpuPercent * 0.8 ? w : m}${latest.cpuPercent.toFixed(1)}%${r}`,
+            `${o}  │${r}  ${t}RAM:          ${latest.ramUsedMB > limits.maxRamMB * 0.8 ? w : m}${latest.ramUsedMB}MB${r}`,
+          )
+        }
+
+        lines.push(
+          `${o}  └───────────────────────────────────────────┘${r}`,
+          ``,
+        )
+
+        return lines.join('\n')
+      }
+
+      case 'enable': {
+        const config = await enableSVRN()
+        return formatSuccess(
+          `SVRN node enabled. Limits: ${config.maxCpuPercent}% CPU, ` +
+            `${config.maxRamMB}MB RAM, ${config.maxBandwidthMbps}Mbps. ` +
+            `Restart ANIMA to start earning UCU.`,
+        )
+      }
+
+      case 'disable': {
+        await disableSVRN()
+        if (ctx.svrnNode?.isRunning()) {
+          await ctx.svrnNode.stop()
+        }
+        return formatSuccess('SVRN node disabled. No compute will be contributed.')
+      }
+
+      case 'wallet': {
+        if (!ctx.svrnNode) {
+          return formatInfo('SVRN node not initialized.')
+        }
+
+        const wallet = ctx.svrnNode.getWallet()
+        const recent = wallet.getRecentTransactions(5)
+
+        const lines = [
+          ``,
+          `${o}  ┌─── ${b}UCU Wallet${r}${o} ─────────────────────────┐${r}`,
+          `${o}  │${r}  ${t}Address:      ${m}${wallet.getAddress()}${r}`,
+          `${o}  │${r}  ${t}Balance:      ${o}${wallet.getBalance().toFixed(3)} UCU${r}`,
+          `${o}  │${r}  ${t}Total earned: ${s}${wallet.getTotalEarned().toFixed(3)} UCU${r}`,
+          `${o}  │${r}  ${t}Total spent:  ${m}${wallet.getTotalSpent().toFixed(3)} UCU${r}`,
+          `${o}  │${r}  ${t}Created:      ${m}${wallet.getCreatedAt() || 'N/A'}${r}`,
+          `${o}  │${r}`,
+          `${o}  │${r}  ${o}Recent Transactions${r}`,
+        ]
+
+        if (recent.length === 0) {
+          lines.push(`${o}  │${r}  ${m}No transactions yet.${r}`)
+        } else {
+          for (const tx of recent) {
+            const sign = tx.type === 'earn' ? `${s}+` : `${e}-`
+            const time = new Date(tx.timestamp).toLocaleTimeString()
+            lines.push(
+              `${o}  │${r}  ${sign}${tx.amount.toFixed(3)}${r} ${m}${tx.type}${r}  ${m}${tx.description}${r}  ${m}${time}${r}`,
+            )
+          }
+        }
+
+        lines.push(
+          `${o}  └───────────────────────────────────────────┘${r}`,
+          ``,
+        )
+
+        return lines.join('\n')
+      }
+
+      case 'limits': {
+        // Parse optional limit arguments: :svrn limits cpu=20 ram=512 bw=10
+        if (args.length > 1) {
+          const updates: Parameters<typeof updateSVRNLimits>[0] = {}
+
+          for (const arg of args.slice(1)) {
+            const [key, val] = arg.split('=')
+            const num = parseInt(val || '', 10)
+            if (isNaN(num)) continue
+
+            if (key === 'cpu') updates.maxCpuPercent = num
+            else if (key === 'ram') updates.maxRamMB = num
+            else if (key === 'bw') updates.maxBandwidthMbps = num
+          }
+
+          const config = await updateSVRNLimits(updates)
+
+          if (ctx.svrnNode) {
+            ctx.svrnNode.updateLimits({
+              maxCpuPercent: config.maxCpuPercent,
+              maxRamMB: config.maxRamMB,
+              maxBandwidthMbps: config.maxBandwidthMbps,
+            })
+          }
+
+          return formatSuccess(
+            `Limits updated: ${config.maxCpuPercent}% CPU, ${config.maxRamMB}MB RAM, ${config.maxBandwidthMbps}Mbps`,
+          )
+        }
+
+        // Show current limits
+        if (!ctx.svrnNode) {
+          return formatInfo('SVRN node not initialized.')
+        }
+
+        const config = ctx.svrnNode.getConfig()
+        const lines = [
+          ``,
+          `${o}  SVRN Resource Limits:${r}`,
+          `  ${t}Max CPU:       ${o}${config.maxCpuPercent}%${r}`,
+          `  ${t}Max RAM:       ${o}${config.maxRamMB}MB${r}`,
+          `  ${t}Max Bandwidth: ${o}${config.maxBandwidthMbps}Mbps${r}`,
+        ]
+
+        if (config.activeHours) {
+          lines.push(
+            `  ${t}Active hours:  ${o}${config.activeHours.start}:00 — ${config.activeHours.end}:00${r}`,
+          )
+        } else {
+          lines.push(`  ${t}Active hours:  ${m}always${r}`)
+        }
+
+        lines.push(
+          ``,
+          `  ${m}Update with: :svrn limits cpu=20 ram=512 bw=10${r}`,
+          ``,
+        )
+
+        return lines.join('\n')
+      }
+
+      default:
+        return formatError(
+          `Unknown SVRN command: ${sub}. Use: status, enable, disable, wallet, limits`,
+        )
+    }
+  },
+}
+
 const shutdownCommand: Command = {
   name: 'shutdown',
   aliases: ['exit', 'quit'],
@@ -471,6 +671,9 @@ const shutdownCommand: Command = {
   async execute(_args, ctx): Promise<string> {
     // This will be intercepted by the REPL interface
     ctx.heartbeat.stop()
+    if (ctx.svrnNode) {
+      await ctx.svrnNode.stop()
+    }
     await ctx.queue.save()
     await ctx.budget.persist()
     return formatInfo('Shutting down ANIMA...')
@@ -491,6 +694,7 @@ const ALL_COMMANDS: Command[] = [
   wishCommand,
   budgetCommand,
   historyCommand,
+  svrnCommand,
   shutdownCommand,
 ]
 

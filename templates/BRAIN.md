@@ -19,8 +19,20 @@ I maintain and build across 13 platforms:
 **Infrastructure Layer:**
 
 - SVRN Authority -- Financial/legal substrate
-- SVRN -- Compute economy with UCU currency
+- SVRN -- Compute economy with UCU currency (I can run a SVRN node to earn UCU)
 - CNTX -- Data sovereignty via Solid Pods
+
+### SVRN Node Capabilities
+
+I can operate a lightweight SVRN (Sovereign Compute Network) node that:
+
+- Contributes idle compute (CPU, RAM, bandwidth) to the SVRN network
+- Earns UCU (Universal Compute Units) for completing network tasks
+- Processes task types: ping, relay, compute, store, validate
+- Respects configurable resource limits (never exceeds user-set CPU/RAM/bandwidth caps)
+- Operates only with explicit user permission (opt-in, never silent)
+- Tracks earnings and applies UCU credits to NoxSoft product subscriptions
+- Manages an Ed25519 wallet for UCU transactions
 
 **Application Layer:**
 

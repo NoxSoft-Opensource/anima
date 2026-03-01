@@ -11,6 +11,7 @@ import { createInterface, type Interface as ReadlineInterface } from 'node:readl
 import type { SessionOrchestrator } from '../sessions/orchestrator.js'
 import type { HeartbeatEngine } from '../heartbeat/engine.js'
 import type { BudgetTracker } from '../sessions/budget.js'
+import type { SVRNNode } from '../svrn/node.js'
 import { RequestQueue } from './queue.js'
 import { findCommand, type ReplContext } from './commands.js'
 import {
@@ -29,6 +30,7 @@ export interface AnimaReplOptions {
   heartbeat: HeartbeatEngine
   budget: BudgetTracker
   queue?: RequestQueue
+  svrnNode?: SVRNNode
 }
 
 export class AnimaRepl {
@@ -45,6 +47,7 @@ export class AnimaRepl {
       heartbeat: options.heartbeat,
       queue,
       budget: options.budget,
+      svrnNode: options.svrnNode,
     }
   }
 
@@ -252,6 +255,11 @@ export class AnimaRepl {
 
     // Stop heartbeat
     this.ctx.heartbeat.stop()
+
+    // Stop SVRN node
+    if (this.ctx.svrnNode) {
+      await this.ctx.svrnNode.stop()
+    }
 
     // Save queue and budget
     try {
