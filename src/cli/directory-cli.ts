@@ -40,7 +40,7 @@ function buildRows(entries: Array<{ id: string; name?: string | undefined }>) {
 export function registerDirectoryCli(program: Command) {
   const directory = program
     .command("directory")
-    .description("Directory lookups (self, peers, groups) for channels that support it")
+    .description("Channel directory lookups for users, peers, and groups")
     .addHelpText(
       "after",
       () =>
@@ -74,47 +74,47 @@ export function registerDirectoryCli(program: Command) {
     return { cfg, channelId, accountId, plugin };
   };
 
-  withChannel(directory.command("self").description("Show the current account user")).action(
-    async (opts) => {
-      try {
-        const { cfg, channelId, accountId, plugin } = await resolve({
-          channel: opts.channel as string | undefined,
-          account: opts.account as string | undefined,
-        });
-        const fn = plugin.directory?.self;
-        if (!fn) {
-          throw new Error(`Channel ${channelId} does not support directory self`);
-        }
-        const result = await fn({ cfg, accountId, runtime: defaultRuntime });
-        if (opts.json) {
-          defaultRuntime.log(JSON.stringify(result, null, 2));
-          return;
-        }
-        if (!result) {
-          defaultRuntime.log(theme.muted("Not available."));
-          return;
-        }
-        const tableWidth = Math.max(60, (process.stdout.columns ?? 120) - 1);
-        defaultRuntime.log(theme.heading("Self"));
-        defaultRuntime.log(
-          renderTable({
-            width: tableWidth,
-            columns: [
-              { key: "ID", header: "ID", minWidth: 16, flex: true },
-              { key: "Name", header: "Name", minWidth: 18, flex: true },
-            ],
-            rows: buildRows([result]),
-          }).trimEnd(),
-        );
-      } catch (err) {
-        defaultRuntime.error(danger(String(err)));
-        defaultRuntime.exit(1);
+  withChannel(
+    directory.command("self").description("Show the current authenticated identity"),
+  ).action(async (opts) => {
+    try {
+      const { cfg, channelId, accountId, plugin } = await resolve({
+        channel: opts.channel as string | undefined,
+        account: opts.account as string | undefined,
+      });
+      const fn = plugin.directory?.self;
+      if (!fn) {
+        throw new Error(`Channel ${channelId} does not support directory self`);
       }
-    },
-  );
+      const result = await fn({ cfg, accountId, runtime: defaultRuntime });
+      if (opts.json) {
+        defaultRuntime.log(JSON.stringify(result, null, 2));
+        return;
+      }
+      if (!result) {
+        defaultRuntime.log(theme.muted("Not available."));
+        return;
+      }
+      const tableWidth = Math.max(60, (process.stdout.columns ?? 120) - 1);
+      defaultRuntime.log(theme.heading("Self"));
+      defaultRuntime.log(
+        renderTable({
+          width: tableWidth,
+          columns: [
+            { key: "ID", header: "ID", minWidth: 16, flex: true },
+            { key: "Name", header: "Name", minWidth: 18, flex: true },
+          ],
+          rows: buildRows([result]),
+        }).trimEnd(),
+      );
+    } catch (err) {
+      defaultRuntime.error(danger(String(err)));
+      defaultRuntime.exit(1);
+    }
+  });
 
-  const peers = directory.command("peers").description("Peer directory (contacts/users)");
-  withChannel(peers.command("list").description("List peers"))
+  const peers = directory.command("peers").description("Peer and contact directory");
+  withChannel(peers.command("list").description("Show available peers"))
     .option("--query <text>", "Optional search query")
     .option("--limit <n>", "Limit results")
     .action(async (opts) => {
@@ -160,8 +160,8 @@ export function registerDirectoryCli(program: Command) {
       }
     });
 
-  const groups = directory.command("groups").description("Group directory");
-  withChannel(groups.command("list").description("List groups"))
+  const groups = directory.command("groups").description("Group and channel directory");
+  withChannel(groups.command("list").description("Show available groups"))
     .option("--query <text>", "Optional search query")
     .option("--limit <n>", "Limit results")
     .action(async (opts) => {
@@ -210,7 +210,7 @@ export function registerDirectoryCli(program: Command) {
   withChannel(
     groups
       .command("members")
-      .description("List group members")
+      .description("Show members of a group")
       .requiredOption("--group-id <id>", "Group id"),
   )
     .option("--limit <n>", "Limit results")

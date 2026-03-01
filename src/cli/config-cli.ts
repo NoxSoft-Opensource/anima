@@ -280,7 +280,7 @@ export async function runConfigUnset(opts: { path: string; runtime?: RuntimeEnv 
 export function registerConfigCli(program: Command) {
   const cmd = program
     .command("config")
-    .description("Config helpers (get/set/unset). Run without subcommand for the wizard.")
+    .description("Read, write, and manage ANIMA configuration")
     .addHelpText(
       "after",
       () =>
@@ -318,7 +318,7 @@ export function registerConfigCli(program: Command) {
 
   cmd
     .command("get")
-    .description("Get a config value by dot path")
+    .description("Read a configuration value")
     .argument("<path>", "Config path (dot or bracket notation)")
     .option("--json", "Output JSON", false)
     .action(async (path: string, opts) => {
@@ -327,7 +327,7 @@ export function registerConfigCli(program: Command) {
 
   cmd
     .command("set")
-    .description("Set a config value by dot path")
+    .description("Write a configuration value")
     .argument("<path>", "Config path (dot or bracket notation)")
     .argument("<value>", "Value (JSON5 or raw string)")
     .option("--json", "Parse value as JSON5 (required)", false)
@@ -354,7 +354,7 @@ export function registerConfigCli(program: Command) {
 
   cmd
     .command("unset")
-    .description("Remove a config value by dot path")
+    .description("Remove a configuration value")
     .argument("<path>", "Config path (dot or bracket notation)")
     .action(async (path: string) => {
       await runConfigUnset({ path });

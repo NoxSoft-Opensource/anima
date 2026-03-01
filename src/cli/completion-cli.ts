@@ -225,7 +225,7 @@ export async function usesSlowDynamicCompletion(
 export function registerCompletionCli(program: Command) {
   program
     .command("completion")
-    .description("Generate shell completion script")
+    .description("Shell completion for zsh, bash, fish, and PowerShell")
     .addOption(
       new Option("-s, --shell <shell>", "Shell to generate completion for (default: zsh)").choices(
         COMPLETION_SHELLS,

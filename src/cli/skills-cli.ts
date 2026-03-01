@@ -19,7 +19,7 @@ export { formatSkillInfo, formatSkillsCheck, formatSkillsList } from "./skills-c
 export function registerSkillsCli(program: Command) {
   const skills = program
     .command("skills")
-    .description("List and inspect available skills")
+    .description("Agent skill discovery and inspection")
     .addHelpText(
       "after",
       () =>
@@ -28,7 +28,7 @@ export function registerSkillsCli(program: Command) {
 
   skills
     .command("list")
-    .description("List all available skills")
+    .description("Show all available skills and their status")
     .option("--json", "Output as JSON", false)
     .option("--eligible", "Show only eligible (ready to use) skills", false)
     .option("-v, --verbose", "Show more details including missing requirements", false)
@@ -47,7 +47,7 @@ export function registerSkillsCli(program: Command) {
 
   skills
     .command("info")
-    .description("Show detailed information about a skill")
+    .description("Inspect a skill's details and requirements")
     .argument("<name>", "Skill name")
     .option("--json", "Output as JSON", false)
     .action(async (name, opts) => {
@@ -65,7 +65,7 @@ export function registerSkillsCli(program: Command) {
 
   skills
     .command("check")
-    .description("Check which skills are ready vs missing requirements")
+    .description("Verify skill readiness and missing requirements")
     .option("--json", "Output as JSON", false)
     .action(async (opts) => {
       try {

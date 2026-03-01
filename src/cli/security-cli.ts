@@ -29,7 +29,7 @@ function formatSummary(summary: { critical: number; warn: number; info: number }
 export function registerSecurityCli(program: Command) {
   const security = program
     .command("security")
-    .description("Security tools (audit)")
+    .description("Security auditing and hardening tools")
     .addHelpText(
       "after",
       () =>
@@ -38,7 +38,7 @@ export function registerSecurityCli(program: Command) {
 
   security
     .command("audit")
-    .description("Audit config + local state for common security foot-guns")
+    .description("Audit configuration and state for security vulnerabilities")
     .option("--deep", "Attempt live Gateway probe (best-effort)", false)
     .option("--fix", "Apply safe fixes (tighten defaults + chmod state/config)", false)
     .option("--json", "Print JSON", false)

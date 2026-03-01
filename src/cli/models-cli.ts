@@ -154,7 +154,7 @@ export function registerModelsCli(program: Command) {
 
   aliases
     .command("remove")
-    .description("Remove a model alias")
+    .description("Delete a model alias")
     .argument("<alias>", "Alias name")
     .action(async (alias: string) => {
       await runModelsCommand(async () => {
@@ -282,7 +282,7 @@ export function registerModelsCli(program: Command) {
     });
   });
 
-  const auth = models.command("auth").description("Manage model auth profiles");
+  const auth = models.command("auth").description("Manage provider authentication profiles");
   auth.option("--agent <id>", "Agent id for auth order get/set/clear");
   auth.action(() => {
     auth.help();
@@ -290,7 +290,7 @@ export function registerModelsCli(program: Command) {
 
   auth
     .command("add")
-    .description("Interactive auth helper (setup-token or paste token)")
+    .description("Interactive authentication setup wizard")
     .action(async () => {
       await runModelsCommand(async () => {
         await modelsAuthAddCommand({}, defaultRuntime);
@@ -299,7 +299,7 @@ export function registerModelsCli(program: Command) {
 
   auth
     .command("login")
-    .description("Run a provider plugin auth flow (OAuth/API key)")
+    .description("Authenticate with a provider via OAuth or API key")
     .option("--provider <id>", "Provider id registered by a plugin")
     .option("--method <id>", "Provider auth method id")
     .option("--set-default", "Apply the provider's default model recommendation", false)
@@ -318,7 +318,7 @@ export function registerModelsCli(program: Command) {
 
   auth
     .command("setup-token")
-    .description("Run a provider CLI to create/sync a token (TTY required)")
+    .description("Create or sync a provider token via CLI")
     .option("--provider <name>", "Provider id (default: anthropic)")
     .option("--yes", "Skip confirmation", false)
     .action(async (opts) => {
@@ -335,7 +335,7 @@ export function registerModelsCli(program: Command) {
 
   auth
     .command("paste-token")
-    .description("Paste a token into auth-profiles.json and update config")
+    .description("Store a provider token directly into auth profiles")
     .requiredOption("--provider <name>", "Provider id (e.g. anthropic)")
     .option("--profile-id <id>", "Auth profile id (default: <provider>:manual)")
     .option(
@@ -357,7 +357,7 @@ export function registerModelsCli(program: Command) {
 
   auth
     .command("login-github-copilot")
-    .description("Login to GitHub Copilot via GitHub device flow (TTY required)")
+    .description("Authenticate with GitHub Copilot via device flow")
     .option("--profile-id <id>", "Auth profile id (default: github-copilot:github)")
     .option("--yes", "Overwrite existing profile without prompting", false)
     .action(async (opts) => {
@@ -372,11 +372,11 @@ export function registerModelsCli(program: Command) {
       });
     });
 
-  const order = auth.command("order").description("Manage per-agent auth profile order overrides");
+  const order = auth.command("order").description("Control per-agent authentication priority");
 
   order
     .command("get")
-    .description("Show per-agent auth order override (from auth-profiles.json)")
+    .description("Show the auth profile priority for an agent")
     .requiredOption("--provider <name>", "Provider id (e.g. anthropic)")
     .option("--agent <id>", "Agent id (default: configured default agent)")
     .option("--json", "Output JSON", false)
@@ -397,7 +397,7 @@ export function registerModelsCli(program: Command) {
 
   order
     .command("set")
-    .description("Set per-agent auth order override (locks rotation to this list)")
+    .description("Lock an agent to a specific auth profile rotation")
     .requiredOption("--provider <name>", "Provider id (e.g. anthropic)")
     .option("--agent <id>", "Agent id (default: configured default agent)")
     .argument("<profileIds...>", "Auth profile ids (e.g. anthropic:default)")
@@ -418,7 +418,7 @@ export function registerModelsCli(program: Command) {
 
   order
     .command("clear")
-    .description("Clear per-agent auth order override (fall back to config/round-robin)")
+    .description("Reset auth priority to default round-robin rotation")
     .requiredOption("--provider <name>", "Provider id (e.g. anthropic)")
     .option("--agent <id>", "Agent id (default: configured default agent)")
     .action(async (opts, command) => {

@@ -102,7 +102,7 @@ function ensureImportLine(corefilePath: string, importGlob: string): boolean {
 export function registerDnsCli(program: Command) {
   const dns = program
     .command("dns")
-    .description("DNS helpers for wide-area discovery (Tailscale + CoreDNS)")
+    .description("Wide-area DNS discovery configuration")
     .addHelpText(
       "after",
       () =>
@@ -111,9 +111,7 @@ export function registerDnsCli(program: Command) {
 
   dns
     .command("setup")
-    .description(
-      "Set up CoreDNS to serve your discovery domain for unicast DNS-SD (Wide-Area Bonjour)",
-    )
+    .description("Configure CoreDNS for unicast DNS-SD wide-area discovery")
     .option("--domain <domain>", "Wide-area discovery domain (e.g. anima.internal)")
     .option(
       "--apply",

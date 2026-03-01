@@ -13,7 +13,7 @@ import { registerNodesStatusCommands } from "./register.status.js";
 export function registerNodesCli(program: Command) {
   const nodes = program
     .command("nodes")
-    .description("Manage gateway-owned node pairing")
+    .description("Manage Gateway node pairing and orchestration")
     .addHelpText(
       "after",
       () =>

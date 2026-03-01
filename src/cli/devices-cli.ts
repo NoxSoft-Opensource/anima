@@ -97,12 +97,14 @@ function formatTokenSummary(tokens: DeviceTokenSummary[] | undefined) {
 }
 
 export function registerDevicesCli(program: Command) {
-  const devices = program.command("devices").description("Device pairing and auth tokens");
+  const devices = program
+    .command("devices")
+    .description("Device pairing, token management, and access control");
 
   devicesCallOpts(
     devices
       .command("list")
-      .description("List pending and paired devices")
+      .description("Show all pending and paired devices")
       .action(async (opts: DevicesRpcOpts) => {
         const result = await callGatewayCli("device.pair.list", opts, {});
         const list = parseDevicePairingList(result);
@@ -171,7 +173,7 @@ export function registerDevicesCli(program: Command) {
   devicesCallOpts(
     devices
       .command("approve")
-      .description("Approve a pending device pairing request")
+      .description("Approve a device pairing request")
       .argument("<requestId>", "Pending request id")
       .action(async (requestId: string, opts: DevicesRpcOpts) => {
         const result = await callGatewayCli("device.pair.approve", opts, { requestId });
@@ -187,7 +189,7 @@ export function registerDevicesCli(program: Command) {
   devicesCallOpts(
     devices
       .command("reject")
-      .description("Reject a pending device pairing request")
+      .description("Reject a device pairing request")
       .argument("<requestId>", "Pending request id")
       .action(async (requestId: string, opts: DevicesRpcOpts) => {
         const result = await callGatewayCli("device.pair.reject", opts, { requestId });
@@ -203,7 +205,7 @@ export function registerDevicesCli(program: Command) {
   devicesCallOpts(
     devices
       .command("rotate")
-      .description("Rotate a device token for a role")
+      .description("Rotate a device authentication token")
       .requiredOption("--device <id>", "Device id")
       .requiredOption("--role <role>", "Role name")
       .option("--scope <scope...>", "Scopes to attach to the token (repeatable)")
@@ -227,7 +229,7 @@ export function registerDevicesCli(program: Command) {
   devicesCallOpts(
     devices
       .command("revoke")
-      .description("Revoke a device token for a role")
+      .description("Revoke a device authentication token")
       .requiredOption("--device <id>", "Device id")
       .requiredOption("--role <role>", "Role name")
       .action(async (opts: DevicesRpcOpts) => {

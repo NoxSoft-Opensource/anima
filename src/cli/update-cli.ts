@@ -18,7 +18,7 @@ export type { UpdateCommandOptions, UpdateStatusOptions, UpdateWizardOptions };
 export function registerUpdateCli(program: Command) {
   const update = program
     .command("update")
-    .description("Update ANIMA to the latest version")
+    .description("Update ANIMA to the latest release")
     .option("--json", "Output result as JSON", false)
     .option("--no-restart", "Skip restarting the gateway service after a successful update")
     .option("--channel <stable|beta|dev>", "Persist update channel (git + npm)")
@@ -83,7 +83,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.noxsoft.net/anima/
 
   update
     .command("wizard")
-    .description("Interactive update wizard")
+    .description("Guided interactive update process")
     .option("--timeout <seconds>", "Timeout for each update step in seconds (default: 1200)")
     .addHelpText(
       "after",
@@ -102,7 +102,7 @@ ${theme.muted("Docs:")} ${formatDocsLink("/cli/update", "docs.noxsoft.net/anima/
 
   update
     .command("status")
-    .description("Show update channel and version status")
+    .description("Show current version, channel, and update availability")
     .option("--json", "Output result as JSON", false)
     .option("--timeout <seconds>", "Timeout for update checks in seconds (default: 3)")
     .addHelpText(

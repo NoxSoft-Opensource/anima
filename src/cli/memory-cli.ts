@@ -515,7 +515,7 @@ export async function runMemoryStatus(opts: MemoryCommandOptions) {
 export function registerMemoryCli(program: Command) {
   const memory = program
     .command("memory")
-    .description("Memory search tools")
+    .description("Persistent memory indexing and semantic search")
     .addHelpText(
       "after",
       () =>
@@ -524,7 +524,7 @@ export function registerMemoryCli(program: Command) {
 
   memory
     .command("status")
-    .description("Show memory search index status")
+    .description("Show memory index health and embedding status")
     .option("--agent <id>", "Agent id (default: default agent)")
     .option("--json", "Print JSON")
     .option("--deep", "Probe embedding provider availability")
@@ -536,7 +536,7 @@ export function registerMemoryCli(program: Command) {
 
   memory
     .command("index")
-    .description("Reindex memory files")
+    .description("Rebuild the memory search index")
     .option("--agent <id>", "Agent id (default: default agent)")
     .option("--force", "Force full reindex", false)
     .option("--verbose", "Verbose logging", false)
@@ -678,7 +678,7 @@ export function registerMemoryCli(program: Command) {
 
   memory
     .command("search")
-    .description("Search memory files")
+    .description("Semantic search across agent memory")
     .argument("<query>", "Search query")
     .option("--agent <id>", "Agent id (default: default agent)")
     .option("--max-results <n>", "Max results", (value: string) => Number(value))

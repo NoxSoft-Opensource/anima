@@ -162,7 +162,7 @@ function logSlotWarnings(warnings: string[]) {
 export function registerPluginsCli(program: Command) {
   const plugins = program
     .command("plugins")
-    .description("Manage ANIMA plugins/extensions")
+    .description("ANIMA plugin and extension management")
     .addHelpText(
       "after",
       () =>
@@ -171,7 +171,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("list")
-    .description("List discovered plugins")
+    .description("Show all discovered plugins and their status")
     .option("--json", "Print JSON")
     .option("--enabled", "Only show enabled plugins", false)
     .option("--verbose", "Show detailed entries", false)
@@ -269,7 +269,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("info")
-    .description("Show plugin details")
+    .description("Inspect a plugin's details and capabilities")
     .argument("<id>", "Plugin id")
     .option("--json", "Print JSON")
     .action((id: string, opts: PluginInfoOptions) => {
@@ -347,7 +347,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("enable")
-    .description("Enable a plugin in config")
+    .description("Activate a plugin")
     .argument("<id>", "Plugin id")
     .action(async (id: string) => {
       const cfg = loadConfig();
@@ -373,7 +373,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("disable")
-    .description("Disable a plugin in config")
+    .description("Deactivate a plugin")
     .argument("<id>", "Plugin id")
     .action(async (id: string) => {
       const cfg = loadConfig();
@@ -396,7 +396,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("uninstall")
-    .description("Uninstall a plugin")
+    .description("Remove a plugin and clean up its resources")
     .argument("<id>", "Plugin id")
     .option("--keep-files", "Keep installed files on disk", false)
     .option("--keep-config", "Deprecated alias for --keep-files", false)
@@ -531,7 +531,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("install")
-    .description("Install a plugin (path, archive, or npm spec)")
+    .description("Install a plugin from a path, archive, or npm")
     .argument("<path-or-spec>", "Path (.ts/.js/.zip/.tgz/.tar.gz) or an npm package spec")
     .option("-l, --link", "Link a local path instead of copying", false)
     .action(async (raw: string, opts: { link?: boolean }) => {
@@ -659,7 +659,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("update")
-    .description("Update installed plugins (npm installs only)")
+    .description("Update npm-installed plugins to latest versions")
     .argument("[id]", "Plugin id (omit with --all)")
     .option("--all", "Update all tracked plugins", false)
     .option("--dry-run", "Show what would change without writing", false)
@@ -707,7 +707,7 @@ export function registerPluginsCli(program: Command) {
 
   plugins
     .command("doctor")
-    .description("Report plugin load issues")
+    .description("Diagnose plugin loading errors")
     .action(() => {
       const report = buildPluginStatusReport();
       const errors = report.plugins.filter((p) => p.status === "error");

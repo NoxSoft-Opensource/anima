@@ -86,7 +86,7 @@ export function registerGatewayCli(program: Command) {
   addGatewayRunCommand(gateway.command("run").description("Start the Gateway in the foreground"));
 
   addGatewayServiceCommands(gateway, {
-    statusDescription: "Show gateway service status + probe the Gateway",
+    statusDescription: "Show Gateway service status and probe health",
   });
 
   gatewayCallOpts(

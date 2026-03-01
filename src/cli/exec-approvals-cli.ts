@@ -269,7 +269,7 @@ export function registerExecApprovalsCli(program: Command) {
   const approvals = program
     .command("approvals")
     .alias("exec-approvals")
-    .description("Manage exec approvals (gateway or node host)")
+    .description("Manage execution approvals and security policies")
     .addHelpText(
       "after",
       () =>
@@ -278,7 +278,7 @@ export function registerExecApprovalsCli(program: Command) {
 
   const getCmd = approvals
     .command("get")
-    .description("Fetch exec approvals snapshot")
+    .description("Show current execution approval state")
     .option("--node <node>", "Target node id/name/IP")
     .option("--gateway", "Force gateway approvals", false)
     .action(async (opts: ExecApprovalsCliOpts) => {
@@ -305,7 +305,7 @@ export function registerExecApprovalsCli(program: Command) {
 
   const setCmd = approvals
     .command("set")
-    .description("Replace exec approvals with a JSON file")
+    .description("Replace execution approvals from a JSON file")
     .option("--node <node>", "Target node id/name/IP")
     .option("--gateway", "Force gateway approvals", false)
     .option("--file <path>", "Path to JSON file to upload")
@@ -337,7 +337,7 @@ export function registerExecApprovalsCli(program: Command) {
 
   const allowlist = approvals
     .command("allowlist")
-    .description("Edit the per-agent allowlist")
+    .description("Manage per-agent execution allowlists")
     .addHelpText(
       "after",
       () =>
@@ -358,7 +358,7 @@ export function registerExecApprovalsCli(program: Command) {
 
   const allowlistAdd = allowlist
     .command("add <pattern>")
-    .description("Add a glob pattern to an allowlist")
+    .description("Grant execution access for a glob pattern")
     .option("--node <node>", "Target node id/name/IP")
     .option("--gateway", "Force gateway approvals", false)
     .option("--agent <id>", 'Agent id (defaults to "*")')
@@ -392,7 +392,7 @@ export function registerExecApprovalsCli(program: Command) {
 
   const allowlistRemove = allowlist
     .command("remove <pattern>")
-    .description("Remove a glob pattern from an allowlist")
+    .description("Revoke execution access for a glob pattern")
     .option("--node <node>", "Target node id/name/IP")
     .option("--gateway", "Force gateway approvals", false)
     .option("--agent <id>", 'Agent id (defaults to "*")')

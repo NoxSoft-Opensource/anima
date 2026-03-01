@@ -23,18 +23,18 @@ import { theme } from "../terminal/theme.js";
 export function registerWebhooksCli(program: Command) {
   const webhooks = program
     .command("webhooks")
-    .description("Webhook helpers and integrations")
+    .description("Webhook integrations and event ingestion")
     .addHelpText(
       "after",
       () =>
         `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/webhooks", "docs.noxsoft.net/anima/cli/webhooks")}\n`,
     );
 
-  const gmail = webhooks.command("gmail").description("Gmail Pub/Sub hooks (via gogcli)");
+  const gmail = webhooks.command("gmail").description("Gmail Pub/Sub webhook integration");
 
   gmail
     .command("setup")
-    .description("Configure Gmail watch + Pub/Sub + ANIMA hooks")
+    .description("Configure Gmail watch, Pub/Sub, and ANIMA hook pipeline")
     .requiredOption("--account <email>", "Gmail account to watch")
     .option("--project <id>", "GCP project id (OAuth client owner)")
     .option("--topic <name>", "Pub/Sub topic name", DEFAULT_GMAIL_TOPIC)
@@ -73,7 +73,7 @@ export function registerWebhooksCli(program: Command) {
 
   gmail
     .command("run")
-    .description("Run gog watch serve + auto-renew loop")
+    .description("Run the Gmail watch service with auto-renewal")
     .option("--account <email>", "Gmail account to watch")
     .option("--topic <topic>", "Pub/Sub topic path (projects/.../topics/..)")
     .option("--subscription <name>", "Pub/Sub subscription name")
