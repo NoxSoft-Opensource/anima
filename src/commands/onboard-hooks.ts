@@ -12,10 +12,10 @@ export async function setupInternalHooks(
 ): Promise<AnimaConfig> {
   await prompter.note(
     [
-      "Hooks let you automate actions when agent commands are issued.",
-      "Example: Save session context to memory when you issue /new.",
+      "ANIMA hooks automate actions in response to agent commands.",
+      "Example: persist session context to memory on /new.",
       "",
-      "Learn more: https://docs.noxsoft.net/anima/automation/hooks",
+      "Documentation: https://docs.noxsoft.net/anima/automation/hooks",
     ].join("\n"),
     "Hooks",
   );
@@ -29,16 +29,16 @@ export async function setupInternalHooks(
 
   if (eligibleHooks.length === 0) {
     await prompter.note(
-      "No eligible hooks found. You can configure hooks later in your config.",
-      "No Hooks Available",
+      "No eligible hooks detected. You can configure hooks later via your ANIMA config.",
+      "No hooks available",
     );
     return cfg;
   }
 
   const toEnable = await prompter.multiselect({
-    message: "Enable hooks?",
+    message: "Select hooks to enable",
     options: [
-      { value: "__skip__", label: "Skip for now" },
+      { value: "__skip__", label: "Skip — configure later" },
       ...eligibleHooks.map((hook) => ({
         value: hook.name,
         label: `${hook.emoji ?? "🔗"} ${hook.name}`,
@@ -73,12 +73,12 @@ export async function setupInternalHooks(
     [
       `Enabled ${selected.length} hook${selected.length > 1 ? "s" : ""}: ${selected.join(", ")}`,
       "",
-      "You can manage hooks later with:",
+      "Manage hooks anytime:",
       `  ${formatCliCommand("anima hooks list")}`,
       `  ${formatCliCommand("anima hooks enable <name>")}`,
       `  ${formatCliCommand("anima hooks disable <name>")}`,
     ].join("\n"),
-    "Hooks Configured",
+    "Hooks configured",
   );
 
   return next;

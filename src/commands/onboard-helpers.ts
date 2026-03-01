@@ -103,7 +103,7 @@ export function printWizardHeader(runtime: RuntimeEnv) {
     "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
     "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
     "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-    "                    ✦ ANIMA ✦                       ",
+    "              ✦ ANIMA by NoxSoft ✦                 ",
     " ",
   ].join("\n");
   runtime.log(header);
@@ -213,14 +213,14 @@ export function formatControlUiSshHint(params: {
     : undefined;
   const sshTarget = resolveSshTargetHint();
   return [
-    "No GUI detected. Open from your computer:",
+    "No GUI detected. Access ANIMA from your local machine:",
     `ssh -N -L ${params.port}:127.0.0.1:${params.port} ${sshTarget}`,
-    "Then open:",
+    "Then open in your browser:",
     localUrl,
     authedUrl,
-    "Docs:",
-    "https://docs.noxsoft.net/anima/gateway/remote",
-    "https://docs.noxsoft.net/anima/web/control-ui",
+    "Documentation:",
+    "  Remote access: https://docs.noxsoft.net/anima/gateway/remote",
+    "  Control UI: https://docs.noxsoft.net/anima/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

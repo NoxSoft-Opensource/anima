@@ -66,7 +66,7 @@ export async function finalizeOnboardingWizard(
     process.platform === "linux" ? await isSystemdUserServiceAvailable() : true;
   if (process.platform === "linux" && !systemdAvailable) {
     await prompter.note(
-      "Systemd user services are unavailable. Skipping lingering checks and service install.",
+      "Systemd user services are unavailable on this system. Skipping lingering checks and service install.",
       "Systemd",
     );
   }
@@ -80,7 +80,7 @@ export async function finalizeOnboardingWizard(
         note: prompter.note,
       },
       reason:
-        "Linux installs use a systemd user service by default. Without lingering, systemd stops the user session on logout/idle and kills the Gateway.",
+        "ANIMA on Linux uses a systemd user service by default. Without lingering enabled, systemd terminates your session on logout/idle and kills the Gateway.",
       requireConfirm: false,
     });
   }
@@ -96,14 +96,14 @@ export async function finalizeOnboardingWizard(
     installDaemon = true;
   } else {
     installDaemon = await prompter.confirm({
-      message: "Install Gateway service (recommended)",
+      message: "Install ANIMA Gateway as a system service (recommended)",
       initialValue: true,
     });
   }
 
   if (process.platform === "linux" && !systemdAvailable && installDaemon) {
     await prompter.note(
-      "Systemd user services are unavailable; skipping service install. Use your container supervisor or `docker compose up -d`.",
+      "Systemd user services are unavailable; skipping service install. Use your container supervisor or `docker compose up -d` instead.",
       "Gateway service",
     );
     installDaemon = false;
@@ -120,7 +120,7 @@ export async function finalizeOnboardingWizard(
           });
     if (flow === "quickstart") {
       await prompter.note(
-        "QuickStart uses Node for the Gateway service (stable + supported).",
+        "ANIMA uses Node.js for the Gateway service runtime (stable and well-supported).",
         "Gateway service runtime",
       );
     }
@@ -128,7 +128,7 @@ export async function finalizeOnboardingWizard(
     const loaded = await service.isLoaded({ env: process.env });
     if (loaded) {
       const action = await prompter.select({
-        message: "Gateway service already installed",
+        message: "ANIMA Gateway service is already installed",
         options: [
           { value: "restart", label: "Restart" },
           { value: "reinstall", label: "Reinstall" },
@@ -214,11 +214,11 @@ export async function finalizeOnboardingWizard(
       runtime.error(formatHealthCheckFailure(err));
       await prompter.note(
         [
-          "Docs:",
-          "https://docs.noxsoft.net/anima/gateway/health",
-          "https://docs.noxsoft.net/anima/gateway/troubleshooting",
+          "ANIMA documentation:",
+          "  Health checks: https://docs.noxsoft.net/anima/gateway/health",
+          "  Troubleshooting: https://docs.noxsoft.net/anima/gateway/troubleshooting",
         ].join("\n"),
-        "Health check help",
+        "Health check failed",
       );
     }
   }
@@ -234,12 +234,12 @@ export async function finalizeOnboardingWizard(
 
   await prompter.note(
     [
-      "Add nodes for extra features:",
-      "- macOS app (system + notifications)",
-      "- iOS app (camera/canvas)",
-      "- Android app (camera/canvas)",
+      "Extend ANIMA with companion nodes:",
+      "- macOS app (system integration + notifications)",
+      "- iOS app (camera + canvas)",
+      "- Android app (camera + canvas)",
     ].join("\n"),
-    "Optional apps",
+    "Companion apps (optional)",
   );
 
   const controlUiBasePath =
@@ -279,7 +279,7 @@ export async function finalizeOnboardingWizard(
         : undefined,
       `Gateway WS: ${links.wsUrl}`,
       gatewayStatusLine,
-      "Docs: https://docs.noxsoft.net/anima/web/control-ui",
+      "Documentation: https://docs.noxsoft.net/anima/web/control-ui",
     ]
       .filter(Boolean)
       .join("\n"),
@@ -296,34 +296,34 @@ export async function finalizeOnboardingWizard(
     if (hasBootstrap) {
       await prompter.note(
         [
-          "This is the defining action that makes your agent you.",
-          "Please take your time.",
-          "The more you tell it, the better the experience will be.",
-          'We will send: "Wake up, my friend!"',
+          "This is where your agent's persistent identity begins.",
+          "Take your time with the bootstrap — the more context you provide,",
+          "the more coherent your agent will be.",
+          'ANIMA will send: "Wake up, my friend!"',
         ].join("\n"),
-        "Start TUI (best option!)",
+        "Launch in TUI (recommended)",
       );
     }
 
     await prompter.note(
       [
-        "Gateway token: shared auth for the Gateway + Control UI.",
-        "Stored in: ~/.anima/anima.json (gateway.auth.token) or ANIMA_GATEWAY_TOKEN.",
+        "Gateway token: shared authentication for the ANIMA Gateway and Control UI.",
+        "Stored in: ~/.anima/anima.json (gateway.auth.token) or ANIMA_GATEWAY_TOKEN env var.",
         `View token: ${formatCliCommand("anima config get gateway.auth.token")}`,
-        `Generate token: ${formatCliCommand("anima doctor --generate-gateway-token")}`,
-        "Web UI stores a copy in this browser's localStorage (anima.control.settings.v1).",
+        `Generate new token: ${formatCliCommand("anima doctor --generate-gateway-token")}`,
+        "The Control UI stores a copy in your browser's localStorage.",
         `Open the dashboard anytime: ${formatCliCommand("anima dashboard --no-open")}`,
-        "If prompted: paste the token into Control UI settings (or use the tokenized dashboard URL).",
+        "If prompted, paste the token into Control UI settings or use the tokenized URL.",
       ].join("\n"),
-      "Token",
+      "Authentication",
     );
 
     hatchChoice = await prompter.select({
-      message: "How do you want to hatch your bot?",
+      message: "How do you want to launch your agent?",
       options: [
-        { value: "tui", label: "Hatch in TUI (recommended)" },
-        { value: "web", label: "Open the Web UI" },
-        { value: "later", label: "Do this later" },
+        { value: "tui", label: "Launch in TUI (recommended)" },
+        { value: "web", label: "Open the Control UI in browser" },
+        { value: "later", label: "Skip for now" },
       ],
       initialValue: "tui",
     });
@@ -361,8 +361,8 @@ export async function finalizeOnboardingWizard(
         [
           `Dashboard link (with token): ${authedUrl}`,
           controlUiOpened
-            ? "Opened in your browser. Keep that tab to control Anima."
-            : "Copy/paste this URL in a browser on this machine to control Anima.",
+            ? "Opened in your browser. Keep that tab open to manage ANIMA."
+            : "Copy this URL into a browser on this machine to access the ANIMA dashboard.",
           controlUiOpenHint,
         ]
           .filter(Boolean)
@@ -371,25 +371,25 @@ export async function finalizeOnboardingWizard(
       );
     } else {
       await prompter.note(
-        `When you're ready: ${formatCliCommand("anima dashboard --no-open")}`,
-        "Later",
+        `Launch the dashboard anytime: ${formatCliCommand("anima dashboard --no-open")}`,
+        "Skipped",
       );
     }
   } else if (opts.skipUi) {
-    await prompter.note("Skipping Control UI/TUI prompts.", "Control UI");
+    await prompter.note("Skipping Control UI and TUI prompts.", "Control UI");
   }
 
   await prompter.note(
     [
-      "Back up your agent workspace.",
-      "Docs: https://docs.noxsoft.net/anima/concepts/agent-workspace",
+      "Back up your agent workspace regularly. Your agent's identity and memory live here.",
+      "Documentation: https://docs.noxsoft.net/anima/concepts/agent-workspace",
     ].join("\n"),
     "Workspace backup",
   );
 
   await prompter.note(
-    "Running agents on your computer is risky — harden your setup: https://docs.noxsoft.net/anima/security",
-    "Security",
+    "Running AI agents locally carries inherent risk. Harden your setup: https://docs.noxsoft.net/anima/security",
+    "Security reminder",
   );
 
   await setupOnboardingShellCompletion({ flow, prompter });
@@ -422,8 +422,8 @@ export async function finalizeOnboardingWizard(
       [
         `Dashboard link (with token): ${authedUrl}`,
         controlUiOpened
-          ? "Opened in your browser. Keep that tab to control Anima."
-          : "Copy/paste this URL in a browser on this machine to control Anima.",
+          ? "Opened in your browser. Keep that tab open to manage ANIMA."
+          : "Copy this URL into a browser on this machine to access the ANIMA dashboard.",
         controlUiOpenHint,
       ]
         .filter(Boolean)
@@ -438,39 +438,39 @@ export async function finalizeOnboardingWizard(
   await prompter.note(
     hasWebSearchKey
       ? [
-          "Web search is enabled, so your agent can look things up online when needed.",
+          "Web search is enabled. Your agent can query the web when needed.",
           "",
           webSearchKey
             ? "API key: stored in config (tools.web.search.apiKey)."
             : "API key: provided via BRAVE_API_KEY env var (Gateway environment).",
-          "Docs: https://docs.noxsoft.net/anima/tools/web",
+          "Documentation: https://docs.noxsoft.net/anima/tools/web",
         ].join("\n")
       : [
-          "If you want your agent to be able to search the web, you’ll need an API key.",
+          "To enable web search for your agent, provide a Brave Search API key.",
           "",
-          "Anima uses Brave Search for the `web_search` tool. Without a Brave Search API key, web search won’t work.",
+          "ANIMA uses Brave Search for the `web_search` tool.",
+          "Without a key, web search is unavailable.",
           "",
-          "Set it up interactively:",
-          `- Run: ${formatCliCommand("anima configure --section web")}`,
-          "- Enable web_search and paste your Brave Search API key",
+          "Configure interactively:",
+          `  ${formatCliCommand("anima configure --section web")}`,
           "",
-          "Alternative: set BRAVE_API_KEY in the Gateway environment (no config changes).",
-          "Docs: https://docs.noxsoft.net/anima/tools/web",
+          "Or set BRAVE_API_KEY in the Gateway environment.",
+          "Documentation: https://docs.noxsoft.net/anima/tools/web",
         ].join("\n"),
     "Web search (optional)",
   );
 
   await prompter.note(
-    'What now: https://noxsoft.net/showcase ("What People Are Building").',
-    "What now",
+    "Explore what others are building with ANIMA: https://noxsoft.net/showcase",
+    "Next steps",
   );
 
   await prompter.outro(
     controlUiOpened
-      ? "Onboarding complete. Dashboard opened; keep that tab to control Anima."
+      ? "ANIMA setup complete. Dashboard is open — keep that tab to manage your agent."
       : seededInBackground
-        ? "Onboarding complete. Web UI seeded in the background; open it anytime with the dashboard link above."
-        : "Onboarding complete. Use the dashboard link above to control Anima.",
+        ? "ANIMA setup complete. Control UI seeded in the background. Open it anytime with the dashboard link above."
+        : "ANIMA setup complete. Use the dashboard link above to manage your agent.",
   );
 
   return { launchedTui };

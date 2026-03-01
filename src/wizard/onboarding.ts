@@ -38,15 +38,16 @@ async function requireRiskAcknowledgement(params: {
 
   await params.prompter.note(
     [
-      "ANIMA runs AI agents with tool access on your machine.",
-      "Misconfigured agents can execute unsafe actions.",
-      "Use allowlists, sandboxing, and least-privilege tools.",
+      "ANIMA grants AI agents direct tool access on your machine.",
+      "NoxSoft builds with consent-based architecture and ethical guardrails,",
+      "but you are responsible for your own security posture.",
+      "Use allowlists, sandboxing, and least-privilege tool configurations.",
     ].join("\n"),
     "Security",
   );
 
   const ok = await params.prompter.confirm({
-    message: "I understand the risks. Continue?",
+    message: "I acknowledge the risks and accept responsibility. Continue?",
     initialValue: false,
   });
   if (!ok) {
@@ -60,7 +61,7 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   printWizardHeader(runtime);
-  await prompter.intro("ANIMA Setup");
+  await prompter.intro("Welcome to ANIMA — NoxSoft's AI orchestration daemon.");
   await requireRiskAcknowledgement({ opts, prompter });
 
   // --- Step 1: Load existing config (merge, never prompt) ---
@@ -68,7 +69,7 @@ export async function runOnboardingWizard(
   const baseConfig: AnimaConfig = snapshot.valid ? snapshot.config : {};
 
   if (snapshot.exists && !snapshot.valid) {
-    await prompter.note(summarizeExistingConfig(baseConfig), "Invalid config");
+    await prompter.note(summarizeExistingConfig(baseConfig), "Invalid configuration detected");
     if (snapshot.issues.length > 0) {
       await prompter.note(
         snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`).join("\n"),
@@ -76,7 +77,7 @@ export async function runOnboardingWizard(
       );
     }
     await prompter.outro(
-      `Config invalid. Run \`${formatCliCommand("anima doctor")}\` to repair it, then re-run setup.`,
+      `Configuration is invalid. Run \`${formatCliCommand("anima doctor")}\` to diagnose and repair, then re-run setup.`,
     );
     runtime.exit(1);
     return;
