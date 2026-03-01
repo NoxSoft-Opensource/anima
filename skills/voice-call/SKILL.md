@@ -1,9 +1,9 @@
 ---
 name: voice-call
-description: Start voice calls via the Anima voice-call plugin.
+description: Start voice calls via the ANIMA voice-call plugin.
 metadata:
   {
-    "anima":
+    "noxsoft":
       {
         "emoji": "📞",
         "skillKey": "voice-call",
@@ -19,8 +19,8 @@ Use the voice-call plugin to start or inspect calls (Twilio, Telnyx, Plivo, or m
 ## CLI
 
 ```bash
-anima voicecall call --to "+15555550123" --message "Hello from Anima"
-anima voicecall status --call-id <id>
+noxsoft voicecall call --to "+15555550123" --message "Hello from ANIMA"
+noxsoft voicecall status --call-id <id>
 ```
 
 ## Tool

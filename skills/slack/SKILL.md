@@ -1,14 +1,14 @@
 ---
 name: slack
-description: Use when you need to control Slack from Anima via the slack tool, including reacting to messages or pinning/unpinning items in Slack channels or DMs.
-metadata: { "anima": { "emoji": "💬", "requires": { "config": ["channels.slack"] } } }
+description: Use when you need to control Slack from ANIMA via the slack tool, including reacting to messages or pinning/unpinning items in Slack channels or DMs.
+metadata: { "noxsoft": { "emoji": "💬", "requires": { "config": ["channels.slack"] } } }
 ---
 
 # Slack Actions
 
 ## Overview
 
-Use `slack` to react, manage pins, send/edit/delete messages, and fetch member info. The tool uses the bot token configured for Anima.
+Use `slack` to react, manage pins, send/edit/delete messages, and fetch member info. The tool uses the bot token configured for ANIMA.
 
 ## Inputs to collect
 
@@ -57,7 +57,7 @@ Message context lines include `slack message id` and `channel` fields you can re
 {
   "action": "sendMessage",
   "to": "channel:C123",
-  "content": "Hello from Anima"
+  "content": "Hello from ANIMA"
 }
 ```
 

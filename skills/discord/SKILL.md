@@ -1,7 +1,7 @@
 ---
 name: discord
 description: "Discord ops via the message tool (channel=discord)."
-metadata: { "anima": { "emoji": "🎮", "requires": { "config": ["channels.discord.token"] } } }
+metadata: { "noxsoft": { "emoji": "🎮", "requires": { "config": ["channels.discord.token"] } } }
 allowed-tools: ["message"]
 ---
 

@@ -4,7 +4,7 @@ description: Gemini CLI for one-shot Q&A, summaries, and generation.
 homepage: https://ai.google.dev/
 metadata:
   {
-    "anima":
+    "noxsoft":
       {
         "emoji": "♊️",
         "requires": { "bins": ["gemini"] },

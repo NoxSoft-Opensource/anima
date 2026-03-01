@@ -10,7 +10,7 @@ List tmux sessions on a socket (default tmux socket if none provided).
 Options:
   -L, --socket       tmux socket name (passed to tmux -L)
   -S, --socket-path  tmux socket path (passed to tmux -S)
-  -A, --all          scan all sockets under ANIMA_TMUX_SOCKET_DIR
+  -A, --all          scan all sockets under NOXSOFT_TMUX_SOCKET_DIR
   -q, --query        case-insensitive substring to filter session names
   -h, --help         show this help
 USAGE
@@ -20,7 +20,7 @@ socket_name=""
 socket_path=""
 query=""
 scan_all=false
-socket_dir="${ANIMA_TMUX_SOCKET_DIR:-${ANIMA_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/anima-tmux-sockets}}"
+socket_dir="${NOXSOFT_TMUX_SOCKET_DIR:-${NOXSOFT_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/noxsoft-tmux-sockets}}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
