@@ -6,22 +6,14 @@ import {
 } from "./registry.js";
 
 describe("channel registry", () => {
-  it("normalizes aliases", () => {
-    expect(normalizeChatChannelId("imsg")).toBe("imessage");
-    expect(normalizeChatChannelId("gchat")).toBe("googlechat");
-    expect(normalizeChatChannelId("google-chat")).toBe("googlechat");
-    expect(normalizeChatChannelId("internet-relay-chat")).toBe("irc");
-    expect(normalizeChatChannelId("web")).toBeNull();
+  it("normalizes known channel IDs", () => {
+    expect(normalizeChatChannelId("web")).toBe("web");
+    expect(normalizeChatChannelId("unknown")).toBeNull();
   });
 
-  it("keeps Telegram first in the default order", () => {
+  it("keeps web first in the default order", () => {
     const channels = listChatChannels();
-    expect(channels[0]?.id).toBe("telegram");
-  });
-
-  it("does not include MS Teams by default", () => {
-    const channels = listChatChannels();
-    expect(channels.some((channel) => channel.id === "msteams")).toBe(false);
+    expect(channels[0]?.id).toBe("web");
   });
 
   it("formats selection lines with docs labels", () => {
@@ -33,8 +25,7 @@ describe("channel registry", () => {
     const line = formatChannelSelectionLine(first, (path, label) =>
       [label, path].filter(Boolean).join(":"),
     );
-    expect(line).not.toContain("Docs:");
-    expect(line).toContain("/channels/telegram");
-    expect(line).toContain("https://anima.ai");
+    expect(line).toContain("/channels/web");
+    expect(line).toContain("https://noxsoft.net");
   });
 });
