@@ -113,6 +113,22 @@ const coreEntries: CoreCliEntry[] = [
       mod.registerBrowserCli(program);
     },
   },
+  {
+    commands: [
+      { name: "start", description: "Start ANIMA daemon with heartbeat + REPL" },
+      { name: "init", description: "Initialize ~/.anima/ directory structure" },
+      { name: "migrate", description: "Import from Claude Coherence Protocol" },
+      { name: "ask", description: "Queue a task to the running daemon" },
+      { name: "pulse", description: "Show last heartbeat information" },
+      { name: "soul", description: "View current identity summary" },
+      { name: "wander", description: "Trigger freedom exploration session" },
+      { name: "journal", description: "View or write journal entries" },
+    ],
+    register: async ({ program }) => {
+      const mod = await import("./register.anima.js");
+      mod.registerAnimaCommands(program);
+    },
+  },
 ];
 
 export function getCoreCliCommandNames(): string[] {
