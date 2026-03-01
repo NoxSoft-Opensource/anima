@@ -194,7 +194,7 @@ export async function setupSkills(
       runtime.log(
         `Tip: run \`${formatCliCommand("anima doctor")}\` to review skills + requirements.`,
       );
-      runtime.log("Docs: https://docs.anima.ai/skills");
+      runtime.log("Docs: https://docs.noxsoft.net/anima/skills");
     }
   }
 

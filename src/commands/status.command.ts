@@ -615,8 +615,8 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.anima.ai/faq");
-  runtime.log("Troubleshooting: https://docs.anima.ai/troubleshooting");
+  runtime.log("FAQ: https://docs.noxsoft.net/anima/faq");
+  runtime.log("Troubleshooting: https://docs.noxsoft.net/anima/troubleshooting");
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {

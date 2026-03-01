@@ -148,9 +148,11 @@ export async function configureGatewayForOnboarding(
   let tailscaleResetOnExit = flow === "quickstart" ? quickstartGateway.tailscaleResetOnExit : false;
   if (tailscaleMode !== "off" && flow !== "quickstart") {
     await prompter.note(
-      ["Docs:", "https://docs.anima.ai/gateway/tailscale", "https://docs.anima.ai/web"].join(
-        "\n",
-      ),
+      [
+        "Docs:",
+        "https://docs.noxsoft.net/anima/gateway/tailscale",
+        "https://docs.noxsoft.net/anima/web",
+      ].join("\n"),
       "Tailscale",
     );
     tailscaleResetOnExit = Boolean(

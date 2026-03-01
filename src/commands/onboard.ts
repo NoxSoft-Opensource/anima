@@ -40,7 +40,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
     runtime.error(
       [
         "Non-interactive onboarding requires explicit risk acknowledgement.",
-        "Read: https://docs.anima.ai/security",
+        "Read: https://docs.noxsoft.net/anima/security",
         `Re-run with: ${formatCliCommand("anima onboard --non-interactive --accept-risk ...")}`,
       ].join("\n"),
     );
@@ -62,7 +62,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
         "Windows detected — Anima runs great on WSL2!",
         "Native Windows might be trickier.",
         "Quick setup: wsl --install (one command, one reboot)",
-        "Guide: https://docs.anima.ai/windows",
+        "Guide: https://docs.noxsoft.net/anima/windows",
       ].join("\n"),
     );
   }

@@ -1,6 +1,6 @@
 import { formatTerminalLink } from "../utils.js";
 
-export const DOCS_ROOT = "https://docs.anima.ai";
+export const DOCS_ROOT = "https://docs.noxsoft.net/anima";
 
 export function formatDocsLink(
   path: string,

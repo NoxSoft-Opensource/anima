@@ -219,8 +219,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     authedUrl,
     "Docs:",
-    "https://docs.anima.ai/gateway/remote",
-    "https://docs.anima.ai/web/control-ui",
+    "https://docs.noxsoft.net/anima/gateway/remote",
+    "https://docs.noxsoft.net/anima/web/control-ui",
   ]
     .filter(Boolean)
     .join("\n");

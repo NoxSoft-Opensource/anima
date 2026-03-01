@@ -5,7 +5,7 @@ import { runCommandWithTimeout } from "../process/exec.js";
 import { formatDocsLink } from "../terminal/links.js";
 import { isRich, theme } from "../terminal/theme.js";
 
-const SEARCH_TOOL = "https://docs.anima.ai/mcp.SearchAnima";
+const SEARCH_TOOL = "https://docs.noxsoft.net/anima/mcp.SearchAnima";
 const SEARCH_TIMEOUT_MS = 30_000;
 const DEFAULT_SNIPPET_MAX = 220;
 
@@ -160,12 +160,12 @@ async function renderMarkdown(markdown: string, runtime: RuntimeEnv) {
 export async function docsSearchCommand(queryParts: string[], runtime: RuntimeEnv) {
   const query = queryParts.join(" ").trim();
   if (!query) {
-    const docs = formatDocsLink("/", "docs.anima.ai");
+    const docs = formatDocsLink("/", "docs.noxsoft.net/anima");
     if (isRich()) {
       runtime.log(`${theme.muted("Docs:")} ${docs}`);
       runtime.log(`${theme.muted("Search:")} ${formatCliCommand('anima docs "your query"')}`);
     } else {
-      runtime.log("Docs: https://docs.anima.ai/");
+      runtime.log("Docs: https://docs.noxsoft.net/anima/");
       runtime.log(`Search: ${formatCliCommand('anima docs "your query"')}`);
     }
     return;

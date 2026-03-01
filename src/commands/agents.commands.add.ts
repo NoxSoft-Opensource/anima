@@ -333,7 +333,7 @@ export async function agentsAddCommand(
         await prompter.note(
           [
             "Routing unchanged. Add bindings when you're ready.",
-            "Docs: https://docs.anima.ai/concepts/multi-agent",
+            "Docs: https://docs.noxsoft.net/anima/concepts/multi-agent",
           ].join("\n"),
           "Routing",
         );

@@ -154,7 +154,7 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
   return [
     "## Documentation",
     `Anima docs: ${docsPath}`,
-    "Mirror: https://docs.anima.ai",
+    "Mirror: https://docs.noxsoft.net/anima",
     "Source: https://github.com/anima/anima",
     "Community: https://discord.com/invite/clawd",
     "Find new skills: https://animahub.com",

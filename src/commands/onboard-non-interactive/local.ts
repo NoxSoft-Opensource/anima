@@ -141,7 +141,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
 
   if (!opts.json) {
     runtime.log(
-      `Tip: run \`${formatCliCommand("anima configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.anima.ai/tools/web`,
+      `Tip: run \`${formatCliCommand("anima configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.noxsoft.net/anima/tools/web`,
     );
   }
 }

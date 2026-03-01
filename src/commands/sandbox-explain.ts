@@ -30,7 +30,7 @@ type SandboxExplainOptions = {
   json: boolean;
 };
 
-const SANDBOX_DOCS_URL = "https://docs.anima.ai/sandbox";
+const SANDBOX_DOCS_URL = "https://docs.noxsoft.net/anima/sandbox";
 
 function normalizeExplainSessionKey(params: {
   cfg: AnimaConfig;
@@ -331,7 +331,7 @@ export async function sandboxExplainCommand(
     lines.push(`  - ${key}`);
   }
   lines.push("");
-  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.anima.ai/sandbox")}`);
+  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.noxsoft.net/anima/sandbox")}`);
 
   runtime.log(`${lines.join("\n")}\n`);
 }
