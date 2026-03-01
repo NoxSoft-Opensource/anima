@@ -15,6 +15,7 @@ import type { HeartbeatEngine } from '../heartbeat/engine.js'
 import type { RequestQueue } from './queue.js'
 import type { BudgetTracker } from '../sessions/budget.js'
 import type { SVRNNode } from '../svrn/node.js'
+import type { AnimaAutoUpdater } from '../updater/auto-update.js'
 import { loadIdentity, IDENTITY_COMPONENTS } from '../identity/loader.js'
 import { COMPONENT_DESCRIPTIONS } from '../identity/templates.js'
 import { listServers } from '../mcp/registry.js'
@@ -36,6 +37,7 @@ export interface ReplContext {
   queue: RequestQueue
   budget: BudgetTracker
   svrnNode?: SVRNNode
+  updater?: AnimaAutoUpdater
 }
 
 export interface Command {
@@ -74,6 +76,7 @@ const helpCommand: Command = {
       `${o}  │${r}  ${o}:budget${r}        ${m}Show budget details${r}`,
       `${o}  │${r}  ${o}:history${r} ${t}[n]${r}   ${m}Show last N session transcripts${r}`,
       `${o}  │${r}  ${o}:svrn${r} ${t}[cmd]${r}    ${m}SVRN node (status|enable|disable|wallet|limits)${r}`,
+      `${o}  │${r}  ${o}:update${r} ${t}[cmd]${r}  ${m}Check/install updates (check|install|status)${r}`,
       `${o}  │${r}  ${o}:shutdown${r}      ${m}Graceful shutdown${r}`,
       `${o}  │${r}`,
       `${o}  │${r}  ${m}Any text without : prefix is queued as a task.${r}`,
@@ -664,6 +667,95 @@ const svrnCommand: Command = {
   },
 }
 
+const updateCommand: Command = {
+  name: 'update',
+  aliases: ['up'],
+  description: 'Check for or install ANIMA updates (check|install|status)',
+  async execute(args, ctx): Promise<string> {
+    const o = colors.accent
+    const t = colors.text
+    const m = colors.muted
+    const s = colors.success
+    const w = colors.warning
+    const r = colors.reset
+
+    if (!ctx.updater) {
+      return formatError('Auto-updater not initialized. Restart ANIMA to initialize.')
+    }
+
+    const sub = args[0] || 'check'
+
+    switch (sub) {
+      case 'check': {
+        const info = await ctx.updater.check()
+        if (info) {
+          return [
+            ``,
+            `${w}  Update available: v${info.currentVersion} -> v${info.latestVersion}${r}`,
+            `${m}  Channel: ${info.channel}${r}`,
+            `${m}  Run \`:update install\` to download and install.${r}`,
+            ``,
+          ].join('\n')
+        }
+        return formatSuccess(`Already up to date (v${ctx.updater.getVersion()}).`)
+      }
+
+      case 'install': {
+        process.stdout.write(`${m}  Checking for updates...${r}\n`)
+        const info = await ctx.updater.installAndRestart()
+        if (info) {
+          process.stdout.write(
+            `${s}  Updated: v${info.currentVersion} -> v${info.latestVersion}${r}\n`,
+          )
+          process.stdout.write(`${m}  Restarting ANIMA...${r}\n`)
+          // The installAndRestart triggers process restart internally
+          // If autoRestart is off, we just installed -- need manual restart
+          return formatSuccess(
+            `Update installed (v${info.latestVersion}). Restart ANIMA to use the new version.`,
+          )
+        }
+        return formatSuccess(`Already up to date (v${ctx.updater.getVersion()}).`)
+      }
+
+      case 'status': {
+        const config = ctx.updater.getConfig()
+        const lastCheck = ctx.updater.getLastCheckTime()
+        const lastUpdate = ctx.updater.getLastUpdateInfo()
+
+        const lines = [
+          ``,
+          `${o}  ┌─── ${colors.bold}Auto-Update Status${r}${o} ──────────────────┐${r}`,
+          `${o}  │${r}  ${t}Version:       ${o}v${ctx.updater.getVersion()}${r}`,
+          `${o}  │${r}  ${t}Channel:       ${m}${config.channel}${r}`,
+          `${o}  │${r}  ${t}Enabled:       ${config.enabled ? `${s}yes${r}` : `${colors.error}no${r}`}`,
+          `${o}  │${r}  ${t}Auto-restart:  ${config.autoRestart ? `${s}yes${r}` : `${m}no${r}`}`,
+          `${o}  │${r}  ${t}Check interval:${m} every ${config.checkIntervalHours}h${r}`,
+          `${o}  │${r}  ${t}Last check:    ${m}${lastCheck ? lastCheck.toLocaleString() : 'never'}${r}`,
+        ]
+
+        if (lastUpdate) {
+          lines.push(
+            `${o}  │${r}`,
+            `${o}  │${r}  ${w}Pending update: v${lastUpdate.currentVersion} -> v${lastUpdate.latestVersion}${r}`,
+          )
+        }
+
+        lines.push(
+          `${o}  └───────────────────────────────────────────┘${r}`,
+          ``,
+        )
+
+        return lines.join('\n')
+      }
+
+      default:
+        return formatError(
+          `Unknown update command: ${sub}. Use: check, install, status`,
+        )
+    }
+  },
+}
+
 const shutdownCommand: Command = {
   name: 'shutdown',
   aliases: ['exit', 'quit'],
@@ -671,6 +763,9 @@ const shutdownCommand: Command = {
   async execute(_args, ctx): Promise<string> {
     // This will be intercepted by the REPL interface
     ctx.heartbeat.stop()
+    if (ctx.updater) {
+      ctx.updater.stop()
+    }
     if (ctx.svrnNode) {
       await ctx.svrnNode.stop()
     }
@@ -695,6 +790,7 @@ const ALL_COMMANDS: Command[] = [
   budgetCommand,
   historyCommand,
   svrnCommand,
+  updateCommand,
   shutdownCommand,
 ]
 

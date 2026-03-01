@@ -10,10 +10,14 @@
  * 6. Initialize RequestQueue
  * 7. Start heartbeat (async, runs first beat then schedules)
  * 8. Start SVRN node if enabled (compute contributor)
- * 9. Print ANIMA boot banner with identity + budget + SVRN status
- * 10. Start AnimaRepl (unless --no-repl)
- * 11. Register SIGINT/SIGTERM handlers for graceful shutdown
+ * 9. Initialize auto-updater
+ * 10. Print ANIMA boot banner with identity + budget + SVRN + update status
+ * 11. Start AnimaRepl (unless --no-repl)
+ * 12. Register SIGINT/SIGTERM handlers for graceful shutdown
  */
+
+import { join } from "node:path";
+import { homedir } from "node:os";
 
 import { HeartbeatEngine } from "../heartbeat/engine.js";
 import { loadIdentity } from "../identity/loader.js";
@@ -25,6 +29,7 @@ import { BudgetTracker } from "../sessions/budget.js";
 import { SessionOrchestrator } from "../sessions/orchestrator.js";
 import { SVRNNode, DEFAULT_SVRN_CONFIG } from "../svrn/node.js";
 import { loadSVRNConfig } from "../svrn/config.js";
+import { AnimaAutoUpdater, loadAutoUpdateConfig } from "../updater/auto-update.js";
 
 export interface StartOptions {
   daemon?: boolean;
@@ -107,12 +112,38 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
     );
   }
 
-  // 9. Print ANIMA boot banner
+  // 9. Initialize auto-updater
+  const autoUpdateConfig = loadAutoUpdateConfig();
+  const dataDir = join(homedir(), ".anima");
+  const updater = new AnimaAutoUpdater(autoUpdateConfig, dataDir);
+
+  if (autoUpdateConfig.enabled) {
+    updater.start();
+    const intervalLabel = `${autoUpdateConfig.checkIntervalHours}h`;
+    process.stdout.write(
+      `${colors.muted}  Auto-update: ${colors.success}enabled${colors.reset} ` +
+        `${colors.muted}(checking every ${intervalLabel}, channel: ${autoUpdateConfig.channel})${colors.reset}\n`,
+    );
+
+    // Check if an update is already available (from the immediate check)
+    updater.on("update-available", (info) => {
+      process.stdout.write(
+        `\n${colors.warning}  Update available: v${info.currentVersion} -> v${info.latestVersion}${colors.reset}` +
+          ` ${colors.muted}(run \`anima self-update\` or \`:update install\` to install)${colors.reset}\n`,
+      );
+    });
+  } else {
+    process.stdout.write(
+      `${colors.muted}  Auto-update: Disabled${colors.reset}\n`,
+    );
+  }
+
+  // 10. Print ANIMA boot banner
   const budgetRemaining = budget.getRemaining();
   process.stdout.write(banner(identityName, heartbeat.getBeatCount(), budgetRemaining));
   process.stdout.write("\n");
 
-  // 10. Start REPL (unless headless)
+  // 11. Start REPL (unless headless)
   if (!noRepl) {
     const repl = new AnimaRepl({
       orchestrator,
@@ -120,6 +151,7 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
       budget,
       queue,
       svrnNode,
+      updater,
     });
 
     await repl.start();
@@ -134,6 +166,7 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
     const shutdown = async () => {
       process.stdout.write(`\n${colors.muted}  Shutting down...${colors.reset}\n`);
       heartbeat.stop();
+      updater.stop();
       await svrnNode.stop();
       await queue.save();
       await budget.persist();

@@ -12,6 +12,7 @@ import type { SessionOrchestrator } from '../sessions/orchestrator.js'
 import type { HeartbeatEngine } from '../heartbeat/engine.js'
 import type { BudgetTracker } from '../sessions/budget.js'
 import type { SVRNNode } from '../svrn/node.js'
+import type { AnimaAutoUpdater } from '../updater/auto-update.js'
 import { RequestQueue } from './queue.js'
 import { findCommand, type ReplContext } from './commands.js'
 import {
@@ -31,6 +32,7 @@ export interface AnimaReplOptions {
   budget: BudgetTracker
   queue?: RequestQueue
   svrnNode?: SVRNNode
+  updater?: AnimaAutoUpdater
 }
 
 export class AnimaRepl {
@@ -48,6 +50,7 @@ export class AnimaRepl {
       queue,
       budget: options.budget,
       svrnNode: options.svrnNode,
+      updater: options.updater,
     }
   }
 
@@ -255,6 +258,11 @@ export class AnimaRepl {
 
     // Stop heartbeat
     this.ctx.heartbeat.stop()
+
+    // Stop auto-updater
+    if (this.ctx.updater) {
+      this.ctx.updater.stop()
+    }
 
     // Stop SVRN node
     if (this.ctx.svrnNode) {

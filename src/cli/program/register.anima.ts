@@ -246,6 +246,53 @@ export function registerAnimaCommands(program: Command): void {
       }
     });
 
+  // anima self-update — check npm and update @noxsoft/anima
+  program
+    .command("self-update")
+    .description("Check npm for a newer version of @noxsoft/anima and install it")
+    .option("--check", "Only check for updates without installing")
+    .action(async (opts) => {
+      const { AnimaAutoUpdater, loadAutoUpdateConfig } = await import(
+        "../../updater/auto-update.js"
+      );
+      const { join } = await import("node:path");
+      const { homedir } = await import("node:os");
+
+      const config = loadAutoUpdateConfig();
+      const dataDir = join(homedir(), ".anima");
+      const updater = new AnimaAutoUpdater(config, dataDir);
+
+      console.log(`Current version: v${updater.getVersion()}`);
+      console.log(`Channel: ${config.channel}`);
+      console.log("Checking npm for updates...");
+
+      const info = await updater.check();
+
+      if (!info) {
+        console.log("Already up to date.");
+        return;
+      }
+
+      console.log(
+        `Update available: v${info.currentVersion} -> v${info.latestVersion}`,
+      );
+
+      if (opts.check) {
+        console.log('Run `anima self-update` (without --check) to install.');
+        return;
+      }
+
+      console.log("Installing update...");
+      const result = await updater.installAndRestart();
+
+      if (result) {
+        console.log(`Updated to v${result.latestVersion}.`);
+        console.log("Restart ANIMA to use the new version.");
+      } else {
+        console.log("Already up to date.");
+      }
+    });
+
   // anima journal [entry]
   program
     .command("journal [entry...]")
