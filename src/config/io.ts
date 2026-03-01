@@ -436,7 +436,7 @@ function warnIfConfigFromFuture(cfg: AnimaConfig, logger: Pick<typeof console, "
   }
   if (cmp < 0) {
     logger.warn(
-      `Config was last written by a newer Anima (${touched}); current version is ${VERSION}.`,
+      `Config was last written by a newer ANIMA (${touched}); current version is ${VERSION}.`,
     );
   }
 }

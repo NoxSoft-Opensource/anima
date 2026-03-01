@@ -6,7 +6,9 @@ import { formatDocsLink } from "../terminal/links.js";
 import { theme } from "../terminal/theme.js";
 
 export function registerAcpCli(program: Command) {
-  const acp = program.command("acp").description("Run an ACP bridge backed by the Gateway");
+  const acp = program
+    .command("acp")
+    .description("Agent Control Protocol bridge for AI orchestration");
 
   acp
     .option("--url <url>", "Gateway WebSocket URL (defaults to gateway.remote.url when configured)")
@@ -44,7 +46,7 @@ export function registerAcpCli(program: Command) {
 
   acp
     .command("client")
-    .description("Run an interactive ACP client against the local ACP bridge")
+    .description("Launch an interactive ACP client session")
     .option("--cwd <dir>", "Working directory for the ACP session")
     .option("--server <command>", "ACP server command (default: anima)")
     .option("--server-args <args...>", "Extra arguments for the ACP server")

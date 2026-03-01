@@ -29,7 +29,7 @@ export type IrcAccountConfig = {
   nick?: string;
   /** IRC USER field username (defaults to nick). */
   username?: string;
-  /** IRC USER field realname (default: Anima). */
+  /** IRC USER field realname (default: ANIMA). */
   realname?: string;
   /** Optional IRC server password (sensitive). */
   password?: string;

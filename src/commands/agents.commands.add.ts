@@ -177,7 +177,7 @@ export async function agentsAddCommand(
 
   const prompter = createClackPrompter();
   try {
-    await prompter.intro("Add a new Anima agent to your NoxSoft deployment");
+    await prompter.intro("Add a new ANIMA agent to your NoxSoft deployment");
     const name =
       nameInput ??
       (await prompter.text({

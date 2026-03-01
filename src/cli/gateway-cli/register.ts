@@ -75,7 +75,7 @@ export function registerGatewayCli(program: Command) {
   const gateway = addGatewayRunCommand(
     program
       .command("gateway")
-      .description("Run the WebSocket Gateway")
+      .description("ANIMA Gateway orchestration and control")
       .addHelpText(
         "after",
         () =>
@@ -83,9 +83,7 @@ export function registerGatewayCli(program: Command) {
       ),
   );
 
-  addGatewayRunCommand(
-    gateway.command("run").description("Run the WebSocket Gateway (foreground)"),
-  );
+  addGatewayRunCommand(gateway.command("run").description("Start the Gateway in the foreground"));
 
   addGatewayServiceCommands(gateway, {
     statusDescription: "Show gateway service status + probe the Gateway",
@@ -94,7 +92,7 @@ export function registerGatewayCli(program: Command) {
   gatewayCallOpts(
     gateway
       .command("call")
-      .description("Call a Gateway method")
+      .description("Invoke a Gateway RPC method")
       .argument("<method>", "Method name (health/status/system-presence/cron.*)")
       .option("--params <json>", "JSON object string for params", "{}")
       .action(async (method, opts) => {
@@ -117,7 +115,7 @@ export function registerGatewayCli(program: Command) {
   gatewayCallOpts(
     gateway
       .command("usage-cost")
-      .description("Fetch usage cost summary from session logs")
+      .description("Show usage cost breakdown from session logs")
       .option("--days <days>", "Number of days to include", "30")
       .action(async (opts) => {
         await runGatewayCommand(async () => {
@@ -139,7 +137,7 @@ export function registerGatewayCli(program: Command) {
   gatewayCallOpts(
     gateway
       .command("health")
-      .description("Fetch Gateway health")
+      .description("Probe Gateway health status")
       .action(async (opts) => {
         await runGatewayCommand(async () => {
           const result = await callGatewayCli("health", opts);
@@ -165,7 +163,7 @@ export function registerGatewayCli(program: Command) {
 
   gateway
     .command("probe")
-    .description("Show gateway reachability + discovery + health + status summary (local + remote)")
+    .description("Full Gateway reachability, discovery, and health probe")
     .option("--url <url>", "Explicit Gateway WebSocket URL (still probes localhost)")
     .option("--ssh <target>", "SSH target for remote gateway tunnel (user@host or user@host:port)")
     .option("--ssh-identity <path>", "SSH identity file path")
@@ -182,7 +180,7 @@ export function registerGatewayCli(program: Command) {
 
   gateway
     .command("discover")
-    .description("Discover gateways via Bonjour (local + wide-area if configured)")
+    .description("Discover Gateways via Bonjour and wide-area DNS-SD")
     .option("--timeout <ms>", "Per-command timeout in ms", "2000")
     .option("--json", "Output JSON", false)
     .action(async (opts: GatewayDiscoverOpts) => {

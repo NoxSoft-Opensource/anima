@@ -390,7 +390,7 @@ function buildChatCommands(): ChatCommandDefinition[] {
     defineChatCommand({
       key: "restart",
       nativeName: "restart",
-      description: "Restart Anima.",
+      description: "Restart ANIMA.",
       textAlias: "/restart",
       category: "tools",
     }),

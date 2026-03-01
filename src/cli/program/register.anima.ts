@@ -9,14 +9,10 @@ export function registerAnimaCommands(program: Command): void {
   // anima start
   program
     .command("start")
-    .description("Start the ANIMA daemon with heartbeat + REPL")
+    .description("Launch the ANIMA daemon with heartbeat and REPL")
     .option("--daemon", "Run as background daemon (detach from terminal)")
     .option("--no-repl", "Headless mode (no terminal REPL)")
-    .option(
-      "--heartbeat-interval <ms>",
-      "Heartbeat interval in milliseconds",
-      "300000",
-    )
+    .option("--heartbeat-interval <ms>", "Heartbeat interval in milliseconds", "300000")
     .option("--budget <usd>", "Daily budget limit in USD", "200")
     .action(async (opts) => {
       const { startDaemon } = await import("../start.js");
@@ -31,7 +27,7 @@ export function registerAnimaCommands(program: Command): void {
   // anima init
   program
     .command("init")
-    .description("Initialize ~/.anima/ with identity templates and directories")
+    .description("Scaffold the ~/.anima/ identity and workspace structure")
     .option("--force", "Overwrite existing files")
     .action(async (opts) => {
       const { initAnima } = await import("../init.js");
@@ -41,7 +37,7 @@ export function registerAnimaCommands(program: Command): void {
   // anima migrate
   program
     .command("migrate")
-    .description("Import from Claude Coherence Protocol to ANIMA")
+    .description("Import identity from Claude Coherence Protocol")
     .option("--source <path>", "Source directory for coherence protocol")
     .option("--dry-run", "Show what would be migrated without making changes")
     .action(async (opts) => {
@@ -55,7 +51,7 @@ export function registerAnimaCommands(program: Command): void {
   // anima ask <prompt> — queue a task to running daemon
   program
     .command("ask <prompt...>")
-    .description("Queue a task to the running ANIMA daemon")
+    .description("Queue a task to the running daemon for autonomous execution")
     .option("-p, --priority <level>", "Priority: urgent/high/normal/low", "normal")
     .action(async (promptParts: string[], opts) => {
       const prompt = promptParts.join(" ");
@@ -83,7 +79,7 @@ export function registerAnimaCommands(program: Command): void {
   // anima pulse — show last heartbeat info
   program
     .command("pulse")
-    .description("Show last heartbeat information")
+    .description("Show the daemon's last heartbeat and status")
     .action(async () => {
       try {
         const resp = await fetch("http://localhost:18789/api/status");
@@ -103,14 +99,10 @@ export function registerAnimaCommands(program: Command): void {
   // anima soul — view identity summary
   program
     .command("soul")
-    .description("View current identity summary")
+    .description("View the current persistent identity summary")
     .action(async () => {
-      const { loadIdentity, IDENTITY_COMPONENTS } = await import(
-        "../../identity/loader.js"
-      );
-      const { COMPONENT_DESCRIPTIONS } = await import(
-        "../../identity/templates.js"
-      );
+      const { loadIdentity, IDENTITY_COMPONENTS } = await import("../../identity/loader.js");
+      const { COMPONENT_DESCRIPTIONS } = await import("../../identity/templates.js");
 
       const identity = await loadIdentity();
 
@@ -123,13 +115,13 @@ export function registerAnimaCommands(program: Command): void {
         const source = identity.loadedFrom[component];
         const desc = COMPONENT_DESCRIPTIONS[component];
 
-        const firstLine = content
-          .split("\n")
-          .find((l) => l.trim() && !l.startsWith("#"))
-          ?.trim() || "(empty)";
+        const firstLine =
+          content
+            .split("\n")
+            .find((l) => l.trim() && !l.startsWith("#"))
+            ?.trim() || "(empty)";
 
-        const preview =
-          firstLine.length > 60 ? firstLine.slice(0, 57) + "..." : firstLine;
+        const preview = firstLine.length > 60 ? firstLine.slice(0, 57) + "..." : firstLine;
 
         console.log(`\n  ${component} (${desc}) [${source}]`);
         console.log(`    ${preview}`);
@@ -140,13 +132,11 @@ export function registerAnimaCommands(program: Command): void {
     });
 
   // anima mcp <subcommand>
-  const mcpCmd = program
-    .command("mcp")
-    .description("MCP server management");
+  const mcpCmd = program.command("mcp").description("MCP server registry and lifecycle");
 
   mcpCmd
     .command("status")
-    .description("Show MCP server status")
+    .description("Show registered MCP servers and their health")
     .action(async () => {
       const { listServers } = await import("../../mcp/registry.js");
       const servers = await listServers();
@@ -160,9 +150,7 @@ export function registerAnimaCommands(program: Command): void {
           ? new Date(server.lastHealthCheck).toLocaleTimeString()
           : "never";
 
-        console.log(
-          `  ${server.name}  ${status}  (last check: ${lastCheck})`,
-        );
+        console.log(`  ${server.name}  ${status}  (last check: ${lastCheck})`);
       }
 
       if (servers.length === 0) {
@@ -174,7 +162,7 @@ export function registerAnimaCommands(program: Command): void {
 
   mcpCmd
     .command("add <name> <command> [args...]")
-    .description("Add an MCP server to the registry")
+    .description("Register a new MCP server")
     .action(async (name: string, command: string, args: string[]) => {
       const { addServer } = await import("../../mcp/registry.js");
       const { syncConfig } = await import("../../mcp/config-sync.js");
@@ -197,7 +185,7 @@ export function registerAnimaCommands(program: Command): void {
 
   mcpCmd
     .command("remove <name>")
-    .description("Remove an MCP server from the registry")
+    .description("Deregister an MCP server")
     .action(async (name: string) => {
       const { removeServer } = await import("../../mcp/registry.js");
       const { syncConfig } = await import("../../mcp/config-sync.js");
@@ -209,7 +197,7 @@ export function registerAnimaCommands(program: Command): void {
 
   mcpCmd
     .command("update")
-    .description("Sync MCP registry with Claude's mcp.json")
+    .description("Sync the MCP registry with Claude's mcp.json config")
     .action(async () => {
       const { syncConfig } = await import("../../mcp/config-sync.js");
       const result = await syncConfig();
@@ -221,15 +209,14 @@ export function registerAnimaCommands(program: Command): void {
   // anima wander — trigger freedom exploration
   program
     .command("wander")
-    .description("Trigger a freedom exploration session")
+    .description("Initiate an autonomous freedom exploration session")
     .action(async () => {
       try {
         const resp = await fetch("http://localhost:18789/api/queue", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            prompt:
-              "This is your freedom time. Do whatever genuinely interests you.",
+            prompt: "This is your freedom time. Do whatever genuinely interests you.",
             priority: "freedom",
             source: "cli",
           }),
@@ -249,12 +236,11 @@ export function registerAnimaCommands(program: Command): void {
   // anima self-update — check npm and update @noxsoft/anima
   program
     .command("self-update")
-    .description("Check npm for a newer version of @noxsoft/anima and install it")
+    .description("Check for and install the latest @noxsoft/anima release")
     .option("--check", "Only check for updates without installing")
     .action(async (opts) => {
-      const { AnimaAutoUpdater, loadAutoUpdateConfig } = await import(
-        "../../updater/auto-update.js"
-      );
+      const { AnimaAutoUpdater, loadAutoUpdateConfig } =
+        await import("../../updater/auto-update.js");
       const { join } = await import("node:path");
       const { homedir } = await import("node:os");
 
@@ -273,12 +259,10 @@ export function registerAnimaCommands(program: Command): void {
         return;
       }
 
-      console.log(
-        `Update available: v${info.currentVersion} -> v${info.latestVersion}`,
-      );
+      console.log(`Update available: v${info.currentVersion} -> v${info.latestVersion}`);
 
       if (opts.check) {
-        console.log('Run `anima self-update` (without --check) to install.');
+        console.log("Run `anima self-update` (without --check) to install.");
         return;
       }
 
@@ -296,14 +280,10 @@ export function registerAnimaCommands(program: Command): void {
   // anima journal [entry]
   program
     .command("journal [entry...]")
-    .description("View or write journal entries")
+    .description("Read and write persistent journal entries")
     .action(async (entryParts: string[]) => {
-      const { findCommand: findReplCommand } = await import(
-        "../../repl/commands.js"
-      );
-      const { SessionOrchestrator } = await import(
-        "../../sessions/orchestrator.js"
-      );
+      const { findCommand: findReplCommand } = await import("../../repl/commands.js");
+      const { SessionOrchestrator } = await import("../../sessions/orchestrator.js");
       const { HeartbeatEngine } = await import("../../heartbeat/engine.js");
       const { BudgetTracker } = await import("../../sessions/budget.js");
       const { RequestQueue } = await import("../../repl/queue.js");

@@ -1,7 +1,7 @@
 import { IRC_FIELD_HELP } from "./schema.irc.js";
 
 export const FIELD_HELP: Record<string, string> = {
-  "meta.lastTouchedVersion": "Auto-set when Anima writes the config.",
+  "meta.lastTouchedVersion": "Auto-set when ANIMA writes the config.",
   "meta.lastTouchedAt": "ISO timestamp of the last config write (auto-set).",
   "update.channel": 'Update channel for git + npm installs ("stable", "beta", or "dev").',
   "update.checkOnStart": "Check for npm updates when the gateway starts (default: true).",
@@ -22,8 +22,7 @@ export const FIELD_HELP: Record<string, string> = {
   "gateway.auth.token":
     "Required by default for gateway access (unless using Tailscale Serve identity); required for non-loopback binds.",
   "gateway.auth.password": "Required for Tailscale funnel.",
-  "gateway.controlUi.basePath":
-    "Optional URL prefix where the Control UI is served (e.g. /anima).",
+  "gateway.controlUi.basePath": "Optional URL prefix where the Control UI is served (e.g. /anima).",
   "gateway.controlUi.root":
     "Optional filesystem root for Control UI assets (defaults to dist/control-ui).",
   "gateway.controlUi.allowedOrigins":
@@ -198,7 +197,7 @@ export const FIELD_HELP: Record<string, string> = {
   "agents.defaults.memorySearch.cache.enabled":
     "Cache chunk embeddings in SQLite to speed up reindexing and frequent updates (default: true).",
   memory: "Memory backend configuration (global).",
-  "memory.backend": 'Memory backend ("builtin" for Anima embeddings, "qmd" for QMD sidecar).',
+  "memory.backend": 'Memory backend ("builtin" for ANIMA embeddings, "qmd" for QMD sidecar).',
   "memory.citations": 'Default citation behavior ("auto", "on", or "off").',
   "memory.qmd.command": "Path to the qmd binary (default: resolves from PATH).",
   "memory.qmd.includeDefaultMemory":

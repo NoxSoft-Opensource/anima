@@ -99,7 +99,7 @@ describe("buildAgentSystemPrompt", () => {
       workspaceDir: "/tmp/anima",
     });
 
-    expect(prompt).toContain("## Anima CLI Quick Reference");
+    expect(prompt).toContain("## ANIMA CLI Quick Reference");
     expect(prompt).toContain("anima gateway restart");
     expect(prompt).toContain("Do not invent commands");
   });
@@ -150,9 +150,9 @@ describe("buildAgentSystemPrompt", () => {
     expect(prompt).toContain(
       "- If exactly one skill clearly applies: read its SKILL.md at <location> with `Read`, then follow it.",
     );
-    expect(prompt).toContain("Anima docs: /tmp/anima/docs");
+    expect(prompt).toContain("ANIMA docs: /tmp/anima/docs");
     expect(prompt).toContain(
-      "For Anima behavior, commands, config, or architecture: consult local docs first.",
+      "For ANIMA behavior, commands, config, or architecture: consult local docs first.",
     );
   });
 
@@ -163,9 +163,9 @@ describe("buildAgentSystemPrompt", () => {
     });
 
     expect(prompt).toContain("## Documentation");
-    expect(prompt).toContain("Anima docs: /tmp/anima/docs");
+    expect(prompt).toContain("ANIMA docs: /tmp/anima/docs");
     expect(prompt).toContain(
-      "For Anima behavior, commands, config, or architecture: consult local docs first.",
+      "For ANIMA behavior, commands, config, or architecture: consult local docs first.",
     );
   });
 
@@ -268,7 +268,7 @@ describe("buildAgentSystemPrompt", () => {
       toolNames: ["gateway", "exec"],
     });
 
-    expect(prompt).toContain("## Anima Self-Update");
+    expect(prompt).toContain("## ANIMA Self-Update");
     expect(prompt).toContain("config.apply");
     expect(prompt).toContain("update.run");
   });

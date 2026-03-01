@@ -263,7 +263,7 @@ export const handleRestartCommand: CommandHandler = async (params, allowTextComm
     return {
       shouldContinue: false,
       reply: {
-        text: "⚙️ Restarting Anima in-process (SIGUSR1); back in a few seconds.",
+        text: "⚙️ Restarting ANIMA in-process (SIGUSR1); back in a few seconds.",
       },
     };
   }
@@ -280,7 +280,7 @@ export const handleRestartCommand: CommandHandler = async (params, allowTextComm
   return {
     shouldContinue: false,
     reply: {
-      text: `⚙️ Restarting Anima via ${restartMethod.method}; give me a few seconds to come back online.`,
+      text: `⚙️ Restarting ANIMA via ${restartMethod.method}; give me a few seconds to come back online.`,
     },
   };
 };

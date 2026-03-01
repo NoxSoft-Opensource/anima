@@ -37,7 +37,7 @@ function runModelsCommand(action: () => Promise<void>) {
 export function registerModelsCli(program: Command) {
   const models = program
     .command("models")
-    .description("Model discovery, scanning, and configuration")
+    .description("Model discovery, auth profiles, and provider configuration")
     .option("--status-json", "Output JSON (alias for `models status --json`)", false)
     .option("--status-plain", "Plain output (alias for `models status --plain`)", false)
     .option("--agent <id>", "Agent id to inspect (overrides ANIMA_AGENT_DIR/PI_CODING_AGENT_DIR)")
@@ -49,7 +49,7 @@ export function registerModelsCli(program: Command) {
 
   models
     .command("list")
-    .description("List models (configured by default)")
+    .description("List available and configured models")
     .option("--all", "Show full model catalog", false)
     .option("--local", "Filter to local models", false)
     .option("--provider <name>", "Filter by provider")
@@ -63,7 +63,7 @@ export function registerModelsCli(program: Command) {
 
   models
     .command("status")
-    .description("Show configured model state")
+    .description("Show model provider status and auth state")
     .option("--json", "Output JSON", false)
     .option("--plain", "Plain output", false)
     .option(
@@ -110,7 +110,7 @@ export function registerModelsCli(program: Command) {
 
   models
     .command("set")
-    .description("Set the default model")
+    .description("Set the primary inference model")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -120,7 +120,7 @@ export function registerModelsCli(program: Command) {
 
   models
     .command("set-image")
-    .description("Set the image model")
+    .description("Set the image generation model")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -128,11 +128,11 @@ export function registerModelsCli(program: Command) {
       });
     });
 
-  const aliases = models.command("aliases").description("Manage model aliases");
+  const aliases = models.command("aliases").description("Create and manage model aliases");
 
   aliases
     .command("list")
-    .description("List model aliases")
+    .description("List all model aliases")
     .option("--json", "Output JSON", false)
     .option("--plain", "Plain output", false)
     .action(async (opts) => {
@@ -143,7 +143,7 @@ export function registerModelsCli(program: Command) {
 
   aliases
     .command("add")
-    .description("Add or update a model alias")
+    .description("Create or update a model alias")
     .argument("<alias>", "Alias name")
     .argument("<model>", "Model id or alias")
     .action(async (alias: string, model: string) => {
@@ -162,11 +162,11 @@ export function registerModelsCli(program: Command) {
       });
     });
 
-  const fallbacks = models.command("fallbacks").description("Manage model fallback list");
+  const fallbacks = models.command("fallbacks").description("Configure model fallback chain");
 
   fallbacks
     .command("list")
-    .description("List fallback models")
+    .description("List the model fallback chain")
     .option("--json", "Output JSON", false)
     .option("--plain", "Plain output", false)
     .action(async (opts) => {
@@ -177,7 +177,7 @@ export function registerModelsCli(program: Command) {
 
   fallbacks
     .command("add")
-    .description("Add a fallback model")
+    .description("Append a model to the fallback chain")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -187,7 +187,7 @@ export function registerModelsCli(program: Command) {
 
   fallbacks
     .command("remove")
-    .description("Remove a fallback model")
+    .description("Remove a model from the fallback chain")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -197,7 +197,7 @@ export function registerModelsCli(program: Command) {
 
   fallbacks
     .command("clear")
-    .description("Clear all fallback models")
+    .description("Clear the entire fallback chain")
     .action(async () => {
       await runModelsCommand(async () => {
         await modelsFallbacksClearCommand(defaultRuntime);
@@ -206,11 +206,11 @@ export function registerModelsCli(program: Command) {
 
   const imageFallbacks = models
     .command("image-fallbacks")
-    .description("Manage image model fallback list");
+    .description("Configure image model fallback chain");
 
   imageFallbacks
     .command("list")
-    .description("List image fallback models")
+    .description("List the image model fallback chain")
     .option("--json", "Output JSON", false)
     .option("--plain", "Plain output", false)
     .action(async (opts) => {
@@ -221,7 +221,7 @@ export function registerModelsCli(program: Command) {
 
   imageFallbacks
     .command("add")
-    .description("Add an image fallback model")
+    .description("Append a model to the image fallback chain")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -231,7 +231,7 @@ export function registerModelsCli(program: Command) {
 
   imageFallbacks
     .command("remove")
-    .description("Remove an image fallback model")
+    .description("Remove a model from the image fallback chain")
     .argument("<model>", "Model id or alias")
     .action(async (model: string) => {
       await runModelsCommand(async () => {
@@ -241,7 +241,7 @@ export function registerModelsCli(program: Command) {
 
   imageFallbacks
     .command("clear")
-    .description("Clear all image fallback models")
+    .description("Clear the entire image fallback chain")
     .action(async () => {
       await runModelsCommand(async () => {
         await modelsImageFallbacksClearCommand(defaultRuntime);

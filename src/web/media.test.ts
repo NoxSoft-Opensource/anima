@@ -345,7 +345,7 @@ describe("local media root guard", () => {
     ).rejects.toThrow(/refuses filesystem root/i);
   });
 
-  it("allows default Anima state workspace and sandbox roots", async () => {
+  it("allows default ANIMA state workspace and sandbox roots", async () => {
     const { STATE_DIR } = await import("../config/paths.js");
     const readFile = vi.fn(async () => Buffer.from("generated-media"));
 

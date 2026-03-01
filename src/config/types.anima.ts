@@ -27,7 +27,7 @@ import type { ToolsConfig } from "./types.tools.js";
 
 export type AnimaConfig = {
   meta?: {
-    /** Last Anima version that wrote this config. */
+    /** Last ANIMA version that wrote this config. */
     lastTouchedVersion?: string;
     /** ISO timestamp when this config was last written. */
     lastTouchedAt?: string;
@@ -66,7 +66,7 @@ export type AnimaConfig = {
   };
   browser?: BrowserConfig;
   ui?: {
-    /** Accent color for Anima UI chrome (hex). */
+    /** Accent color for ANIMA UI chrome (hex). */
     seamColor?: string;
     assistant?: {
       /** Assistant display name for UI surfaces. */

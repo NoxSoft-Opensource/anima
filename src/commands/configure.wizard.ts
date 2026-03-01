@@ -213,7 +213,7 @@ export async function runConfigureWizard(
 ) {
   try {
     printWizardHeader(runtime);
-    intro(opts.command === "update" ? "Anima update wizard" : "Anima configure");
+    intro(opts.command === "update" ? "ANIMA update wizard" : "ANIMA configure");
     const prompter = createClackPrompter();
 
     const snapshot = await readConfigFileSnapshot();

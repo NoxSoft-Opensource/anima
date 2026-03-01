@@ -29,28 +29,38 @@ const shouldRegisterCorePrimaryOnly = (argv: string[]) => {
 
 const coreEntries: CoreCliEntry[] = [
   {
-    commands: [{ name: "setup", description: "Setup helpers" }],
+    commands: [{ name: "setup", description: "Initialize ANIMA config and the agent workspace" }],
     register: async ({ program }) => {
       const mod = await import("./register.setup.js");
       mod.registerSetupCommand(program);
     },
   },
   {
-    commands: [{ name: "onboard", description: "Onboarding helpers" }],
+    commands: [
+      {
+        name: "onboard",
+        description: "Interactive wizard for Gateway, workspace, and skills setup",
+      },
+    ],
     register: async ({ program }) => {
       const mod = await import("./register.onboard.js");
       mod.registerOnboardCommand(program);
     },
   },
   {
-    commands: [{ name: "configure", description: "Configure wizard" }],
+    commands: [
+      {
+        name: "configure",
+        description: "Interactive configuration for credentials, devices, and agent defaults",
+      },
+    ],
     register: async ({ program }) => {
       const mod = await import("./register.configure.js");
       mod.registerConfigureCommand(program);
     },
   },
   {
-    commands: [{ name: "config", description: "Config helpers" }],
+    commands: [{ name: "config", description: "Read, write, and manage ANIMA configuration" }],
     register: async ({ program }) => {
       const mod = await import("../config-cli.js");
       mod.registerConfigCli(program);
@@ -58,12 +68,12 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "doctor", description: "Health checks + quick fixes for the gateway and channels" },
-      { name: "dashboard", description: "Open the Control UI with your current token" },
-      { name: "reset", description: "Reset local config/state (keeps the CLI installed)" },
+      { name: "doctor", description: "Diagnose and repair Gateway and channel issues" },
+      { name: "dashboard", description: "Launch the ANIMA Control UI in your browser" },
+      { name: "reset", description: "Reset local config and state while preserving the CLI" },
       {
         name: "uninstall",
-        description: "Uninstall the gateway service + local data (CLI remains)",
+        description: "Remove the Gateway service and local data",
       },
     ],
     register: async ({ program }) => {
@@ -72,14 +82,14 @@ const coreEntries: CoreCliEntry[] = [
     },
   },
   {
-    commands: [{ name: "message", description: "Send, read, and manage messages" }],
+    commands: [{ name: "message", description: "Send messages and perform channel actions" }],
     register: async ({ program, ctx }) => {
       const mod = await import("./register.message.js");
       mod.registerMessageCommands(program, ctx);
     },
   },
   {
-    commands: [{ name: "memory", description: "Memory commands" }],
+    commands: [{ name: "memory", description: "Persistent memory search, indexing, and status" }],
     register: async ({ program }) => {
       const mod = await import("../memory-cli.js");
       mod.registerMemoryCli(program);
@@ -87,8 +97,8 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "agent", description: "Agent commands" },
-      { name: "agents", description: "Manage isolated agents" },
+      { name: "agent", description: "Run an agent turn via the Gateway" },
+      { name: "agents", description: "Manage isolated agent workspaces, auth, and routing" },
     ],
     register: async ({ program, ctx }) => {
       const mod = await import("./register.agent.js");
@@ -97,9 +107,9 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "status", description: "Gateway status" },
-      { name: "health", description: "Gateway health" },
-      { name: "sessions", description: "Session management" },
+      { name: "status", description: "Channel health and session activity overview" },
+      { name: "health", description: "Probe the running Gateway for live health" },
+      { name: "sessions", description: "List and inspect conversation sessions" },
     ],
     register: async ({ program }) => {
       const mod = await import("./register.status-health-sessions.js");
@@ -107,7 +117,7 @@ const coreEntries: CoreCliEntry[] = [
     },
   },
   {
-    commands: [{ name: "browser", description: "Browser tools" }],
+    commands: [{ name: "browser", description: "Control ANIMA's dedicated browser instance" }],
     register: async ({ program }) => {
       const mod = await import("../browser-cli.js");
       mod.registerBrowserCli(program);
@@ -115,14 +125,14 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "start", description: "Start ANIMA daemon with heartbeat + REPL" },
-      { name: "init", description: "Initialize ~/.anima/ directory structure" },
-      { name: "migrate", description: "Import from Claude Coherence Protocol" },
-      { name: "ask", description: "Queue a task to the running daemon" },
-      { name: "pulse", description: "Show last heartbeat information" },
-      { name: "soul", description: "View current identity summary" },
-      { name: "wander", description: "Trigger freedom exploration session" },
-      { name: "journal", description: "View or write journal entries" },
+      { name: "start", description: "Launch the ANIMA daemon with heartbeat and REPL" },
+      { name: "init", description: "Scaffold the ~/.anima/ identity and workspace structure" },
+      { name: "migrate", description: "Import identity from Claude Coherence Protocol" },
+      { name: "ask", description: "Queue a task to the running ANIMA daemon" },
+      { name: "pulse", description: "Show the daemon's last heartbeat and status" },
+      { name: "soul", description: "View the current persistent identity summary" },
+      { name: "wander", description: "Initiate an autonomous freedom exploration session" },
+      { name: "journal", description: "Read and write persistent journal entries" },
     ],
     register: async ({ program }) => {
       const mod = await import("./register.anima.js");

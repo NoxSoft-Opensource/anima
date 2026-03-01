@@ -10,7 +10,7 @@ import { hasExplicitOptions } from "../command-options.js";
 export function registerSetupCommand(program: Command) {
   program
     .command("setup")
-    .description("Initialize ~/.anima/anima.json and the agent workspace")
+    .description("Initialize ANIMA config and the agent workspace")
     .addHelpText(
       "after",
       () =>

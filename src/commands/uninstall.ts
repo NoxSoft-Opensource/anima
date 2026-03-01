@@ -91,9 +91,9 @@ async function removeMacApp(runtime: RuntimeEnv, dryRun?: boolean) {
   if (process.platform !== "darwin") {
     return;
   }
-  await removePath("/Applications/Anima.app", runtime, {
+  await removePath("/Applications/ANIMA.app", runtime, {
     dryRun,
-    label: "/Applications/Anima.app",
+    label: "/Applications/ANIMA.app",
   });
 }
 
@@ -125,7 +125,7 @@ export async function uninstallCommand(runtime: RuntimeEnv, opts: UninstallOptio
         {
           value: "app",
           label: "macOS app",
-          hint: "/Applications/Anima.app",
+          hint: "/Applications/ANIMA.app",
         },
       ],
       initialValues: ["service", "state", "workspace"],

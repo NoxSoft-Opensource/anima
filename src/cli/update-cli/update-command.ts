@@ -559,7 +559,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
 
   const showProgress = !opts.json && process.stdout.isTTY;
   if (!opts.json) {
-    defaultRuntime.log(theme.heading("Updating Anima..."));
+    defaultRuntime.log(theme.heading("Updating ANIMA..."));
     defaultRuntime.log("");
   }
 
@@ -608,7 +608,7 @@ export async function updateCommand(opts: UpdateCommandOptions): Promise<void> {
     if (result.reason === "not-git-install") {
       defaultRuntime.log(
         theme.warn(
-          `Skipped: this Anima install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("anima doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("anima gateway restart"), CLI_NAME)}\`.`,
+          `Skipped: this ANIMA install isn't a git checkout, and the package manager couldn't be detected. Update via your package manager, then run \`${replaceCliName(formatCliCommand("anima doctor"), CLI_NAME)}\` and \`${replaceCliName(formatCliCommand("anima gateway restart"), CLI_NAME)}\`.`,
         ),
       );
       defaultRuntime.log(

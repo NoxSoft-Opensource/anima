@@ -149,7 +149,7 @@ export type PluginCommandContext = {
   args?: string;
   /** The full normalized command body */
   commandBody: string;
-  /** Current Anima configuration */
+  /** Current ANIMA configuration */
   config: AnimaConfig;
   /** Raw "From" value (channel-scoped id) */
   from?: string;

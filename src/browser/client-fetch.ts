@@ -92,7 +92,7 @@ function withLoopbackBrowserAuth(
 function enhanceBrowserFetchError(url: string, err: unknown, timeoutMs: number): Error {
   const hint = isAbsoluteHttp(url)
     ? "If this is a sandboxed session, ensure the sandbox browser is running and try again."
-    : `Start (or restart) the Anima gateway (Anima.app menubar, or \`${formatCliCommand("anima gateway")}\`) and try again.`;
+    : `Start (or restart) the ANIMA gateway (ANIMA.app menubar, or \`${formatCliCommand("anima gateway")}\`) and try again.`;
   const msg = String(err);
   const msgLower = msg.toLowerCase();
   const looksLikeTimeout =
@@ -103,10 +103,10 @@ function enhanceBrowserFetchError(url: string, err: unknown, timeoutMs: number):
     msgLower.includes("aborterror");
   if (looksLikeTimeout) {
     return new Error(
-      `Can't reach the Anima browser control service (timed out after ${timeoutMs}ms). ${hint}`,
+      `Can't reach the ANIMA browser control service (timed out after ${timeoutMs}ms). ${hint}`,
     );
   }
-  return new Error(`Can't reach the Anima browser control service. ${hint} (${msg})`);
+  return new Error(`Can't reach the ANIMA browser control service. ${hint} (${msg})`);
 }
 
 async function fetchHttpJson<T>(

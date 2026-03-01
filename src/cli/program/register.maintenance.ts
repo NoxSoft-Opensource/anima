@@ -11,7 +11,7 @@ import { runCommandWithRuntime } from "../cli-utils.js";
 export function registerMaintenanceCommands(program: Command) {
   program
     .command("doctor")
-    .description("Health checks + quick fixes for the gateway and channels")
+    .description("Diagnose and repair Gateway and channel issues")
     .addHelpText(
       "after",
       () =>
@@ -41,7 +41,7 @@ export function registerMaintenanceCommands(program: Command) {
 
   program
     .command("dashboard")
-    .description("Open the Control UI with your current token")
+    .description("Launch the ANIMA Control UI in your browser")
     .addHelpText(
       "after",
       () =>
@@ -58,7 +58,7 @@ export function registerMaintenanceCommands(program: Command) {
 
   program
     .command("reset")
-    .description("Reset local config/state (keeps the CLI installed)")
+    .description("Reset local config and state while preserving the CLI")
     .addHelpText(
       "after",
       () =>
@@ -81,7 +81,7 @@ export function registerMaintenanceCommands(program: Command) {
 
   program
     .command("uninstall")
-    .description("Uninstall the gateway service + local data (CLI remains)")
+    .description("Remove the Gateway service and local data")
     .addHelpText(
       "after",
       () =>

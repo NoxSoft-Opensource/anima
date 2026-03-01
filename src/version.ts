@@ -61,7 +61,7 @@ export function resolveVersionFromModuleUrl(moduleUrl: string): string | null {
   );
 }
 
-// Single source of truth for the current Anima version.
+// Single source of truth for the current ANIMA version.
 // - Embedded/bundled builds: injected define or env var.
 // - Dev/npm builds: package.json.
 export const VERSION =

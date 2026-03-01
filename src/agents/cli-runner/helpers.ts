@@ -169,7 +169,7 @@ function tokenToRegex(token: string): string {
 }
 
 /**
- * Cleanup suspended Anima CLI processes that have accumulated.
+ * Cleanup suspended ANIMA CLI processes that have accumulated.
  * Only cleans up if there are more than the threshold (default: 10).
  */
 export async function cleanupSuspendedCliProcesses(

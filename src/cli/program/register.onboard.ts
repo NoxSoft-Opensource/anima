@@ -47,7 +47,7 @@ const AUTH_CHOICE_HELP = formatAuthChoiceChoicesForCli({
 export function registerOnboardCommand(program: Command) {
   const command = program
     .command("onboard")
-    .description("Interactive wizard to set up the gateway, workspace, and skills")
+    .description("Interactive wizard for Gateway, workspace, and skills setup")
     .addHelpText(
       "after",
       () =>

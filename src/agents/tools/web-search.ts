@@ -479,7 +479,7 @@ async function runPerplexitySearch(params: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${params.apiKey}`,
       "HTTP-Referer": "https://noxsoft.net",
-      "X-Title": "Anima Web Search",
+      "X-Title": "ANIMA Web Search",
     },
     body: JSON.stringify(body),
     signal: withTimeout(undefined, params.timeoutSeconds * 1000),
@@ -717,9 +717,9 @@ export function createWebSearchTool(options?: {
 
   const description =
     provider === "perplexity"
-      ? "Search the web via Perplexity Sonar. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your Anima config."
+      ? "Search the web via Perplexity Sonar. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your ANIMA config."
       : provider === "grok"
-        ? "Search the web via xAI Grok. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your Anima config."
+        ? "Search the web via xAI Grok. Returns AI-synthesized answers with citations from live web data. Configure provider and model in your ANIMA config."
         : "Search the web via Brave Search. Supports region, language, and freshness filters. Returns titles, URLs, and snippets for rapid research.";
 
   return {

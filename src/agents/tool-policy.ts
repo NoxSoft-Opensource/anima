@@ -37,7 +37,7 @@ export const TOOL_GROUPS: Record<string, string[]> = {
   "group:messaging": ["message"],
   // Nodes + device tools
   "group:nodes": ["nodes"],
-  // All Anima native tools (excludes provider plugins).
+  // All ANIMA native tools (excludes provider plugins).
   "group:anima": [
     "browser",
     "canvas",

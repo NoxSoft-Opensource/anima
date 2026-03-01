@@ -59,7 +59,7 @@ export async function onboardCommand(opts: OnboardOptions, runtime: RuntimeEnv =
   if (process.platform === "win32") {
     runtime.log(
       [
-        "Windows detected — Anima runs great on WSL2!",
+        "Windows detected — ANIMA runs great on WSL2!",
         "Native Windows might be trickier.",
         "Quick setup: wsl --install (one command, one reboot)",
         "Guide: https://docs.noxsoft.net/anima/windows",

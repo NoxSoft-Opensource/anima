@@ -13,11 +13,7 @@ type SubCliEntry = {
 };
 
 const shouldRegisterPrimaryOnly = (argv: string[]) => {
-  if (
-    isTruthyEnvValue(
-      process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS,
-    )
-  ) {
+  if (isTruthyEnvValue(process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS)) {
     return false;
   }
   if (hasHelpOrVersion(argv)) {
@@ -27,9 +23,7 @@ const shouldRegisterPrimaryOnly = (argv: string[]) => {
 };
 
 const shouldEagerRegisterSubcommands = (_argv: string[]) => {
-  return isTruthyEnvValue(
-    process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS,
-  );
+  return isTruthyEnvValue(process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS);
 };
 
 const loadConfig = async (): Promise<AnimaConfig> => {
@@ -64,7 +58,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "logs",
-    description: "Gateway logs",
+    description: "Stream and tail Gateway runtime logs",
     register: async (program) => {
       const mod = await import("../logs-cli.js");
       mod.registerLogsCli(program);
@@ -72,7 +66,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "system",
-    description: "System events, heartbeat, and presence",
+    description: "System events, heartbeat lifecycle, and presence monitoring",
     register: async (program) => {
       const mod = await import("../system-cli.js");
       mod.registerSystemCli(program);
@@ -80,7 +74,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "models",
-    description: "Model configuration",
+    description: "Model discovery, auth profiles, and provider configuration",
     register: async (program) => {
       const mod = await import("../models-cli.js");
       mod.registerModelsCli(program);
@@ -88,7 +82,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "approvals",
-    description: "Exec approvals",
+    description: "Execution approval policies and allowlists",
     register: async (program) => {
       const mod = await import("../exec-approvals-cli.js");
       mod.registerExecApprovalsCli(program);
@@ -96,7 +90,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "nodes",
-    description: "Node commands",
+    description: "Distributed node fleet pairing and orchestration",
     register: async (program) => {
       const mod = await import("../nodes-cli.js");
       mod.registerNodesCli(program);
@@ -104,7 +98,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "devices",
-    description: "Device pairing + token management",
+    description: "Device pairing, auth tokens, and access control",
     register: async (program) => {
       const mod = await import("../devices-cli.js");
       mod.registerDevicesCli(program);
@@ -112,7 +106,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "node",
-    description: "Node control",
+    description: "Run and manage a headless compute node",
     register: async (program) => {
       const mod = await import("../node-cli.js");
       mod.registerNodeCli(program);
@@ -120,7 +114,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "sandbox",
-    description: "Sandbox tools",
+    description: "Docker-based agent isolation and sandboxing",
     register: async (program) => {
       const mod = await import("../sandbox-cli.js");
       mod.registerSandboxCli(program);
@@ -128,7 +122,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "tui",
-    description: "Terminal UI",
+    description: "Interactive terminal interface for the Gateway",
     register: async (program) => {
       const mod = await import("../tui-cli.js");
       mod.registerTuiCli(program);
@@ -136,7 +130,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "cron",
-    description: "Cron scheduler",
+    description: "Scheduled task automation via the Gateway",
     register: async (program) => {
       const mod = await import("../cron-cli.js");
       mod.registerCronCli(program);
@@ -144,7 +138,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "dns",
-    description: "DNS helpers",
+    description: "Wide-area DNS discovery for Tailscale + CoreDNS",
     register: async (program) => {
       const mod = await import("../dns-cli.js");
       mod.registerDnsCli(program);
@@ -152,7 +146,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "docs",
-    description: "Docs helpers",
+    description: "Search the ANIMA documentation",
     register: async (program) => {
       const mod = await import("../docs-cli.js");
       mod.registerDocsCli(program);
@@ -160,7 +154,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "hooks",
-    description: "Hooks tooling",
+    description: "Agent hook lifecycle and dependency management",
     register: async (program) => {
       const mod = await import("../hooks-cli.js");
       mod.registerHooksCli(program);
@@ -168,7 +162,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "webhooks",
-    description: "Webhook helpers",
+    description: "Webhook integrations and event ingestion",
     register: async (program) => {
       const mod = await import("../webhooks-cli.js");
       mod.registerWebhooksCli(program);
@@ -176,7 +170,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "pairing",
-    description: "Pairing helpers",
+    description: "Secure DM pairing and sender approval",
     register: async (program) => {
       // Initialize plugins before registering pairing CLI.
       // The pairing CLI calls listPairingChannels() at registration time,
@@ -189,7 +183,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "plugins",
-    description: "Plugin management",
+    description: "Install, update, and manage ANIMA extensions",
     register: async (program) => {
       const mod = await import("../plugins-cli.js");
       mod.registerPluginsCli(program);
@@ -199,7 +193,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "channels",
-    description: "Channel management",
+    description: "Communication channel accounts and auth profiles",
     register: async (program) => {
       const mod = await import("../channels-cli.js");
       mod.registerChannelsCli(program);
@@ -207,7 +201,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "directory",
-    description: "Directory commands",
+    description: "Contact and group directory lookups across channels",
     register: async (program) => {
       const mod = await import("../directory-cli.js");
       mod.registerDirectoryCli(program);
@@ -215,7 +209,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "security",
-    description: "Security helpers",
+    description: "Security auditing and hardening tools",
     register: async (program) => {
       const mod = await import("../security-cli.js");
       mod.registerSecurityCli(program);
@@ -223,7 +217,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "skills",
-    description: "Skills management",
+    description: "Inspect and manage agent capabilities",
     register: async (program) => {
       const mod = await import("../skills-cli.js");
       mod.registerSkillsCli(program);
@@ -231,7 +225,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "update",
-    description: "CLI update helpers",
+    description: "Update ANIMA to the latest version",
     register: async (program) => {
       const mod = await import("../update-cli.js");
       mod.registerUpdateCli(program);
@@ -239,7 +233,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "completion",
-    description: "Generate shell completion script",
+    description: "Generate shell completion for tab-complete support",
     register: async (program) => {
       const mod = await import("../completion-cli.js");
       mod.registerCompletionCli(program);

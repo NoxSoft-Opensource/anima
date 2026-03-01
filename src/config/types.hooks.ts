@@ -119,7 +119,7 @@ export type HooksConfig = {
   token?: string;
   /**
    * Default session key used for hook agent runs when no request/mapping session key is used.
-   * If omitted, Anima generates `hook:<uuid>` per request.
+   * If omitted, ANIMA generates `hook:<uuid>` per request.
    */
   defaultSessionKey?: string;
   /**
