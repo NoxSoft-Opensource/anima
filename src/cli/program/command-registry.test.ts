@@ -64,7 +64,7 @@ describe("command-registry", () => {
 
   it("registers doctor placeholder for doctor primary command", () => {
     const program = new Command();
-    registerCoreCliCommands(program, testProgramContext, ["node", "anima", "doctor"]);
+    registerCoreCliCommands(program, testProgramContext, ["node", "openclaw", "doctor"]);
 
     expect(program.commands.map((command) => command.name())).toEqual(["doctor"]);
   });
@@ -84,13 +84,13 @@ describe("command-registry", () => {
 
   it("registers grouped core entry placeholders without duplicate command errors", async () => {
     const program = new Command();
-    registerCoreCliCommands(program, testProgramContext, ["node", "anima", "vitest"]);
+    registerCoreCliCommands(program, testProgramContext, ["node", "openclaw", "vitest"]);
 
     const prevArgv = process.argv;
-    process.argv = ["node", "anima", "status"];
+    process.argv = ["node", "openclaw", "status"];
     try {
       program.exitOverride();
-      await program.parseAsync(["node", "anima", "status"]);
+      await program.parseAsync(["node", "openclaw", "status"]);
     } finally {
       process.argv = prevArgv;
     }

@@ -225,11 +225,11 @@ export async function gatherDaemonStatus(
         url: probeUrl,
         token:
           opts.rpc.token ||
-          mergedDaemonEnv.ANIMA_GATEWAY_TOKEN ||
+          mergedDaemonEnv.OPENCLAW_GATEWAY_TOKEN ||
           daemonCfg.gateway?.auth?.token,
         password:
           opts.rpc.password ||
-          mergedDaemonEnv.ANIMA_GATEWAY_PASSWORD ||
+          mergedDaemonEnv.OPENCLAW_GATEWAY_PASSWORD ||
           daemonCfg.gateway?.auth?.password,
         timeoutMs,
         json: opts.rpc.json,

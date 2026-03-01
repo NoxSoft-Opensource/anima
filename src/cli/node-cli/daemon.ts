@@ -46,7 +46,7 @@ type NodeDaemonStatusOptions = {
 };
 
 function renderNodeServiceStartHints(): string[] {
-  const base = [formatCliCommand("anima node install"), formatCliCommand("anima node start")];
+  const base = [formatCliCommand("openclaw node install"), formatCliCommand("openclaw node start")];
   switch (process.platform) {
     case "darwin":
       return [
@@ -134,7 +134,7 @@ export async function runNodeDaemonInstall(opts: NodeDaemonInstallOptions) {
     });
     if (!json) {
       defaultRuntime.log(`Node service already ${service.loadedText}.`);
-      defaultRuntime.log(`Reinstall with: ${formatCliCommand("anima node install --force")}`);
+      defaultRuntime.log(`Reinstall with: ${formatCliCommand("openclaw node install --force")}`);
     }
     return;
   }
@@ -297,7 +297,7 @@ export async function runNodeDaemonStatus(opts: NodeDaemonStatusOptions = {}) {
   };
   const hintEnv = {
     ...baseEnv,
-    ANIMA_LOG_PREFIX: baseEnv.ANIMA_LOG_PREFIX ?? "node",
+    OPENCLAW_LOG_PREFIX: baseEnv.OPENCLAW_LOG_PREFIX ?? "node",
   } as NodeJS.ProcessEnv;
 
   if (runtime?.missingUnit) {
