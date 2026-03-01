@@ -31,13 +31,24 @@ const discoveryCache = new Map<string, BedrockDiscoveryCacheEntry>();
 let hasLoggedBedrockError = false;
 
 /**
+ * Shape of the lazily-loaded `@aws-sdk/client-bedrock` module. Only the
+ * members used by this file are declared.
+ */
+type BedrockSdkModule = {
+  BedrockClient: new (config: { region: string }) => {
+    send: (command: unknown) => Promise<{ modelSummaries?: BedrockModelSummary[] }>;
+  };
+  ListFoundationModelsCommand: new (input: Record<string, unknown>) => unknown;
+};
+
+/**
  * Lazily load `@aws-sdk/client-bedrock`. Returns null if the package is not
  * installed, allowing ANIMA to start without the AWS SDK when Bedrock is not
  * being used.
  */
-async function loadBedrockSdk(): Promise<typeof import("@aws-sdk/client-bedrock") | null> {
+async function loadBedrockSdk(): Promise<BedrockSdkModule | null> {
   try {
-    return await import("@aws-sdk/client-bedrock");
+    return (await import("@aws-sdk/client-bedrock")) as unknown as BedrockSdkModule;
   } catch {
     return null;
   }
