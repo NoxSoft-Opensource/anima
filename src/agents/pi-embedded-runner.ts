@@ -1,28 +1,66 @@
-export type { MessagingToolSend } from "./pi-embedded-messaging.js";
-export { compactEmbeddedPiSession } from "./pi-embedded-runner/compact.js";
-export { applyExtraParamsToAgent, resolveExtraParams } from "./pi-embedded-runner/extra-params.js";
+/**
+ * Pi-embedded runner — STUBBED
+ *
+ * The OpenClaw pi-embedded LLM provider abstraction has been removed.
+ * ANIMA uses Claude Code CLI as its sole interface to Claude.
+ * These exports are kept as stubs to prevent import breakage during Phase 1.
+ */
 
-export { applyGoogleTurnOrderingFix } from "./pi-embedded-runner/google.js";
-export {
-  getDmHistoryLimitFromSessionKey,
-  getHistoryLimitFromSessionKey,
-  limitHistoryTurns,
-} from "./pi-embedded-runner/history.js";
-export { resolveEmbeddedSessionLane } from "./pi-embedded-runner/lanes.js";
-export { runEmbeddedPiAgent } from "./pi-embedded-runner/run.js";
-export {
-  abortEmbeddedPiRun,
-  isEmbeddedPiRunActive,
-  isEmbeddedPiRunStreaming,
-  queueEmbeddedPiMessage,
-  waitForEmbeddedPiRunEnd,
-} from "./pi-embedded-runner/runs.js";
-export { buildEmbeddedSandboxInfo } from "./pi-embedded-runner/sandbox-info.js";
-export { createSystemPromptOverride } from "./pi-embedded-runner/system-prompt.js";
-export { splitSdkTools } from "./pi-embedded-runner/tool-split.js";
 export type {
   EmbeddedPiAgentMeta,
   EmbeddedPiCompactResult,
   EmbeddedPiRunMeta,
   EmbeddedPiRunResult,
-} from "./pi-embedded-runner/types.js";
+} from "./pi-embedded.js";
+
+export {
+  runEmbeddedPiAgent,
+  compactEmbeddedPiSession,
+  abortEmbeddedPiRun,
+  isEmbeddedPiRunActive,
+  isEmbeddedPiRunStreaming,
+  queueEmbeddedPiMessage,
+  resolveEmbeddedSessionLane,
+  waitForEmbeddedPiRunEnd,
+} from "./pi-embedded.js";
+
+export type MessagingToolSend = {
+  to: string;
+  text: string;
+};
+
+export function applyExtraParamsToAgent(): void {
+  // stub
+}
+
+export function resolveExtraParams(): Record<string, unknown> {
+  return {};
+}
+
+export function applyGoogleTurnOrderingFix(): void {
+  // stub
+}
+
+export function getDmHistoryLimitFromSessionKey(): number | undefined {
+  return undefined;
+}
+
+export function getHistoryLimitFromSessionKey(): number | undefined {
+  return undefined;
+}
+
+export function limitHistoryTurns(): void {
+  // stub
+}
+
+export function buildEmbeddedSandboxInfo(): Record<string, unknown> {
+  return {};
+}
+
+export function createSystemPromptOverride(): string | undefined {
+  return undefined;
+}
+
+export function splitSdkTools(): { local: unknown[]; remote: unknown[] } {
+  return { local: [], remote: [] };
+}
