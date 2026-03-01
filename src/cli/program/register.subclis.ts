@@ -15,8 +15,7 @@ type SubCliEntry = {
 const shouldRegisterPrimaryOnly = (argv: string[]) => {
   if (
     isTruthyEnvValue(
-      process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS ??
-        process.env.OPENCLAW_DISABLE_LAZY_SUBCOMMANDS /* legacy fallback */,
+      process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS,
     )
   ) {
     return false;
@@ -29,8 +28,7 @@ const shouldRegisterPrimaryOnly = (argv: string[]) => {
 
 const shouldEagerRegisterSubcommands = (_argv: string[]) => {
   return isTruthyEnvValue(
-    process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS ??
-      process.env.OPENCLAW_DISABLE_LAZY_SUBCOMMANDS /* legacy fallback */,
+    process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS,
   );
 };
 
@@ -42,7 +40,7 @@ const loadConfig = async (): Promise<AnimaConfig> => {
 const entries: SubCliEntry[] = [
   {
     name: "acp",
-    description: "Agent Control Protocol tools",
+    description: "Agent Control Protocol bridge for AI orchestration",
     register: async (program) => {
       const mod = await import("../acp-cli.js");
       mod.registerAcpCli(program);
@@ -50,7 +48,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "gateway",
-    description: "Gateway control",
+    description: "ANIMA Gateway orchestration and control",
     register: async (program) => {
       const mod = await import("../gateway-cli.js");
       mod.registerGatewayCli(program);
@@ -58,7 +56,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "daemon",
-    description: "Gateway service (legacy alias)",
+    description: "ANIMA Gateway service lifecycle management",
     register: async (program) => {
       const mod = await import("../daemon-cli.js");
       mod.registerDaemonCli(program);

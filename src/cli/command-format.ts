@@ -12,7 +12,7 @@ export function formatCliCommand(
   const cliName = resolveCliName();
   const normalizedCommand = replaceCliName(command, cliName);
   const profile = normalizeProfileName(
-    env.ANIMA_PROFILE ?? env.OPENCLAW_PROFILE /* legacy fallback */,
+    env.ANIMA_PROFILE,
   );
   if (!profile) {
     return normalizedCommand;

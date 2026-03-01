@@ -111,24 +111,19 @@ export function applyCliProfileEnv(params: {
 
   // Convenience only: fill defaults, never override explicit env values.
   env.ANIMA_PROFILE = profile;
-  env.OPENCLAW_PROFILE = profile; // legacy fallback
 
   const stateDir =
     env.ANIMA_STATE_DIR?.trim() ||
-    env.OPENCLAW_STATE_DIR?.trim() ||
     resolveProfileStateDir(profile, env, homedir);
   if (!env.ANIMA_STATE_DIR?.trim()) {
     env.ANIMA_STATE_DIR = stateDir;
-    env.OPENCLAW_STATE_DIR = stateDir; // legacy fallback
   }
 
   if (!env.ANIMA_CONFIG_PATH?.trim()) {
     env.ANIMA_CONFIG_PATH = path.join(stateDir, "anima.json");
-    env.OPENCLAW_CONFIG_PATH = path.join(stateDir, "anima.json"); // legacy fallback
   }
 
   if (profile === "dev" && !env.ANIMA_GATEWAY_PORT?.trim()) {
     env.ANIMA_GATEWAY_PORT = "19001";
-    env.OPENCLAW_GATEWAY_PORT = "19001"; // legacy fallback
   }
 }

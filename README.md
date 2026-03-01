@@ -1160,18 +1160,6 @@ pnpm protocol:check
 | `ANIMA_GATEWAY_PORT`     | Gateway HTTP port                 | `18789`   |
 | `ANIMA_GATEWAY_BIND`     | Gateway bind mode (localhost/lan) | localhost |
 
-### Legacy (OpenClaw compatibility)
-
-| Variable                            | Description                     |
-| ----------------------------------- | ------------------------------- |
-| `OPENCLAW_STATE_DIR`                | Legacy state directory override |
-| `OPENCLAW_CONFIG_PATH`              | Legacy config path override     |
-| `OPENCLAW_GATEWAY_PORT`             | Legacy gateway port override    |
-| `OPENCLAW_HOME`                     | Legacy home directory override  |
-| `OPENCLAW_NIX_MODE`                 | Nix integration mode            |
-| `OPENCLAW_OAUTH_DIR`                | OAuth credentials directory     |
-| `OPENCLAW_DISABLE_LAZY_SUBCOMMANDS` | Disable lazy CLI loading        |
-
 ### AI Provider Keys
 
 Set provider API keys as environment variables or in `anima.json` under `env.vars`:

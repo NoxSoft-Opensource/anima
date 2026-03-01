@@ -597,10 +597,10 @@ describe("update-cli", () => {
 
   it("updateWizardCommand offers dev checkout and forwards selections", async () => {
     const tempDir = await createCaseDir("openclaw-update-wizard");
-    const previousGitDir = process.env.OPENCLAW_GIT_DIR;
+    const previousGitDir = process.env.ANIMA_GIT_DIR;
     try {
       setTty(true);
-      process.env.OPENCLAW_GIT_DIR = tempDir;
+      process.env.ANIMA_GIT_DIR = tempDir;
 
       vi.mocked(checkUpdateStatus).mockResolvedValue({
         root: "/test/path",
@@ -627,7 +627,7 @@ describe("update-cli", () => {
       const call = vi.mocked(runGatewayUpdate).mock.calls[0]?.[0];
       expect(call?.channel).toBe("dev");
     } finally {
-      process.env.OPENCLAW_GIT_DIR = previousGitDir;
+      process.env.ANIMA_GIT_DIR = previousGitDir;
     }
   });
 });
