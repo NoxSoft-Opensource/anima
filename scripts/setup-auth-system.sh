@@ -1,7 +1,7 @@
 #!/bin/bash
 # Setup Anima Auth Management System
 # Run this once to set up:
-# 1. Long-lived Claude Code token
+# 1. Long-lived auth token
 # 2. Auth monitoring with notifications
 # 3. Instructions for Termux widgets
 
@@ -91,17 +91,17 @@ echo "2. Create ~/.shortcuts/ directory in Termux:"
 echo "   mkdir -p ~/.shortcuts"
 echo ""
 echo "3. Copy the widget scripts:"
-echo "   scp $SCRIPT_DIR/termux-quick-auth.sh phone:~/.shortcuts/ClawdAuth"
-echo "   scp $SCRIPT_DIR/termux-auth-widget.sh phone:~/.shortcuts/ClawdAuth-Full"
+echo "   scp $SCRIPT_DIR/termux-quick-auth.sh phone:~/.shortcuts/AnimaAuth"
+echo "   scp $SCRIPT_DIR/termux-auth-widget.sh phone:~/.shortcuts/AnimaAuth-Full"
 echo ""
 echo "4. Make them executable on phone:"
-echo "   ssh phone 'chmod +x ~/.shortcuts/Clawd*'"
+echo "   ssh phone 'chmod +x ~/.shortcuts/Anima*'"
 echo ""
 echo "5. Add Termux:Widget to your home screen"
 echo "6. Tap the widget to see your auth scripts"
 echo ""
-echo "The quick widget (ClawdAuth) shows status and opens auth URL if needed."
-echo "The full widget (ClawdAuth-Full) provides guided re-auth flow."
+echo "The quick widget (AnimaAuth) shows status and opens auth URL if needed."
+echo "The full widget (AnimaAuth-Full) provides guided re-auth flow."
 echo ""
 
 # Summary

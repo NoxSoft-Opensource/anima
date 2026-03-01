@@ -10,7 +10,7 @@ struct AboutSettings: View {
         VStack(spacing: 8) {
             let appIcon = NSApplication.shared.applicationIconImage ?? CritterIconRenderer.makeIcon(blink: 0)
             Button {
-                if let url = URL(string: "https://github.com/anima/anima") {
+                if let url = URL(string: "https://noxsoft.net") {
                     NSWorkspace.shared.open(url)
                 }
             } label: {
@@ -48,11 +48,10 @@ struct AboutSettings: View {
             VStack(alignment: .center, spacing: 6) {
                 AboutLinkRow(
                     icon: "chevron.left.slash.chevron.right",
-                    title: "GitHub",
-                    url: "https://github.com/anima/anima")
-                AboutLinkRow(icon: "globe", title: "Website", url: "https://anima.ai")
-                AboutLinkRow(icon: "bird", title: "Twitter", url: "https://twitter.com/steipete")
-                AboutLinkRow(icon: "envelope", title: "Email", url: "mailto:peter@steipete.me")
+                    title: "GitLab",
+                    url: "https://gitlab.com/sylys-group")
+                AboutLinkRow(icon: "globe", title: "Website", url: "https://noxsoft.net")
+                AboutLinkRow(icon: "envelope", title: "Email", url: "mailto:hello@noxsoft.net")
             }
             .frame(maxWidth: .infinity)
             .multilineTextAlignment(.center)
@@ -77,7 +76,7 @@ struct AboutSettings: View {
                 }
             }
 
-            Text("© 2025 Peter Steinberger — MIT License.")
+            Text("© 2025–2026 NoxSoft DAO LLC — MIT License.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .padding(.top, 4)

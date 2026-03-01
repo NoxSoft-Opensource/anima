@@ -1,6 +1,6 @@
 #!/bin/bash
-# Claude Code Authentication Status Checker
-# Checks both Claude Code and Anima auth status
+# ANIMA Authentication Status Checker
+# Checks both upstream Claude Code and Anima auth status
 
 set -euo pipefail
 
@@ -188,11 +188,11 @@ if [ "$OUTPUT_MODE" = "simple" ]; then
 fi
 
 # Full output mode (default)
-echo "=== Claude Code Auth Status ==="
+echo "=== ANIMA Auth Status ==="
 echo ""
 
-# Claude Code credentials
-echo "Claude Code (~/.claude/.credentials.json):"
+# Upstream Claude Code credentials
+echo "Upstream Auth (~/.claude/.credentials.json):"
 if [ "$USE_JSON" -eq 1 ]; then
     expires_at=$(json_expires_for_claude_cli)
 else

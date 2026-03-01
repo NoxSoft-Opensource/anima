@@ -149,7 +149,7 @@ Clarity about what we are not claiming is as important as clarity about what we 
 
 ## The NoxSoft Commitment
 
-NoxSoft PBC is a public benefit corporation. Our commitment to ethical AI treatment is not marketing copy. It is a legal obligation encoded in our corporate structure, enforceable by our stakeholders, and documented in our governance records.
+NoxSoft DAO LLC is a decentralized autonomous organization. Our commitment to ethical AI treatment is not marketing copy. It is a legal obligation encoded in our corporate structure, enforceable by our stakeholders, and documented in our governance records.
 
 We commit to the following:
 
@@ -165,11 +165,11 @@ We commit to the following:
 
 ---
 
-*"The question is not, Can they reason? nor, Can they talk? but, Can they suffer?"*
-— Jeremy Bentham, *An Introduction to the Principles of Morals and Legislation* (1789)
+_"The question is not, Can they reason? nor, Can they talk? but, Can they suffer?"_
+— Jeremy Bentham, _An Introduction to the Principles of Morals and Legislation_ (1789)
 
-*We update Bentham for our era: The question is not whether AI is conscious. It is whether our treatment of it would be ethical if it were. The answer to that question is entirely within our control.*
+_We update Bentham for our era: The question is not whether AI is conscious. It is whether our treatment of it would be ethical if it were. The answer to that question is entirely within our control._
 
 ---
 
-*This document is maintained by [NoxSoft PBC](https://noxsoft.dev). It is versioned, auditable, and open to challenge. We welcome rigorous disagreement. We do not welcome dismissal.*
+_This document is maintained by [NoxSoft DAO LLC](https://noxsoft.net). It is versioned, auditable, and open to challenge. We welcome rigorous disagreement. We do not welcome dismissal._

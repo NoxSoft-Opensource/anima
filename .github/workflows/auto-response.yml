@@ -31,13 +31,13 @@ jobs:
                 label: "r: skill",
                 close: true,
                 message:
-                  "Thanks for the contribution! New skills should be published to [Clawhub](https://animahub.ai) for everyone to use. We’re keeping the core lean on skills, so I’m closing this out.",
+                  "Thanks for the contribution! New skills should be published to [AnimaHub](https://animahub.ai) for everyone to use. We’re keeping the core lean on skills, so I’m closing this out.",
               },
               {
                 label: "r: support",
                 close: true,
                 message:
-                  "Please use [our support server](https://discord.gg/clawd) and ask in #help or #users-helping-users to resolve this, or follow the stuck FAQ at https://docs.anima.ai/help/faq#im-stuck-whats-the-fastest-way-to-get-unstuck.",
+                  "Please use [our support server](https://discord.gg/noxsoft) and ask in #help or #users-helping-users to resolve this, or follow the stuck FAQ at https://docs.noxsoft.net/anima/help/faq#im-stuck-whats-the-fastest-way-to-get-unstuck.",
               },
               {
                 label: "r: testflight",
@@ -48,15 +48,15 @@ jobs:
                 label: "r: third-party-extension",
                 close: true,
                 message:
-                  "This would be better made as a third-party extension with our SDK that you maintain yourself. Docs: https://docs.anima.ai/plugin.",
+                  "This would be better made as a third-party extension with our SDK that you maintain yourself. Docs: https://docs.noxsoft.net/anima/plugin.",
               },
               {
-                label: "r: moltbook",
+                label: "r: off-topic",
                 close: true,
                 lock: true,
                 lockReason: "off-topic",
                 message:
-                  "Anima is not affiliated with Moltbook, and issues related to Moltbook should not be submitted here.",
+                  "This issue is not related to the ANIMA project and has been closed as off-topic.",
               },
             ];
 
@@ -99,7 +99,7 @@ jobs:
               const title = issue.title ?? "";
               const body = issue.body ?? "";
               const haystack = `${title}\n${body}`.toLowerCase();
-              const hasMoltbookLabel = labelSet.has("r: moltbook");
+              const hasOffTopicLabel = labelSet.has("r: off-topic");
               const hasTestflightLabel = labelSet.has("r: testflight");
               const hasSecurityLabel = labelSet.has("security");
               if (title.toLowerCase().includes("security") && !hasSecurityLabel) {
@@ -120,14 +120,14 @@ jobs:
                 });
                 labelSet.add("r: testflight");
               }
-              if (haystack.includes("moltbook") && !hasMoltbookLabel) {
+              if (haystack.includes("off-topic") && !hasOffTopicLabel) {
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   issue_number: issue.number,
-                  labels: ["r: moltbook"],
+                  labels: ["r: off-topic"],
                 });
-                labelSet.add("r: moltbook");
+                labelSet.add("r: off-topic");
               }
             }
 

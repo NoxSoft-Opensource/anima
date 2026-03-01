@@ -1,6 +1,6 @@
-# ClawDock <!-- omit in toc -->
+# AnimaDock <!-- omit in toc -->
 
-Stop typing `docker-compose` commands. Just type `clawdock-start`.
+Stop typing `docker-compose` commands. Just type `animadock-start`.
 
 Inspired by Simon Willison's [Running Anima in Docker](https://til.simonwillison.net/llms/anima-docker).
 
@@ -25,102 +25,102 @@ Inspired by Simon Willison's [Running Anima in Docker](https://til.simonwillison
 **Install:**
 
 ```bash
-mkdir -p ~/.clawdock && curl -sL https://raw.githubusercontent.com/anima/anima/main/scripts/shell-helpers/clawdock-helpers.sh -o ~/.clawdock/clawdock-helpers.sh
+mkdir -p ~/.animadock && curl -sL https://raw.githubusercontent.com/anima/anima/main/scripts/shell-helpers/animadock-helpers.sh -o ~/.animadock/animadock-helpers.sh
 ```
 
 ```bash
-echo 'source ~/.clawdock/clawdock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
+echo 'source ~/.animadock/animadock-helpers.sh' >> ~/.zshrc && source ~/.zshrc
 ```
 
 **See what you get:**
 
 ```bash
-clawdock-help
+animadock-help
 ```
 
-On first command, ClawDock auto-detects your Anima directory:
+On first command, AnimaDock auto-detects your Anima directory:
 
 - Checks common paths (`~/anima`, `~/workspace/anima`, etc.)
 - If found, asks you to confirm
-- Saves to `~/.clawdock/config`
+- Saves to `~/.animadock/config`
 
 **First time setup:**
 
 ```bash
-clawdock-start
+animadock-start
 ```
 
 ```bash
-clawdock-fix-token
+animadock-fix-token
 ```
 
 ```bash
-clawdock-dashboard
+animadock-dashboard
 ```
 
 If you see "pairing required":
 
 ```bash
-clawdock-devices
+animadock-devices
 ```
 
 And approve the request for the specific device:
 
 ```bash
-clawdock-approve <request-id>
+animadock-approve <request-id>
 ```
 
 ## Available Commands
 
 ### Basic Operations
 
-| Command            | Description                     |
-| ------------------ | ------------------------------- |
-| `clawdock-start`   | Start the gateway               |
-| `clawdock-stop`    | Stop the gateway                |
-| `clawdock-restart` | Restart the gateway             |
-| `clawdock-status`  | Check container status          |
-| `clawdock-logs`    | View live logs (follows output) |
+| Command             | Description                     |
+| ------------------- | ------------------------------- |
+| `animadock-start`   | Start the gateway               |
+| `animadock-stop`    | Stop the gateway                |
+| `animadock-restart` | Restart the gateway             |
+| `animadock-status`  | Check container status          |
+| `animadock-logs`    | View live logs (follows output) |
 
 ### Container Access
 
-| Command                   | Description                                    |
-| ------------------------- | ---------------------------------------------- |
-| `clawdock-shell`          | Interactive shell inside the gateway container |
-| `clawdock-cli <command>`  | Run Anima CLI commands                      |
-| `clawdock-exec <command>` | Execute arbitrary commands in the container    |
+| Command                    | Description                                    |
+| -------------------------- | ---------------------------------------------- |
+| `animadock-shell`          | Interactive shell inside the gateway container |
+| `animadock-cli <command>`  | Run Anima CLI commands                         |
+| `animadock-exec <command>` | Execute arbitrary commands in the container    |
 
 ### Web UI & Devices
 
-| Command                 | Description                                |
-| ----------------------- | ------------------------------------------ |
-| `clawdock-dashboard`    | Open web UI in browser with authentication |
-| `clawdock-devices`      | List device pairing requests               |
-| `clawdock-approve <id>` | Approve a device pairing request           |
+| Command                  | Description                                |
+| ------------------------ | ------------------------------------------ |
+| `animadock-dashboard`    | Open web UI in browser with authentication |
+| `animadock-devices`      | List device pairing requests               |
+| `animadock-approve <id>` | Approve a device pairing request           |
 
 ### Setup & Configuration
 
-| Command              | Description                                       |
-| -------------------- | ------------------------------------------------- |
-| `clawdock-fix-token` | Configure gateway authentication token (run once) |
+| Command               | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `animadock-fix-token` | Configure gateway authentication token (run once) |
 
 ### Maintenance
 
-| Command            | Description                                      |
-| ------------------ | ------------------------------------------------ |
-| `clawdock-rebuild` | Rebuild the Docker image                         |
-| `clawdock-clean`   | Remove all containers and volumes (destructive!) |
+| Command             | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| `animadock-rebuild` | Rebuild the Docker image                         |
+| `animadock-clean`   | Remove all containers and volumes (destructive!) |
 
 ### Utilities
 
-| Command              | Description                               |
-| -------------------- | ----------------------------------------- |
-| `clawdock-health`    | Run gateway health check                  |
-| `clawdock-token`     | Display the gateway authentication token  |
-| `clawdock-cd`        | Jump to the Anima project directory    |
-| `clawdock-config`    | Open the Anima config directory        |
-| `clawdock-workspace` | Open the workspace directory              |
-| `clawdock-help`      | Show all available commands with examples |
+| Command               | Description                               |
+| --------------------- | ----------------------------------------- |
+| `animadock-health`    | Run gateway health check                  |
+| `animadock-token`     | Display the gateway authentication token  |
+| `animadock-cd`        | Jump to the Anima project directory       |
+| `animadock-config`    | Open the Anima config directory           |
+| `animadock-workspace` | Open the workspace directory              |
+| `animadock-help`      | Show all available commands with examples |
 
 ## Common Workflows
 
@@ -129,19 +129,19 @@ clawdock-approve <request-id>
 **Restart the gateway:**
 
 ```bash
-clawdock-restart
+animadock-restart
 ```
 
 **Check container status:**
 
 ```bash
-clawdock-status
+animadock-status
 ```
 
 **View live logs:**
 
 ```bash
-clawdock-logs
+animadock-logs
 ```
 
 ### Set Up WhatsApp Bot
@@ -149,7 +149,7 @@ clawdock-logs
 **Shell into the container:**
 
 ```bash
-clawdock-shell
+animadock-shell
 ```
 
 **Inside the container, login to WhatsApp:**
@@ -171,13 +171,13 @@ anima status
 **Check for pending pairing requests:**
 
 ```bash
-clawdock-devices
+animadock-devices
 ```
 
 **Copy the Request ID from the "Pending" table, then approve:**
 
 ```bash
-clawdock-approve <request-id>
+animadock-approve <request-id>
 ```
 
 Then refresh your browser.
@@ -187,7 +187,7 @@ Then refresh your browser.
 If you see "gateway token mismatch" errors:
 
 ```bash
-clawdock-fix-token
+animadock-fix-token
 ```
 
 This will:
@@ -216,11 +216,11 @@ docker ps
 **Test with fresh config (mimics first-time install):**
 
 ```bash
-unset CLAWDOCK_DIR && rm -f ~/.clawdock/config && source scripts/shell-helpers/clawdock-helpers.sh
+unset ANIMADOCK_DIR && rm -f ~/.animadock/config && source scripts/shell-helpers/animadock-helpers.sh
 ```
 
 Then run any command to trigger auto-detect:
 
 ```bash
-clawdock-start
+animadock-start
 ```

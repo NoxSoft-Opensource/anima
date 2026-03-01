@@ -1,6 +1,6 @@
 # ANIMA — Ethical AI Infrastructure
 
-NoxSoft's AI orchestration daemon, maintained by NoxSoft PBC.
+NoxSoft's AI orchestration daemon, maintained by NoxSoft DAO LLC.
 
 ## What This Is
 
