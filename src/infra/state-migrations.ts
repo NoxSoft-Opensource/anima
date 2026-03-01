@@ -334,7 +334,7 @@ type StateDirMigrationResult = {
   warnings: string[];
 };
 
-export async function autoMigrateLegacyStateDir(params: {
+export async function autoMigrateLegacyStateDir(_params: {
   env?: NodeJS.ProcessEnv;
   homedir?: () => string;
   log?: MigrationLogger;
