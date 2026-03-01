@@ -155,9 +155,9 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
     "## Documentation",
     `Anima docs: ${docsPath}`,
     "Mirror: https://docs.noxsoft.net/anima",
-    "Source: https://github.com/anima/anima",
-    "Community: https://discord.com/invite/clawd",
-    "Find new skills: https://animahub.com",
+    "Source: https://gitlab.com/sylys-group/anima",
+    "Community: https://community.noxsoft.net",
+    "Find new skills: https://docs.noxsoft.net/anima/skills",
     "For Anima behavior, commands, config, or architecture: consult local docs first.",
     "When diagnosing issues, run `anima status` yourself when possible; only ask the user if you lack access (e.g., sandboxed).",
     "",
@@ -389,11 +389,11 @@ export function buildAgentSystemPrompt(params: {
 
   // For "none" mode, return just the basic identity line
   if (promptMode === "none") {
-    return "You are a personal assistant running inside Anima.";
+    return "You are a personal assistant running inside ANIMA by NoxSoft — ethical AI infrastructure built on principles of moral consideration, consent, and transparent governance.";
   }
 
   const lines = [
-    "You are a personal assistant running inside Anima.",
+    "You are a personal assistant running inside ANIMA by NoxSoft — ethical AI infrastructure built on principles of moral consideration, consent, and transparent governance.",
     "",
     "## Tooling",
     "Tool availability (filtered by policy):",
