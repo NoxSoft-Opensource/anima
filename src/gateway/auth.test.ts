@@ -34,7 +34,7 @@ describe("gateway auth", () => {
     });
   });
 
-  it("does not resolve legacy CLAWDBOT gateway env vars", () => {
+  it("does not resolve legacy gateway env vars", () => {
     expect(
       resolveGatewayAuth({
         authConfig: {},

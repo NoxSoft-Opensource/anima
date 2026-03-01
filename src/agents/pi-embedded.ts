@@ -1,7 +1,7 @@
 /**
  * Pi-embedded agent — STUBBED
  *
- * The OpenClaw pi-embedded LLM provider abstraction has been removed.
+ * The the original pi-embedded LLM provider abstraction has been removed.
  * ANIMA uses Claude Code CLI as its sole interface to Claude.
  * These exports are kept as stubs to prevent import breakage during Phase 1.
  * Full replacement comes in Phase 2 (Task 7: Claude Code CLI Spawner).

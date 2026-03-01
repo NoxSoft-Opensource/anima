@@ -61,7 +61,7 @@ describe("skills-cli", () => {
       const report = createMockReport([]);
       const output = formatSkillsList(report, {});
       expect(output).toContain("No skills found");
-      expect(output).toContain("npx clawhub");
+      expect(output).toContain("npx animahub");
     });
 
     it("formats skills list with eligible skill", () => {
@@ -141,7 +141,7 @@ describe("skills-cli", () => {
       const report = createMockReport([]);
       const output = formatSkillInfo(report, "unknown-skill", {});
       expect(output).toContain("not found");
-      expect(output).toContain("npx clawhub");
+      expect(output).toContain("npx animahub");
     });
 
     it("shows detailed info for a skill", () => {
@@ -201,7 +201,7 @@ describe("skills-cli", () => {
       expect(output).toContain("ready-2");
       expect(output).toContain("not-ready");
       expect(output).toContain("go"); // missing binary
-      expect(output).toContain("npx clawhub");
+      expect(output).toContain("npx animahub");
     });
 
     it("outputs JSON with --json flag", () => {

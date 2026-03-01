@@ -29,7 +29,7 @@ apps/macos/.build/
 apps/shared/MoltbotKit/.build/
 **/ModuleCache/
 bin/
-bin/clawdbot-mac
+bin/anima-mac
 bin/docs-list
 apps/macos/.build-local/
 apps/macos/.swiftpm/

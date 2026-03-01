@@ -47,22 +47,22 @@ You can gate them via `metadata.anima.requires.config` on the plugin’s config
 entry. See [Plugins](/tools/plugin) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
-## ClawHub (install + sync)
+## AnimaHub (install + sync)
 
-ClawHub is the public skills registry for Anima. Browse at
-[https://clawhub.com](https://clawhub.com). Use it to discover, install, update, and back up skills.
-Full guide: [ClawHub](/tools/clawhub).
+AnimaHub is the public skills registry for Anima. Browse at
+[https://animahub.com](https://animahub.com). Use it to discover, install, update, and back up skills.
+Full guide: [AnimaHub](/tools/animahub).
 
 Common flows:
 
 - Install a skill into your workspace:
-  - `clawhub install <skill-slug>`
+  - `animahub install <skill-slug>`
 - Update all installed skills:
-  - `clawhub update --all`
+  - `animahub update --all`
 - Sync (scan + publish updates):
-  - `clawhub sync --all`
+  - `animahub sync --all`
 
-By default, `clawhub` installs into `./skills` under your current working
+By default, `animahub` installs into `./skills` under your current working
 directory (or falls back to the configured Anima workspace). Anima picks
 that up as `<workspace>/skills` on the next session.
 
@@ -295,6 +295,6 @@ See [Skills config](/tools/skills-config) for the full configuration schema.
 
 ## Looking for more skills?
 
-Browse [https://clawhub.com](https://clawhub.com).
+Browse [https://animahub.com](https://animahub.com).
 
 ---

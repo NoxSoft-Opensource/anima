@@ -157,7 +157,7 @@ function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readT
     "Mirror: https://docs.anima.ai",
     "Source: https://github.com/anima/anima",
     "Community: https://discord.com/invite/clawd",
-    "Find new skills: https://clawhub.com",
+    "Find new skills: https://animahub.com",
     "For Anima behavior, commands, config, or architecture: consult local docs first.",
     "When diagnosing issues, run `anima status` yourself when possible; only ask the user if you lack access (e.g., sandboxed).",
     "",
