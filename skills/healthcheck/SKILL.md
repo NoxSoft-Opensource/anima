@@ -76,14 +76,14 @@ If the user grants read-only permission, run the OS-appropriate checks by defaul
 
 ### 2) Run ANIMA security audits (read-only)
 
-As part of the default read-only checks, run `noxsoft security audit --deep`. Only offer alternatives if the user requests them:
+As part of the default read-only checks, run `anima security audit --deep`. Only offer alternatives if the user requests them:
 
-1. `noxsoft security audit` (faster, non-probing)
-2. `noxsoft security audit --json` (structured output)
+1. `anima security audit` (faster, non-probing)
+2. `anima security audit --json` (structured output)
 
 Offer to apply ANIMA safe defaults (numbered):
 
-1. `noxsoft security audit --fix`
+1. `anima security audit --fix`
 
 Be explicit that `--fix` only tightens ANIMA defaults and file permissions. It does not change host firewall, SSH, or OS update policies.
 
@@ -91,7 +91,7 @@ If browser control is enabled, recommend that 2FA be enabled on all important ac
 
 ### 3) Check ANIMA version/update status (read-only)
 
-As part of the default read-only checks, run `noxsoft update status`.
+As part of the default read-only checks, run `anima update status`.
 
 Report the current channel and whether an update is available.
 
@@ -170,9 +170,9 @@ If unsure, ask.
 
 After ANIMA install or first hardening pass, run at least one baseline audit and version check:
 
-- `noxsoft security audit`
-- `noxsoft security audit --deep`
-- `noxsoft update status`
+- `anima security audit`
+- `anima security audit --deep`
+- `anima update status`
 
 Ongoing monitoring is recommended. Use the ANIMA cron tool/CLI to schedule periodic audits (Gateway scheduler). Do not create scheduled tasks without explicit approval. Store outputs in a user-approved location and avoid secrets in logs.
 When scheduling headless cron runs, include a note in the output that instructs the user to call `healthcheck` so issues can be fixed.
@@ -181,35 +181,35 @@ When scheduling headless cron runs, include a note in the output that instructs 
 
 After any audit or hardening pass, explicitly offer scheduling and require a direct response. Use a short prompt like (numbered):
 
-1. “Do you want me to schedule periodic audits (e.g., daily/weekly) via `noxsoft cron add`?”
+1. “Do you want me to schedule periodic audits (e.g., daily/weekly) via `anima cron add`?”
 
 If the user says yes, ask for:
 
 - cadence (daily/weekly), preferred time window, and output location
-- whether to also schedule `noxsoft update status`
+- whether to also schedule `anima update status`
 
 Use a stable cron job name so updates are deterministic. Prefer exact names:
 
 - `healthcheck:security-audit`
 - `healthcheck:update-status`
 
-Before creating, `noxsoft cron list` and match on exact `name`. If found, `noxsoft cron edit <id> ...`.
-If not found, `noxsoft cron add --name <name> ...`.
+Before creating, `anima cron list` and match on exact `name`. If found, `anima cron edit <id> ...`.
+If not found, `anima cron add --name <name> ...`.
 
 Also offer a periodic version check so the user can decide when to update (numbered):
 
-1. `noxsoft update status` (preferred for source checkouts and channels)
+1. `anima update status` (preferred for source checkouts and channels)
 2. `npm view @noxsoft/anima version` (published npm version)
 
 ## ANIMA command accuracy
 
 Use only supported commands and flags:
 
-- `noxsoft security audit [--deep] [--fix] [--json]`
-- `noxsoft status` / `noxsoft status --deep`
-- `noxsoft health --json`
-- `noxsoft update status`
-- `noxsoft cron add|list|runs|run`
+- `anima security audit [--deep] [--fix] [--json]`
+- `anima status` / `anima status --deep`
+- `anima health --json`
+- `anima update status`
+- `anima cron add|list|runs|run`
 
 Do not invent CLI flags or imply ANIMA enforces host firewall/SSH policies.
 

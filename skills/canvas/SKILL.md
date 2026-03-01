@@ -57,7 +57,7 @@ This is why localhost URLs don't work - the node receives the Tailscale hostname
 
 ## Configuration
 
-In `~/.noxsoft/noxsoft.json`:
+In `~/.anima/anima.json`:
 
 ```json
 {
@@ -106,7 +106,7 @@ HTML
 Check how your gateway is bound:
 
 ```bash
-cat ~/.noxsoft/noxsoft.json | jq '.gateway.bind'
+cat ~/.anima/anima.json | jq '.gateway.bind'
 ```
 
 Then construct the URL:
@@ -123,7 +123,7 @@ tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//'
 ### 3. Find connected nodes
 
 ```bash
-noxsoft nodes list
+anima nodes list
 ```
 
 Look for Mac/iOS/Android nodes with canvas capability.
@@ -156,7 +156,7 @@ canvas action:hide node:<node-id>
 
 **Debug steps:**
 
-1. Check server bind: `cat ~/.noxsoft/noxsoft.json | jq '.gateway.bind'`
+1. Check server bind: `cat ~/.anima/anima.json | jq '.gateway.bind'`
 2. Check what port canvas is on: `lsof -i :18793`
 3. Test URL directly: `curl http://<hostname>:18793/__noxsoft__/canvas/<file>.html`
 
@@ -168,7 +168,7 @@ Always specify `node:<node-id>` parameter.
 
 ### "node not connected" error
 
-Node is offline. Use `noxsoft nodes list` to find online nodes.
+Node is offline. Use `anima nodes list` to find online nodes.
 
 ### Content not updating
 

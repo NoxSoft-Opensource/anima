@@ -39,7 +39,7 @@ Defaults:
 
 ## API key
 
-Set `OPENAI_API_KEY`, or configure it in `~/.noxsoft/noxsoft.json`:
+Set `OPENAI_API_KEY`, or configure it in `~/.anima/anima.json`:
 
 ```json5
 {

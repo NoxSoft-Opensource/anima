@@ -12,10 +12,10 @@ Use tmux only when you need an interactive TTY. Prefer exec background mode for 
 ## Quickstart (isolated socket, exec tool)
 
 ```bash
-SOCKET_DIR="${NOXSOFT_TMUX_SOCKET_DIR:-${NOXSOFT_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/noxsoft-tmux-sockets}}"
+SOCKET_DIR="${ANIMA_TMUX_SOCKET_DIR:-${ANIMA_TMUX_SOCKET_DIR:-${TMPDIR:-/tmp}/anima-tmux-sockets}}"
 mkdir -p "$SOCKET_DIR"
-SOCKET="$SOCKET_DIR/noxsoft.sock"
-SESSION=noxsoft-python
+SOCKET="$SOCKET_DIR/anima.sock"
+SESSION=anima-python
 
 tmux -S "$SOCKET" new -d -s "$SESSION" -n shell
 tmux -S "$SOCKET" send-keys -t "$SESSION":0.0 -- 'PYTHON_BASIC_REPL=1 python3 -q' Enter
@@ -32,8 +32,8 @@ To monitor:
 
 ## Socket convention
 
-- Use `NOXSOFT_TMUX_SOCKET_DIR` (legacy `NOXSOFT_TMUX_SOCKET_DIR` also supported).
-- Default socket path: `"$NOXSOFT_TMUX_SOCKET_DIR/noxsoft.sock"`.
+- Use `ANIMA_TMUX_SOCKET_DIR` (legacy `ANIMA_TMUX_SOCKET_DIR` also supported).
+- Default socket path: `"$ANIMA_TMUX_SOCKET_DIR/anima.sock"`.
 
 ## Targeting panes and naming
 
@@ -44,7 +44,7 @@ To monitor:
 ## Finding sessions
 
 - List sessions on your socket: `{baseDir}/scripts/find-sessions.sh -S "$SOCKET"`.
-- Scan all sockets: `{baseDir}/scripts/find-sessions.sh --all` (uses `NOXSOFT_TMUX_SOCKET_DIR`).
+- Scan all sockets: `{baseDir}/scripts/find-sessions.sh --all` (uses `ANIMA_TMUX_SOCKET_DIR`).
 
 ## Sending input safely
 

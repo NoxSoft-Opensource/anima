@@ -19,8 +19,8 @@ Use the voice-call plugin to start or inspect calls (Twilio, Telnyx, Plivo, or m
 ## CLI
 
 ```bash
-noxsoft voicecall call --to "+15555550123" --message "Hello from ANIMA"
-noxsoft voicecall status --call-id <id>
+anima voicecall call --to "+15555550123" --message "Hello from ANIMA"
+anima voicecall status --call-id <id>
 ```
 
 ## Tool
