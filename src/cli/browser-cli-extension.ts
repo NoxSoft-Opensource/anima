@@ -45,7 +45,7 @@ export async function installChromeExtension(opts?: {
 }): Promise<{ path: string }> {
   const src = opts?.sourceDir ?? resolveBundledExtensionRootDir();
   if (!hasManifest(src)) {
-    throw new Error("Bundled Chrome extension is missing. Reinstall Anima and try again.");
+    throw new Error("Bundled Chrome extension is missing. Reinstall ANIMA and try again.");
   }
 
   const stateDir = opts?.stateDir ?? resolveStateDir();
@@ -100,7 +100,7 @@ export function registerBrowserExtensionCommands(
             "Next:",
             `- Chrome → chrome://extensions → enable “Developer mode”`,
             `- “Load unpacked” → select: ${displayPath}`,
-            `- Pin “Anima Browser Relay”, then click it on the tab (badge shows ON)`,
+            `- Pin “ANIMA Browser Relay”, then click it on the tab (badge shows ON)`,
             "",
             `${theme.muted("Docs:")} ${formatDocsLink("/tools/chrome-extension", "docs.noxsoft.net/anima/tools/chrome-extension")}`,
           ].join("\n"),

@@ -316,7 +316,7 @@ export async function fetchMinimaxUsage(
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "MM-API-Source": "Anima",
+        "MM-API-Source": "ANIMA",
       },
     },
     timeoutMs,

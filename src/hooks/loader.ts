@@ -24,7 +24,7 @@ const log = createSubsystemLogger("hooks:loader");
  * 1. Directory-based discovery (bundled, managed, workspace)
  * 2. Legacy config handlers (backwards compatibility)
  *
- * @param cfg - Anima configuration
+ * @param cfg - ANIMA configuration
  * @param workspaceDir - Workspace directory for hook discovery
  * @returns Number of handlers successfully loaded
  *

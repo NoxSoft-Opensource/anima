@@ -162,7 +162,7 @@ function logSlotWarnings(warnings: string[]) {
 export function registerPluginsCli(program: Command) {
   const plugins = program
     .command("plugins")
-    .description("Manage Anima plugins/extensions")
+    .description("Manage ANIMA plugins/extensions")
     .addHelpText(
       "after",
       () =>

@@ -221,7 +221,7 @@ export async function handleOpenAiHttpRequest(
               .map((p) => (typeof p.text === "string" ? p.text : ""))
               .filter(Boolean)
               .join("\n\n")
-          : "No response from Anima.";
+          : "No response from ANIMA.";
 
       sendJson(res, 200, {
         id: runId,
@@ -351,7 +351,7 @@ export async function handleOpenAiHttpRequest(
                 .map((p) => (typeof p.text === "string" ? p.text : ""))
                 .filter(Boolean)
                 .join("\n\n")
-            : "No response from Anima.";
+            : "No response from ANIMA.";
 
         sawAssistantDelta = true;
         writeSse(res, {

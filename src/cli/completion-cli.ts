@@ -102,7 +102,7 @@ function formatCompletionSourceLine(
 }
 
 function isCompletionProfileHeader(line: string): boolean {
-  return line.trim() === "# Anima Completion";
+  return line.trim() === "# ANIMA Completion";
 }
 
 function isCompletionProfileLine(line: string, binName: string, cachePath: string | null): boolean {
@@ -149,7 +149,7 @@ function updateCompletionProfile(
   }
 
   const trimmed = filtered.join("\n").trimEnd();
-  const block = `# Anima Completion\n${sourceLine}`;
+  const block = `# ANIMA Completion\n${sourceLine}`;
   const next = trimmed ? `${trimmed}\n\n${block}\n` : `${block}\n`;
   return { next, changed: next !== content, hadExisting };
 }

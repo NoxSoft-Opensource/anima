@@ -24,6 +24,6 @@ export type AcpServerOptions = {
 
 export const ACP_AGENT_INFO = {
   name: "anima-acp",
-  title: "Anima ACP Gateway",
+  title: "ANIMA ACP Gateway",
   version: VERSION,
 };

@@ -168,7 +168,7 @@ export async function fetchWithGuard(params: {
     timeoutMs: params.timeoutMs,
     policy: params.policy,
     auditContext: params.auditContext,
-    init: { headers: { "User-Agent": "Anima-Gateway/1.0" } },
+    init: { headers: { "User-Agent": "ANIMA-Gateway/1.0" } },
   });
 
   try {

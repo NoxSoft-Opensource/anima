@@ -202,7 +202,7 @@ echo "Telegram (bot token):"
 echo "  ${COMPOSE_HINT} run --rm anima-cli channels add --channel telegram --token <token>"
 echo "Discord (bot token):"
 echo "  ${COMPOSE_HINT} run --rm anima-cli channels add --channel discord --token <token>"
-echo "Docs: https://docs.anima.ai/channels"
+echo "Docs: https://docs.noxsoft.net/anima/channels"
 
 echo ""
 echo "==> Starting gateway"

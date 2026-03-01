@@ -110,7 +110,7 @@ describe("resolveGatewayWindowsTaskName", () => {
   it("returns default task name when no profile is set", () => {
     const result = resolveGatewayWindowsTaskName();
     expect(result).toBe(GATEWAY_WINDOWS_TASK_NAME);
-    expect(result).toBe("Anima Gateway");
+    expect(result).toBe("ANIMA Gateway");
   });
 
   it("returns default task name when profile is undefined", () => {
@@ -130,17 +130,17 @@ describe("resolveGatewayWindowsTaskName", () => {
 
   it("returns profile-specific task name when profile is set", () => {
     const result = resolveGatewayWindowsTaskName("dev");
-    expect(result).toBe("Anima Gateway (dev)");
+    expect(result).toBe("ANIMA Gateway (dev)");
   });
 
   it("returns profile-specific task name for custom profile", () => {
     const result = resolveGatewayWindowsTaskName("work");
-    expect(result).toBe("Anima Gateway (work)");
+    expect(result).toBe("ANIMA Gateway (work)");
   });
 
   it("trims whitespace from profile", () => {
     const result = resolveGatewayWindowsTaskName("  ci  ");
-    expect(result).toBe("Anima Gateway (ci)");
+    expect(result).toBe("ANIMA Gateway (ci)");
   });
 
   it("returns default task name for empty string profile", () => {
@@ -175,24 +175,24 @@ describe("resolveGatewayProfileSuffix", () => {
 
 describe("formatGatewayServiceDescription", () => {
   it("returns default description when no profile/version", () => {
-    expect(formatGatewayServiceDescription()).toBe("Anima Gateway");
+    expect(formatGatewayServiceDescription()).toBe("ANIMA Gateway");
   });
 
   it("includes profile when set", () => {
     expect(formatGatewayServiceDescription({ profile: "work" })).toBe(
-      "Anima Gateway (profile: work)",
+      "ANIMA Gateway (profile: work)",
     );
   });
 
   it("includes version when set", () => {
     expect(formatGatewayServiceDescription({ version: "2026.1.10" })).toBe(
-      "Anima Gateway (v2026.1.10)",
+      "ANIMA Gateway (v2026.1.10)",
     );
   });
 
   it("includes profile and version when set", () => {
     expect(formatGatewayServiceDescription({ profile: "dev", version: "1.2.3" })).toBe(
-      "Anima Gateway (profile: dev, v1.2.3)",
+      "ANIMA Gateway (profile: dev, v1.2.3)",
     );
   });
 });

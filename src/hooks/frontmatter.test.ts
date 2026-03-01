@@ -200,7 +200,7 @@ describe("resolveAnimaMetadata", () => {
         anima: {
           events: ["command"],
           install: [
-            { id: "bundled", kind: "bundled", label: "Bundled with Anima" },
+            { id: "bundled", kind: "bundled", label: "Bundled with ANIMA" },
             { id: "npm", kind: "npm", package: "@anima/hook" },
           ],
         },
@@ -233,7 +233,7 @@ describe("resolveAnimaMetadata", () => {
     const content = `---
 name: session-memory
 description: "Save session context to memory when /new command is issued"
-homepage: https://docs.anima.ai/automation/hooks#session-memory
+homepage: https://docs.noxsoft.net/anima/automation/hooks#session-memory
 metadata:
   {
     "anima":
@@ -241,7 +241,7 @@ metadata:
         "emoji": "💾",
         "events": ["command:new"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with Anima" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ANIMA" }],
       },
   }
 ---

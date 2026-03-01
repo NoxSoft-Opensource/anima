@@ -1,6 +1,6 @@
 # Bundled Hooks
 
-This directory contains hooks that ship with Anima. These hooks are automatically discovered and can be enabled/disabled via CLI or configuration.
+This directory contains hooks that ship with ANIMA. These hooks are automatically discovered and can be enabled/disabled via CLI or configuration.
 
 ## Available Hooks
 
@@ -81,7 +81,7 @@ session-memory/
 ---
 name: my-hook
 description: "Short description"
-homepage: https://docs.anima.ai/automation/hooks#my-hook
+homepage: https://docs.noxsoft.net/anima/automation/hooks#my-hook
 metadata:
   { "anima": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -220,4 +220,4 @@ Test your hooks by:
 
 ## Documentation
 
-Full documentation: https://docs.anima.ai/automation/hooks
+Full documentation: https://docs.noxsoft.net/anima/automation/hooks

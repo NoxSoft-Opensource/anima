@@ -64,7 +64,7 @@ In `~/.anima/anima.json`:
   "canvasHost": {
     "enabled": true,
     "port": 18793,
-    "root": "/Users/you/clawd/canvas",
+    "root": "/Users/you/anima/canvas",
     "liveReload": true
   },
   "gateway": {
@@ -87,10 +87,10 @@ Great for development!
 
 ### 1. Create HTML content
 
-Place files in the canvas root directory (default `~/clawd/canvas/`):
+Place files in the canvas root directory (default `~/anima/canvas/`):
 
 ```bash
-cat > ~/clawd/canvas/my-game.html << 'HTML'
+cat > ~/anima/canvas/my-game.html << 'HTML'
 <!DOCTYPE html>
 <html>
 <head><title>My Game</title></head>
@@ -183,8 +183,8 @@ If live reload isn't working:
 The canvas host serves from `/__noxsoft__/canvas/` prefix:
 
 ```
-http://<host>:18793/__noxsoft__/canvas/index.html  → ~/clawd/canvas/index.html
-http://<host>:18793/__noxsoft__/canvas/games/snake.html → ~/clawd/canvas/games/snake.html
+http://<host>:18793/__noxsoft__/canvas/index.html  → ~/anima/canvas/index.html
+http://<host>:18793/__noxsoft__/canvas/games/snake.html → ~/anima/canvas/games/snake.html
 ```
 
 The `/__noxsoft__/canvas/` prefix is defined by `CANVAS_HOST_PATH` constant.

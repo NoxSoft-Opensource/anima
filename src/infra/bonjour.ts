@@ -40,12 +40,12 @@ function isDisabledByEnv() {
 
 function safeServiceName(name: string) {
   const trimmed = name.trim();
-  return trimmed.length > 0 ? trimmed : "Anima";
+  return trimmed.length > 0 ? trimmed : "ANIMA";
 }
 
 function prettifyInstanceName(name: string) {
   const normalized = name.trim().replace(/\s+/g, " ");
-  return normalized.replace(/\s+\(Anima\)\s*$/i, "").trim() || normalized;
+  return normalized.replace(/\s+\(ANIMA\)\s*$/i, "").trim() || normalized;
 }
 
 type BonjourService = {

@@ -65,7 +65,7 @@ export function registerSecurityCli(program: Command) {
       const muted = (text: string) => (rich ? theme.muted(text) : text);
 
       const lines: string[] = [];
-      lines.push(heading("Anima security audit"));
+      lines.push(heading("ANIMA security audit"));
       lines.push(muted(`Summary: ${formatSummary(report.summary)}`));
       lines.push(muted(`Run deeper: ${formatCliCommand("anima security audit --deep")}`));
 

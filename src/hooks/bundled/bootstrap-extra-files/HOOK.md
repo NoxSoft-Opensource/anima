@@ -1,7 +1,7 @@
 ---
 name: bootstrap-extra-files
 description: "Inject additional workspace bootstrap files via glob/path patterns"
-homepage: https://docs.anima.ai/automation/hooks#bootstrap-extra-files
+homepage: https://docs.noxsoft.net/anima/automation/hooks#bootstrap-extra-files
 metadata:
   {
     "anima":
@@ -9,7 +9,7 @@ metadata:
         "emoji": "📎",
         "events": ["agent:bootstrap"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with Anima" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ANIMA" }],
       },
   }
 ---

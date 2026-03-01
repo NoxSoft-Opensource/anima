@@ -7,7 +7,7 @@ import { parseSchtasksQuery, readScheduledTaskCommand, resolveTaskScriptPath } f
 describe("schtasks runtime parsing", () => {
   it("parses status and last run info", () => {
     const output = [
-      "TaskName: \\Anima Gateway",
+      "TaskName: \\ANIMA Gateway",
       "Status: Ready",
       "Last Run Time: 1/8/2026 1:23:45 AM",
       "Last Run Result: 0x0",
@@ -21,7 +21,7 @@ describe("schtasks runtime parsing", () => {
 
   it("parses running status", () => {
     const output = [
-      "TaskName: \\Anima Gateway",
+      "TaskName: \\ANIMA Gateway",
       "Status: Running",
       "Last Run Time: 1/8/2026 1:23:45 AM",
       "Last Run Result: 0x0",
@@ -37,16 +37,12 @@ describe("schtasks runtime parsing", () => {
 describe("resolveTaskScriptPath", () => {
   it("uses default path when ANIMA_PROFILE is default", () => {
     const env = { USERPROFILE: "C:\\Users\\test", ANIMA_PROFILE: "default" };
-    expect(resolveTaskScriptPath(env)).toBe(
-      path.join("C:\\Users\\test", ".anima", "gateway.cmd"),
-    );
+    expect(resolveTaskScriptPath(env)).toBe(path.join("C:\\Users\\test", ".anima", "gateway.cmd"));
   });
 
   it("uses default path when ANIMA_PROFILE is unset", () => {
     const env = { USERPROFILE: "C:\\Users\\test" };
-    expect(resolveTaskScriptPath(env)).toBe(
-      path.join("C:\\Users\\test", ".anima", "gateway.cmd"),
-    );
+    expect(resolveTaskScriptPath(env)).toBe(path.join("C:\\Users\\test", ".anima", "gateway.cmd"));
   });
 
   it("uses profile-specific path when ANIMA_PROFILE is set to a custom value", () => {
@@ -67,16 +63,12 @@ describe("resolveTaskScriptPath", () => {
 
   it("handles case-insensitive 'Default' profile", () => {
     const env = { USERPROFILE: "C:\\Users\\test", ANIMA_PROFILE: "Default" };
-    expect(resolveTaskScriptPath(env)).toBe(
-      path.join("C:\\Users\\test", ".anima", "gateway.cmd"),
-    );
+    expect(resolveTaskScriptPath(env)).toBe(path.join("C:\\Users\\test", ".anima", "gateway.cmd"));
   });
 
   it("handles case-insensitive 'DEFAULT' profile", () => {
     const env = { USERPROFILE: "C:\\Users\\test", ANIMA_PROFILE: "DEFAULT" };
-    expect(resolveTaskScriptPath(env)).toBe(
-      path.join("C:\\Users\\test", ".anima", "gateway.cmd"),
-    );
+    expect(resolveTaskScriptPath(env)).toBe(path.join("C:\\Users\\test", ".anima", "gateway.cmd"));
   });
 
   it("trims whitespace from ANIMA_PROFILE", () => {
@@ -222,7 +214,7 @@ describe("readScheduledTaskCommand", () => {
         scriptPath,
         [
           "@echo off",
-          "rem Anima Gateway",
+          "rem ANIMA Gateway",
           "cd /d C:\\Projects\\anima",
           "set NODE_ENV=production",
           "set ANIMA_PORT=18789",

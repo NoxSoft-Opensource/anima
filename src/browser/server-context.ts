@@ -315,7 +315,7 @@ function createProfileContext(
       }
       // Relay server is up, but no attached tab yet. Prompt user to attach.
       throw new Error(
-        `Chrome extension relay is running, but no tab is connected. Click the Anima Chrome extension icon on a tab to attach it (profile "${profile.name}").`,
+        `Chrome extension relay is running, but no tab is connected. Click the ANIMA Chrome extension icon on a tab to attach it (profile "${profile.name}").`,
       );
     }
 
@@ -387,7 +387,7 @@ function createProfileContext(
       if (profile.driver === "extension") {
         throw new Error(
           `tab not found (no attached Chrome tabs for profile "${profile.name}"). ` +
-            "Click the Anima Browser Relay toolbar icon on the tab you want to control (badge ON).",
+            "Click the ANIMA Browser Relay toolbar icon on the tab you want to control (badge ON).",
         );
       }
       await openTab("about:blank");

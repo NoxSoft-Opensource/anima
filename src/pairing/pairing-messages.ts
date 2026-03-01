@@ -8,7 +8,7 @@ export function buildPairingReply(params: {
 }): string {
   const { channel, idLine, code } = params;
   return [
-    "Anima: access not configured.",
+    "ANIMA: access not configured.",
     "",
     idLine,
     "",

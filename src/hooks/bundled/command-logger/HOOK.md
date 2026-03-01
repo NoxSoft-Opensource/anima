@@ -1,14 +1,14 @@
 ---
 name: command-logger
 description: "Log all command events to a centralized audit file"
-homepage: https://docs.anima.ai/automation/hooks#command-logger
+homepage: https://docs.noxsoft.net/anima/automation/hooks#command-logger
 metadata:
   {
     "anima":
       {
         "emoji": "📝",
         "events": ["command"],
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with Anima" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ANIMA" }],
       },
   }
 ---

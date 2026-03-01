@@ -1,7 +1,7 @@
 ---
 name: boot-md
 description: "Run BOOT.md on gateway startup"
-homepage: https://docs.anima.ai/automation/hooks#boot-md
+homepage: https://docs.noxsoft.net/anima/automation/hooks#boot-md
 metadata:
   {
     "anima":
@@ -9,7 +9,7 @@ metadata:
         "emoji": "🚀",
         "events": ["gateway:startup"],
         "requires": { "config": ["workspace.dir"] },
-        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with Anima" }],
+        "install": [{ "id": "bundled", "kind": "bundled", "label": "Bundled with ANIMA" }],
       },
   }
 ---
