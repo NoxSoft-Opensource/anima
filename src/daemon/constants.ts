@@ -1,12 +1,12 @@
 // Default service labels (canonical + legacy compatibility)
 export const GATEWAY_LAUNCH_AGENT_LABEL = "net.noxsoft.anima.gateway";
 export const GATEWAY_SYSTEMD_SERVICE_NAME = "anima-gateway";
-export const GATEWAY_WINDOWS_TASK_NAME = "Anima Gateway";
+export const GATEWAY_WINDOWS_TASK_NAME = "ANIMA Gateway";
 export const GATEWAY_SERVICE_MARKER = "anima";
 export const GATEWAY_SERVICE_KIND = "gateway";
 export const NODE_LAUNCH_AGENT_LABEL = "net.noxsoft.anima.node";
 export const NODE_SYSTEMD_SERVICE_NAME = "anima-node";
-export const NODE_WINDOWS_TASK_NAME = "Anima Node";
+export const NODE_WINDOWS_TASK_NAME = "ANIMA Node";
 export const NODE_SERVICE_MARKER = "anima";
 export const NODE_SERVICE_KIND = "node";
 export const NODE_WINDOWS_TASK_SCRIPT_NAME = "node.cmd";
@@ -53,7 +53,7 @@ export function resolveGatewayWindowsTaskName(profile?: string): string {
   if (!normalized) {
     return GATEWAY_WINDOWS_TASK_NAME;
   }
-  return `Anima Gateway (${normalized})`;
+  return `ANIMA Gateway (${normalized})`;
 }
 
 export function formatGatewayServiceDescription(params?: {
@@ -70,9 +70,9 @@ export function formatGatewayServiceDescription(params?: {
     parts.push(`v${version}`);
   }
   if (parts.length === 0) {
-    return "Anima Gateway";
+    return "ANIMA Gateway";
   }
-  return `Anima Gateway (${parts.join(", ")})`;
+  return `ANIMA Gateway (${parts.join(", ")})`;
 }
 
 export function resolveNodeLaunchAgentLabel(): string {
@@ -90,7 +90,7 @@ export function resolveNodeWindowsTaskName(): string {
 export function formatNodeServiceDescription(params?: { version?: string }): string {
   const version = params?.version?.trim();
   if (!version) {
-    return "Anima Node Host";
+    return "ANIMA Node Host";
   }
-  return `Anima Node Host (v${version})`;
+  return `ANIMA Node Host (v${version})`;
 }
