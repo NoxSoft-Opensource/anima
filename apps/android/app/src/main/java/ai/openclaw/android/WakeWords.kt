@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package net.noxsoft.anima.android
 
 object WakeWords {
   const val maxWords: Int = 32

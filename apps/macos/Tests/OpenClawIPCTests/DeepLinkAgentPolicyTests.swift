@@ -1,6 +1,6 @@
-import OpenClawKit
+import AnimaKit
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite struct DeepLinkAgentPolicyTests {
     @Test func validateMessageForHandleRejectsTooLongWhenUnkeyed() {

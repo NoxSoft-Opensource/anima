@@ -1,9 +1,9 @@
 import Foundation
-import OpenClawKit
+import AnimaKit
 import OSLog
 import WebKit
 
-private let canvasLogger = Logger(subsystem: "ai.openclaw", category: "Canvas")
+private let canvasLogger = Logger(subsystem: "net.noxsoft.anima", category: "Canvas")
 
 final class CanvasSchemeHandler: NSObject, WKURLSchemeHandler {
     private let root: URL
@@ -222,7 +222,7 @@ final class CanvasSchemeHandler: NSObject, WKURLSchemeHandler {
         let name = fileURL.deletingPathExtension().lastPathComponent
         guard !name.isEmpty, !ext.isEmpty else { return nil }
 
-        let bundle = OpenClawKitResources.bundle
+        let bundle = AnimaKitResources.bundle
         let resourceURL =
             bundle.url(forResource: name, withExtension: ext, subdirectory: subdirectory)
             ?? bundle.url(forResource: name, withExtension: ext)

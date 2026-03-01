@@ -1,4 +1,4 @@
-package ai.openclaw.android.voice
+package net.noxsoft.anima.android.voice
 
 object VoiceWakeCommandExtractor {
   fun extractCommand(text: String, triggerWords: List<String>): String? {

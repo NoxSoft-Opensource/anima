@@ -1,8 +1,8 @@
-package ai.openclaw.android.ui
+package net.noxsoft.anima.android.ui
 
 import androidx.compose.runtime.Composable
-import ai.openclaw.android.MainViewModel
-import ai.openclaw.android.ui.chat.ChatSheetContent
+import net.noxsoft.anima.android.MainViewModel
+import net.noxsoft.anima.android.ui.chat.ChatSheetContent
 
 @Composable
 fun ChatSheet(viewModel: MainViewModel) {

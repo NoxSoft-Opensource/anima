@@ -1,4 +1,4 @@
-import OpenClawProtocol
+import AnimaProtocol
 
 /// Server-push messages from the gateway websocket.
 ///

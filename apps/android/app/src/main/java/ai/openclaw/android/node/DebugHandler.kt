@@ -1,9 +1,9 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
 import android.content.Context
-import ai.openclaw.android.BuildConfig
-import ai.openclaw.android.gateway.DeviceIdentityStore
-import ai.openclaw.android.gateway.GatewaySession
+import net.noxsoft.anima.android.BuildConfig
+import net.noxsoft.anima.android.gateway.DeviceIdentityStore
+import net.noxsoft.anima.android.gateway.GatewaySession
 import kotlinx.serialization.json.JsonPrimitive
 
 class DebugHandler(

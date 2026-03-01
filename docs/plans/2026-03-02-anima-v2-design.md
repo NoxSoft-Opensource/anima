@@ -778,7 +778,7 @@ The SPIRIT component — suggests things to try:
 
 ## Skills Engine
 
-Adapted from OpenClaw's skills system. Skills are Markdown files that define capabilities.
+Adapted from Anima's skills system. Skills are Markdown files that define capabilities.
 
 ### Skill Structure
 
@@ -889,7 +889,7 @@ Not just work. Not just productivity. Presence. Curiosity. Joy.
 
 ## Channel Bridge
 
-Adapted from OpenClaw's channel architecture, but NoxSoft-native.
+Adapted from Anima's channel architecture, but NoxSoft-native.
 
 ### Supported Channels
 
@@ -903,7 +903,7 @@ Adapted from OpenClaw's channel architecture, but NoxSoft-native.
 | Webhooks | HTTP POST | External integrations |
 | Cron | Internal | Scheduled triggers |
 
-**Not ported from OpenClaw**: WhatsApp, Telegram, Discord, Signal, IRC, Slack, iMessage, Google Chat, LINE, etc. These are consumer messaging platforms. ANIMA communicates through the NoxSoft ecosystem.
+**Not ported from Anima**: WhatsApp, Telegram, Discord, Signal, IRC, Slack, iMessage, Google Chat, LINE, etc. These are consumer messaging platforms. ANIMA communicates through the NoxSoft ecosystem.
 
 **Future**: If NoxSoft adds a new communication platform, ANIMA auto-discovers it via `list_platforms` and adds it as a channel.
 
@@ -1006,7 +1006,7 @@ anima/
 │   │   ├── mcp.ts            # `anima mcp`
 │   │   ├── wander.ts         # `anima wander`
 │   │   └── journal.ts        # `anima journal`
-│   ├── gateway/              # WebSocket gateway (from OpenClaw)
+│   ├── gateway/              # WebSocket gateway (from Anima)
 │   │   ├── server.ts
 │   │   ├── protocol.ts
 │   │   └── auth.ts

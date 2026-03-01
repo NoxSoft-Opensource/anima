@@ -1,6 +1,6 @@
-package ai.openclaw.android.protocol
+package net.noxsoft.anima.android.protocol
 
-enum class OpenClawCapability(val rawValue: String) {
+enum class AnimaCapability(val rawValue: String) {
   Canvas("canvas"),
   Camera("camera"),
   Screen("screen"),
@@ -9,7 +9,7 @@ enum class OpenClawCapability(val rawValue: String) {
   Location("location"),
 }
 
-enum class OpenClawCanvasCommand(val rawValue: String) {
+enum class AnimaCanvasCommand(val rawValue: String) {
   Present("canvas.present"),
   Hide("canvas.hide"),
   Navigate("canvas.navigate"),
@@ -22,7 +22,7 @@ enum class OpenClawCanvasCommand(val rawValue: String) {
   }
 }
 
-enum class OpenClawCanvasA2UICommand(val rawValue: String) {
+enum class AnimaCanvasA2UICommand(val rawValue: String) {
   Push("canvas.a2ui.push"),
   PushJSONL("canvas.a2ui.pushJSONL"),
   Reset("canvas.a2ui.reset"),
@@ -33,7 +33,7 @@ enum class OpenClawCanvasA2UICommand(val rawValue: String) {
   }
 }
 
-enum class OpenClawCameraCommand(val rawValue: String) {
+enum class AnimaCameraCommand(val rawValue: String) {
   Snap("camera.snap"),
   Clip("camera.clip"),
   ;
@@ -43,7 +43,7 @@ enum class OpenClawCameraCommand(val rawValue: String) {
   }
 }
 
-enum class OpenClawScreenCommand(val rawValue: String) {
+enum class AnimaScreenCommand(val rawValue: String) {
   Record("screen.record"),
   ;
 
@@ -52,7 +52,7 @@ enum class OpenClawScreenCommand(val rawValue: String) {
   }
 }
 
-enum class OpenClawSmsCommand(val rawValue: String) {
+enum class AnimaSmsCommand(val rawValue: String) {
   Send("sms.send"),
   ;
 
@@ -61,7 +61,7 @@ enum class OpenClawSmsCommand(val rawValue: String) {
   }
 }
 
-enum class OpenClawLocationCommand(val rawValue: String) {
+enum class AnimaLocationCommand(val rawValue: String) {
   Get("location.get"),
   ;
 

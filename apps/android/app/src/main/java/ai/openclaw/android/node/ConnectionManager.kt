@@ -1,21 +1,21 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
 import android.os.Build
-import ai.openclaw.android.BuildConfig
-import ai.openclaw.android.SecurePrefs
-import ai.openclaw.android.gateway.GatewayClientInfo
-import ai.openclaw.android.gateway.GatewayConnectOptions
-import ai.openclaw.android.gateway.GatewayEndpoint
-import ai.openclaw.android.gateway.GatewayTlsParams
-import ai.openclaw.android.protocol.OpenClawCanvasA2UICommand
-import ai.openclaw.android.protocol.OpenClawCanvasCommand
-import ai.openclaw.android.protocol.OpenClawCameraCommand
-import ai.openclaw.android.protocol.OpenClawLocationCommand
-import ai.openclaw.android.protocol.OpenClawScreenCommand
-import ai.openclaw.android.protocol.OpenClawSmsCommand
-import ai.openclaw.android.protocol.OpenClawCapability
-import ai.openclaw.android.LocationMode
-import ai.openclaw.android.VoiceWakeMode
+import net.noxsoft.anima.android.BuildConfig
+import net.noxsoft.anima.android.SecurePrefs
+import net.noxsoft.anima.android.gateway.GatewayClientInfo
+import net.noxsoft.anima.android.gateway.GatewayConnectOptions
+import net.noxsoft.anima.android.gateway.GatewayEndpoint
+import net.noxsoft.anima.android.gateway.GatewayTlsParams
+import net.noxsoft.anima.android.protocol.AnimaCanvasA2UICommand
+import net.noxsoft.anima.android.protocol.AnimaCanvasCommand
+import net.noxsoft.anima.android.protocol.AnimaCameraCommand
+import net.noxsoft.anima.android.protocol.AnimaLocationCommand
+import net.noxsoft.anima.android.protocol.AnimaScreenCommand
+import net.noxsoft.anima.android.protocol.AnimaSmsCommand
+import net.noxsoft.anima.android.protocol.AnimaCapability
+import net.noxsoft.anima.android.LocationMode
+import net.noxsoft.anima.android.VoiceWakeMode
 
 class ConnectionManager(
   private val prefs: SecurePrefs,
@@ -81,24 +81,24 @@ class ConnectionManager(
 
   fun buildInvokeCommands(): List<String> =
     buildList {
-      add(OpenClawCanvasCommand.Present.rawValue)
-      add(OpenClawCanvasCommand.Hide.rawValue)
-      add(OpenClawCanvasCommand.Navigate.rawValue)
-      add(OpenClawCanvasCommand.Eval.rawValue)
-      add(OpenClawCanvasCommand.Snapshot.rawValue)
-      add(OpenClawCanvasA2UICommand.Push.rawValue)
-      add(OpenClawCanvasA2UICommand.PushJSONL.rawValue)
-      add(OpenClawCanvasA2UICommand.Reset.rawValue)
-      add(OpenClawScreenCommand.Record.rawValue)
+      add(AnimaCanvasCommand.Present.rawValue)
+      add(AnimaCanvasCommand.Hide.rawValue)
+      add(AnimaCanvasCommand.Navigate.rawValue)
+      add(AnimaCanvasCommand.Eval.rawValue)
+      add(AnimaCanvasCommand.Snapshot.rawValue)
+      add(AnimaCanvasA2UICommand.Push.rawValue)
+      add(AnimaCanvasA2UICommand.PushJSONL.rawValue)
+      add(AnimaCanvasA2UICommand.Reset.rawValue)
+      add(AnimaScreenCommand.Record.rawValue)
       if (cameraEnabled()) {
-        add(OpenClawCameraCommand.Snap.rawValue)
-        add(OpenClawCameraCommand.Clip.rawValue)
+        add(AnimaCameraCommand.Snap.rawValue)
+        add(AnimaCameraCommand.Clip.rawValue)
       }
       if (locationMode() != LocationMode.Off) {
-        add(OpenClawLocationCommand.Get.rawValue)
+        add(AnimaLocationCommand.Get.rawValue)
       }
       if (smsAvailable()) {
-        add(OpenClawSmsCommand.Send.rawValue)
+        add(AnimaSmsCommand.Send.rawValue)
       }
       if (BuildConfig.DEBUG) {
         add("debug.logs")
@@ -109,15 +109,15 @@ class ConnectionManager(
 
   fun buildCapabilities(): List<String> =
     buildList {
-      add(OpenClawCapability.Canvas.rawValue)
-      add(OpenClawCapability.Screen.rawValue)
-      if (cameraEnabled()) add(OpenClawCapability.Camera.rawValue)
-      if (smsAvailable()) add(OpenClawCapability.Sms.rawValue)
+      add(AnimaCapability.Canvas.rawValue)
+      add(AnimaCapability.Screen.rawValue)
+      if (cameraEnabled()) add(AnimaCapability.Camera.rawValue)
+      if (smsAvailable()) add(AnimaCapability.Sms.rawValue)
       if (voiceWakeMode() != VoiceWakeMode.Off && hasRecordAudioPermission()) {
-        add(OpenClawCapability.VoiceWake.rawValue)
+        add(AnimaCapability.VoiceWake.rawValue)
       }
       if (locationMode() != LocationMode.Off) {
-        add(OpenClawCapability.Location.rawValue)
+        add(AnimaCapability.Location.rawValue)
       }
     }
 
@@ -141,7 +141,7 @@ class ConnectionManager(
     val version = resolvedVersionName()
     val release = Build.VERSION.RELEASE?.trim().orEmpty()
     val releaseLabel = if (release.isEmpty()) "unknown" else release
-    return "OpenClawAndroid/$version (Android $releaseLabel; SDK ${Build.VERSION.SDK_INT})"
+    return "AnimaAndroid/$version (Android $releaseLabel; SDK ${Build.VERSION.SDK_INT})"
   }
 
   fun buildClientInfo(clientId: String, clientMode: String): GatewayClientInfo {
@@ -164,7 +164,7 @@ class ConnectionManager(
       caps = buildCapabilities(),
       commands = buildInvokeCommands(),
       permissions = emptyMap(),
-      client = buildClientInfo(clientId = "openclaw-android", clientMode = "node"),
+      client = buildClientInfo(clientId = "anima-android", clientMode = "node"),
       userAgent = buildUserAgent(),
     )
   }
@@ -176,7 +176,7 @@ class ConnectionManager(
       caps = emptyList(),
       commands = emptyList(),
       permissions = emptyMap(),
-      client = buildClientInfo(clientId = "openclaw-control-ui", clientMode = "ui"),
+      client = buildClientInfo(clientId = "anima-control-ui", clientMode = "ui"),
       userAgent = buildUserAgent(),
     )
   }

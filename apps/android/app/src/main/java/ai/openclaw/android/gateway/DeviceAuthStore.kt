@@ -1,6 +1,6 @@
-package ai.openclaw.android.gateway
+package net.noxsoft.anima.android.gateway
 
-import ai.openclaw.android.SecurePrefs
+import net.noxsoft.anima.android.SecurePrefs
 
 class DeviceAuthStore(private val prefs: SecurePrefs) {
   fun loadToken(deviceId: String, role: String): String? {

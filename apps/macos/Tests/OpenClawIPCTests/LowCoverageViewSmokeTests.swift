@@ -1,9 +1,9 @@
 import AppKit
-import OpenClawProtocol
+import AnimaProtocol
 import SwiftUI
 import Testing
 
-@testable import OpenClaw
+@testable import Anima
 
 @Suite(.serialized)
 @MainActor

@@ -1,7 +1,7 @@
-import OpenClawIPC
+import AnimaIPC
 import CoreLocation
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite(.serialized)
 @MainActor

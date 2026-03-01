@@ -1,8 +1,8 @@
-import OpenClawKit
+import AnimaKit
 import CoreLocation
 import Foundation
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 struct MacNodeRuntimeTests {
     @Test func handleInvokeRejectsUnknownCommand() async {
@@ -14,28 +14,28 @@ struct MacNodeRuntimeTests {
 
     @Test func handleInvokeRejectsEmptySystemRun() async throws {
         let runtime = MacNodeRuntime()
-        let params = OpenClawSystemRunParams(command: [])
+        let params = AnimaSystemRunParams(command: [])
         let json = try String(data: JSONEncoder().encode(params), encoding: .utf8)
         let response = await runtime.handleInvoke(
-            BridgeInvokeRequest(id: "req-2", command: OpenClawSystemCommand.run.rawValue, paramsJSON: json))
+            BridgeInvokeRequest(id: "req-2", command: AnimaSystemCommand.run.rawValue, paramsJSON: json))
         #expect(response.ok == false)
     }
 
     @Test func handleInvokeRejectsEmptySystemWhich() async throws {
         let runtime = MacNodeRuntime()
-        let params = OpenClawSystemWhichParams(bins: [])
+        let params = AnimaSystemWhichParams(bins: [])
         let json = try String(data: JSONEncoder().encode(params), encoding: .utf8)
         let response = await runtime.handleInvoke(
-            BridgeInvokeRequest(id: "req-2b", command: OpenClawSystemCommand.which.rawValue, paramsJSON: json))
+            BridgeInvokeRequest(id: "req-2b", command: AnimaSystemCommand.which.rawValue, paramsJSON: json))
         #expect(response.ok == false)
     }
 
     @Test func handleInvokeRejectsEmptyNotification() async throws {
         let runtime = MacNodeRuntime()
-        let params = OpenClawSystemNotifyParams(title: "", body: "")
+        let params = AnimaSystemNotifyParams(title: "", body: "")
         let json = try String(data: JSONEncoder().encode(params), encoding: .utf8)
         let response = await runtime.handleInvoke(
-            BridgeInvokeRequest(id: "req-3", command: OpenClawSystemCommand.notify.rawValue, paramsJSON: json))
+            BridgeInvokeRequest(id: "req-3", command: AnimaSystemCommand.notify.rawValue, paramsJSON: json))
         #expect(response.ok == false)
     }
 
@@ -43,7 +43,7 @@ struct MacNodeRuntimeTests {
         await TestIsolation.withUserDefaultsValues([cameraEnabledKey: false]) {
             let runtime = MacNodeRuntime()
             let response = await runtime.handleInvoke(
-                BridgeInvokeRequest(id: "req-4", command: OpenClawCameraCommand.list.rawValue))
+                BridgeInvokeRequest(id: "req-4", command: AnimaCameraCommand.list.rawValue))
             #expect(response.ok == false)
             #expect(response.error?.message.contains("CAMERA_DISABLED") == true)
         }
@@ -60,7 +60,7 @@ struct MacNodeRuntimeTests {
                 outPath: String?) async throws -> (path: String, hasAudio: Bool)
             {
                 let url = FileManager().temporaryDirectory
-                    .appendingPathComponent("openclaw-test-screen-record-\(UUID().uuidString).mp4")
+                    .appendingPathComponent("anima-test-screen-record-\(UUID().uuidString).mp4")
                 try Data("ok".utf8).write(to: url)
                 return (path: url.path, hasAudio: false)
             }
@@ -68,7 +68,7 @@ struct MacNodeRuntimeTests {
             func locationAuthorizationStatus() -> CLAuthorizationStatus { .authorizedAlways }
             func locationAccuracyAuthorization() -> CLAccuracyAuthorization { .fullAccuracy }
             func currentLocation(
-                desiredAccuracy: OpenClawLocationAccuracy,
+                desiredAccuracy: AnimaLocationAccuracy,
                 maxAgeMs: Int?,
                 timeoutMs: Int?) async throws -> CLLocation
             {

@@ -1,6 +1,6 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
-import ai.openclaw.android.gateway.GatewaySession
+import net.noxsoft.anima.android.gateway.GatewaySession
 
 class SmsHandler(
   private val sms: SmsManager,

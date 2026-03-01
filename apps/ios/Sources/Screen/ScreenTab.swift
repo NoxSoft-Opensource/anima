@@ -1,4 +1,4 @@
-import OpenClawKit
+import AnimaKit
 import SwiftUI
 
 struct ScreenTab: View {

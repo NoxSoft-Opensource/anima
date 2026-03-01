@@ -1,4 +1,4 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive

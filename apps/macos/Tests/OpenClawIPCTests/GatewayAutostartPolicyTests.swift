@@ -1,5 +1,5 @@
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite(.serialized)
 struct GatewayAutostartPolicyTests {

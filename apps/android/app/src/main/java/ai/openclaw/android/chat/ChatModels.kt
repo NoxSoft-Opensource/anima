@@ -1,4 +1,4 @@
-package ai.openclaw.android.chat
+package net.noxsoft.anima.android.chat
 
 data class ChatMessage(
   val id: String,

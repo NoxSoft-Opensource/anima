@@ -1,4 +1,4 @@
-package ai.openclaw.android.gateway
+package net.noxsoft.anima.android.gateway
 
 data class GatewayEndpoint(
   val stableId: String,

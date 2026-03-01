@@ -1,4 +1,4 @@
-package ai.openclaw.android.gateway
+package net.noxsoft.anima.android.gateway
 
 import android.annotation.SuppressLint
 import kotlinx.coroutines.Dispatchers

@@ -1,12 +1,12 @@
 import Foundation
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite struct WebChatMainSessionKeyTests {
     @Test func configGetSnapshotMainKeyFallsBackToMainWhenMissing() throws {
         let json = """
         {
-          "path": "/Users/pete/.openclaw/openclaw.json",
+          "path": "/Users/pete/.anima/anima.json",
           "exists": true,
           "raw": null,
           "parsed": {},
@@ -22,7 +22,7 @@ import Testing
     @Test func configGetSnapshotMainKeyTrimsAndUsesValue() throws {
         let json = """
         {
-          "path": "/Users/pete/.openclaw/openclaw.json",
+          "path": "/Users/pete/.anima/anima.json",
           "exists": true,
           "raw": null,
           "parsed": {},

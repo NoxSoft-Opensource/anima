@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/memory-core",
+  "name": "@anima/memory-core",
   "version": "2026.2.15",
   "private": true,
-  "description": "OpenClaw core memory search plugin",
+  "description": "Anima core memory search plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.1.26"
+    "anima": ">=2026.1.26"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ]

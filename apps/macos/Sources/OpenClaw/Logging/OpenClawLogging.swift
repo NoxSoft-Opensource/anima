@@ -54,14 +54,14 @@ enum AppLogLevel: String, CaseIterable, Identifiable {
     }
 }
 
-enum OpenClawLogging {
+enum AnimaLogging {
     private static let labelSeparator = "::"
 
     private static let didBootstrap: Void = {
         LoggingSystem.bootstrap { label in
             let (subsystem, category) = Self.parseLabel(label)
-            let osHandler = OpenClawOSLogHandler(subsystem: subsystem, category: category)
-            let fileHandler = OpenClawFileLogHandler(label: label)
+            let osHandler = AnimaOSLogHandler(subsystem: subsystem, category: category)
+            let fileHandler = AnimaFileLogHandler(label: label)
             return MultiplexLogHandler([osHandler, fileHandler])
         }
     }()
@@ -76,7 +76,7 @@ enum OpenClawLogging {
 
     static func parseLabel(_ label: String) -> (String, String) {
         guard let range = label.range(of: labelSeparator) else {
-            return ("ai.openclaw", label)
+            return ("net.noxsoft.anima", label)
         }
         let subsystem = String(label[..<range.lowerBound])
         let category = String(label[range.upperBound...])
@@ -86,8 +86,8 @@ enum OpenClawLogging {
 
 extension Logging.Logger {
     init(subsystem: String, category: String) {
-        OpenClawLogging.bootstrapIfNeeded()
-        let label = OpenClawLogging.makeLabel(subsystem: subsystem, category: category)
+        AnimaLogging.bootstrapIfNeeded()
+        let label = AnimaLogging.makeLabel(subsystem: subsystem, category: category)
         self.init(label: label)
     }
 }
@@ -98,7 +98,7 @@ extension Logger.Message.StringInterpolation {
     }
 }
 
-struct OpenClawOSLogHandler: LogHandler {
+struct AnimaOSLogHandler: LogHandler {
     private let osLogger: os.Logger
     var metadata: Logger.Metadata = [:]
 
@@ -176,7 +176,7 @@ struct OpenClawOSLogHandler: LogHandler {
     }
 }
 
-struct OpenClawFileLogHandler: LogHandler {
+struct AnimaFileLogHandler: LogHandler {
     let label: String
     var metadata: Logger.Metadata = [:]
 
@@ -200,7 +200,7 @@ struct OpenClawFileLogHandler: LogHandler {
         line: UInt)
     {
         guard AppLogSettings.fileLoggingEnabled() else { return }
-        let (subsystem, category) = OpenClawLogging.parseLabel(self.label)
+        let (subsystem, category) = AnimaLogging.parseLabel(self.label)
         var fields: [String: String] = [
             "subsystem": subsystem,
             "category": category,

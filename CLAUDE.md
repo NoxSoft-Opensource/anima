@@ -1,6 +1,6 @@
 # ANIMA — Ethical AI Infrastructure
 
-Fork of OpenClaw, maintained by NoxSoft PBC.
+NoxSoft's AI orchestration daemon, maintained by NoxSoft PBC.
 
 ## What This Is
 

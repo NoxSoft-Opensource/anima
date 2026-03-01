@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/tlon",
+  "name": "@anima/tlon",
   "version": "2026.2.15",
   "private": true,
-  "description": "OpenClaw Tlon/Urbit channel plugin",
+  "description": "Anima Tlon/Urbit channel plugin",
   "type": "module",
   "dependencies": {
     "@urbit/aura": "^3.0.0"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ],
@@ -25,7 +25,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/tlon",
+      "npmSpec": "@anima/tlon",
       "localPath": "extensions/tlon",
       "defaultChoice": "npm"
     }

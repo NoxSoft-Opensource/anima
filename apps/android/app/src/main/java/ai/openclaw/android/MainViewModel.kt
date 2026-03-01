@@ -1,13 +1,13 @@
-package ai.openclaw.android
+package net.noxsoft.anima.android
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import ai.openclaw.android.gateway.GatewayEndpoint
-import ai.openclaw.android.chat.OutgoingAttachment
-import ai.openclaw.android.node.CameraCaptureManager
-import ai.openclaw.android.node.CanvasController
-import ai.openclaw.android.node.ScreenRecordManager
-import ai.openclaw.android.node.SmsManager
+import net.noxsoft.anima.android.gateway.GatewayEndpoint
+import net.noxsoft.anima.android.chat.OutgoingAttachment
+import net.noxsoft.anima.android.node.CameraCaptureManager
+import net.noxsoft.anima.android.node.CanvasController
+import net.noxsoft.anima.android.node.ScreenRecordManager
+import net.noxsoft.anima.android.node.SmsManager
 import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {

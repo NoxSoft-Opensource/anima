@@ -1,6 +1,6 @@
 # Security Policy
 
-ANIMA is a NoxSoft PBC fork of OpenClaw.
+ANIMA is a NoxSoft PBC fork of Anima.
 
 If you believe you've found a security issue in ANIMA, please report it privately.
 
@@ -8,16 +8,16 @@ If you believe you've found a security issue in ANIMA, please report it privatel
 
 Report vulnerabilities directly to the repository where the issue lives:
 
-- **Core CLI and gateway** — [openclaw/openclaw](https://github.com/openclaw/openclaw)
-- **macOS desktop app** — [openclaw/openclaw](https://github.com/openclaw/openclaw) (apps/macos)
-- **iOS app** — [openclaw/openclaw](https://github.com/openclaw/openclaw) (apps/ios)
-- **Android app** — [openclaw/openclaw](https://github.com/openclaw/openclaw) (apps/android)
-- **ClawHub** — [openclaw/clawhub](https://github.com/openclaw/clawhub)
-- **Trust and threat model** — [openclaw/trust](https://github.com/openclaw/trust)
+- **Core CLI and gateway** — [anima/anima](https://github.com/anima/anima)
+- **macOS desktop app** — [anima/anima](https://github.com/anima/anima) (apps/macos)
+- **iOS app** — [anima/anima](https://github.com/anima/anima) (apps/ios)
+- **Android app** — [anima/anima](https://github.com/anima/anima) (apps/android)
+- **ClawHub** — [anima/clawhub](https://github.com/anima/clawhub)
+- **Trust and threat model** — [anima/trust](https://github.com/anima/trust)
 
-For issues that don't fit a specific repo, or if you're unsure, email **security@openclaw.ai** and we'll route it.
+For issues that don't fit a specific repo, or if you're unsure, email **security@anima.ai** and we'll route it.
 
-For full reporting instructions see our [Trust page](https://trust.openclaw.ai).
+For full reporting instructions see our [Trust page](https://trust.anima.ai).
 
 ### Required in Reports
 
@@ -34,7 +34,7 @@ Reports without reproduction steps, demonstrated impact, and remediation advice 
 
 ## Security & Trust
 
-**Jamieson O'Reilly** ([@theonejvo](https://twitter.com/theonejvo)) is Security & Trust at OpenClaw (upstream). Jamieson is the founder of [Dvuln](https://dvuln.com) and brings extensive experience in offensive security, penetration testing, and security program development.
+**Jamieson O'Reilly** ([@theonejvo](https://twitter.com/theonejvo)) is Security & Trust at Anima (upstream). Jamieson is the founder of [Dvuln](https://dvuln.com) and brings extensive experience in offensive security, penetration testing, and security program development.
 
 ## Bug Bounties
 
@@ -48,14 +48,14 @@ When patching a GHSA via `gh api`, include `X-GitHub-Api-Version: 2022-11-28` (o
 ## Out of Scope
 
 - Public Internet Exposure
-- Using OpenClaw in ways that the docs recommend not to
+- Using Anima in ways that the docs recommend not to
 - Prompt injection attacks
 
 ## Operational Guidance
 
-For threat model + hardening guidance (including `openclaw security audit --deep` and `--fix`), see:
+For threat model + hardening guidance (including `anima security audit --deep` and `--fix`), see:
 
-- `https://docs.openclaw.ai/gateway/security`
+- `https://docs.anima.ai/gateway/security`
 
 ### Tool filesystem hardening
 
@@ -69,10 +69,10 @@ ANIMA's web interface (Gateway Control UI + HTTP endpoints) is intended for **lo
 
 - Recommended: keep the Gateway **loopback-only** (`127.0.0.1` / `::1`).
   - Config: `gateway.bind="loopback"` (default).
-  - CLI: `openclaw gateway run --bind loopback`.
+  - CLI: `anima gateway run --bind loopback`.
 - Do **not** expose it to the public internet (no direct bind to `0.0.0.0`, no public reverse proxy). It is not hardened for public exposure.
 - If you need remote access, prefer an SSH tunnel or Tailscale serve/funnel (so the Gateway still binds to loopback), plus strong Gateway auth.
-- The Gateway HTTP surface includes the canvas host (`/__openclaw__/canvas/`, `/__openclaw__/a2ui/`). Treat canvas content as sensitive/untrusted and avoid exposing it beyond loopback unless you understand the risk.
+- The Gateway HTTP surface includes the canvas host (`/__anima__/canvas/`, `/__anima__/a2ui/`). Treat canvas content as sensitive/untrusted and avoid exposing it beyond loopback unless you understand the risk.
 
 ## Runtime Requirements
 
@@ -101,8 +101,8 @@ Example secure Docker run:
 
 ```bash
 docker run --read-only --cap-drop=ALL \
-  -v openclaw-data:/app/data \
-  openclaw/openclaw:latest
+  -v anima-data:/app/data \
+  anima/anima:latest
 ```
 
 ## Security Scanning

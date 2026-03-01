@@ -1,7 +1,7 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
-import ai.openclaw.android.SecurePrefs
-import ai.openclaw.android.gateway.GatewaySession
+import net.noxsoft.anima.android.SecurePrefs
+import net.noxsoft.anima.android.gateway.GatewaySession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

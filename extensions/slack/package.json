@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/slack",
+  "name": "@anima/slack",
   "version": "2026.2.15",
   "private": true,
-  "description": "OpenClaw Slack channel plugin",
+  "description": "Anima Slack channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/mattermost",
+  "name": "@anima/mattermost",
   "version": "2026.2.15",
   "private": true,
-  "description": "OpenClaw Mattermost channel plugin",
+  "description": "Anima Mattermost channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ],
@@ -21,7 +21,7 @@
       "order": 65
     },
     "install": {
-      "npmSpec": "@openclaw/mattermost",
+      "npmSpec": "@anima/mattermost",
       "localPath": "extensions/mattermost",
       "defaultChoice": "npm"
     }

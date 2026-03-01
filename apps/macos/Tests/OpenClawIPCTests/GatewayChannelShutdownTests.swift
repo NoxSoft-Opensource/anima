@@ -1,8 +1,8 @@
-import OpenClawKit
+import AnimaKit
 import Foundation
 import os
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite struct GatewayChannelShutdownTests {
     private final class FakeWebSocketTask: WebSocketTasking, @unchecked Sendable {

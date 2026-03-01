@@ -1,5 +1,5 @@
-import OpenClawKit
-import OpenClawProtocol
+import AnimaKit
+import AnimaProtocol
 
-typealias ProtoAnyCodable = OpenClawProtocol.AnyCodable
-typealias KitAnyCodable = OpenClawKit.AnyCodable
+typealias ProtoAnyCodable = AnimaProtocol.AnyCodable
+typealias KitAnyCodable = AnimaKit.AnyCodable

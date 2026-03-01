@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package net.noxsoft.anima.android
 
 enum class LocationMode(val rawValue: String) {
   Off("off"),

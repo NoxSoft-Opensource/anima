@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/irc",
+  "name": "@anima/irc",
   "version": "2026.2.15",
-  "description": "OpenClaw IRC channel plugin",
+  "description": "Anima IRC channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ]

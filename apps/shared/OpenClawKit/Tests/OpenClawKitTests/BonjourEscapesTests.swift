@@ -1,4 +1,4 @@
-import OpenClawKit
+import AnimaKit
 import Testing
 
 @Suite struct BonjourEscapesTests {
@@ -8,7 +8,7 @@ import Testing
     }
 
     @Test func decodeSpaces() {
-        #expect(BonjourEscapes.decode("OpenClaw\\032Gateway") == "OpenClaw Gateway")
+        #expect(BonjourEscapes.decode("Anima\\032Gateway") == "Anima Gateway")
     }
 
     @Test func decodeMultipleEscapes() {

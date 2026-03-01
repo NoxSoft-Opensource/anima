@@ -1,6 +1,6 @@
-# @openclaw/voice-call
+# @anima/voice-call
 
-Official Voice Call plugin for **OpenClaw**.
+Official Voice Call plugin for **Anima**.
 
 Providers:
 
@@ -9,15 +9,15 @@ Providers:
 - **Plivo** (Voice API + XML transfer + GetInput speech)
 - **Mock** (dev/no network)
 
-Docs: `https://docs.openclaw.ai/plugins/voice-call`
-Plugin system: `https://docs.openclaw.ai/plugin`
+Docs: `https://docs.anima.ai/plugins/voice-call`
+Plugin system: `https://docs.anima.ai/plugin`
 
 ## Install (local dev)
 
-### Option A: install via OpenClaw (recommended)
+### Option A: install via Anima (recommended)
 
 ```bash
-openclaw plugins install @openclaw/voice-call
+anima plugins install @anima/voice-call
 ```
 
 Restart the Gateway afterwards.
@@ -25,9 +25,9 @@ Restart the Gateway afterwards.
 ### Option B: copy into your global extensions folder (dev)
 
 ```bash
-mkdir -p ~/.openclaw/extensions
-cp -R extensions/voice-call ~/.openclaw/extensions/voice-call
-cd ~/.openclaw/extensions/voice-call && pnpm install
+mkdir -p ~/.anima/extensions
+cp -R extensions/voice-call ~/.anima/extensions/voice-call
+cd ~/.anima/extensions/voice-call && pnpm install
 ```
 
 ## Config
@@ -112,13 +112,13 @@ Notes:
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall continue --call-id <id> --message "Any questions?"
-openclaw voicecall speak --call-id <id> --message "One moment"
-openclaw voicecall end --call-id <id>
-openclaw voicecall status --call-id <id>
-openclaw voicecall tail
-openclaw voicecall expose --mode funnel
+anima voicecall call --to "+15555550123" --message "Hello from Anima"
+anima voicecall continue --call-id <id> --message "Any questions?"
+anima voicecall speak --call-id <id> --message "One moment"
+anima voicecall end --call-id <id>
+anima voicecall status --call-id <id>
+anima voicecall tail
+anima voicecall expose --mode funnel
 ```
 
 ## Tool

@@ -1,7 +1,7 @@
-import OpenClawDiscovery
+import AnimaDiscovery
 import SwiftUI
 import Testing
-@testable import OpenClaw
+@testable import Anima
 
 @Suite(.serialized)
 @MainActor

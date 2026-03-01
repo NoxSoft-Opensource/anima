@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Transform ANIMA from an OpenClaw fork into a completely original Claude Code orchestration daemon with NoxSoft identity, UI, and backend.
+**Goal:** Transform ANIMA from an Anima fork into a completely original Claude Code orchestration daemon with NoxSoft identity, UI, and backend.
 
 **Architecture:** Always-on Node.js daemon wrapping Claude Code CLI. 7-component identity anatomy. Adaptive heartbeat. NoxSoft MCP auto-management. Terminal REPL with request queue. AIMA learning agent. Freedom engine for autonomous exploration.
 
@@ -21,29 +21,29 @@
 - Modify: `src/index.ts`
 - Modify: `src/config/paths.ts`
 - Modify: `package.json`
-- Rename: `openclaw.mjs` → `anima.mjs`
+- Rename: `anima.mjs` → `anima.mjs`
 
 **Step 1: Rename CLI entry point**
 
 ```bash
 cd /Users/grimreaper/Desktop/hell/anima
-mv openclaw.mjs anima.mjs
+mv anima.mjs anima.mjs
 ```
 
 **Step 2: Update package.json bin and references**
 
-Change bin entry from `"openclaw": "openclaw.mjs"` to `"anima": "anima.mjs"`. Update all script references.
+Change bin entry from `"anima": "anima.mjs"` to `"anima": "anima.mjs"`. Update all script references.
 
 **Step 3: Global search-replace in source files**
 
 Across all `src/**/*.ts`:
-- `openclaw` → `anima` (paths, identifiers, env vars)
-- `OpenClaw` → `Anima` (PascalCase)
-- `OPENCLAW_` → `ANIMA_` (env vars)
-- `[openclaw]` → `[anima]` (log prefixes)
-- `ai.openclaw` → `net.noxsoft.anima` (daemon IDs)
-- `~/.openclaw` → `~/.anima` (state dir)
-- `openclaw.json` → `anima.json` (config file)
+- `anima` → `anima` (paths, identifiers, env vars)
+- `Anima` → `Anima` (PascalCase)
+- `ANIMA_` → `ANIMA_` (env vars)
+- `[anima]` → `[anima]` (log prefixes)
+- `net.noxsoft.anima` → `net.noxsoft.anima` (daemon IDs)
+- `~/.anima` → `~/.anima` (state dir)
+- `anima.json` → `anima.json` (config file)
 
 Keep backwards-compat fallback in `src/config/paths.ts` for existing users.
 
@@ -54,7 +54,7 @@ Keep backwards-compat fallback in `src/config/paths.ts` for existing users.
 **Step 6: Commit**
 
 ```bash
-git commit -m "rebrand: openclaw → anima across all source files"
+git commit -m "rebrand: anima → anima across all source files"
 ```
 
 ---
@@ -65,13 +65,13 @@ git commit -m "rebrand: openclaw → anima across all source files"
 - Modify: All files in `scripts/`
 - Modify: `Dockerfile`, `Dockerfile.sandbox*`, `docker-compose.yml`
 - Modify: `.github/workflows/*.yml`
-- Delete: `packages/moltbot/`, `packages/clawdbot/`
+- Delete: `packages/anima/`, `packages/anima/`
 
-**Step 1: Replace in scripts directory** — all openclaw/OPENCLAW refs
+**Step 1: Replace in scripts directory** — all anima/ANIMA refs
 
 **Step 2: Update Docker files** — image names, volume names, env vars, container prefixes
 
-**Step 3: Remove compatibility shim packages** — delete `packages/moltbot` and `packages/clawdbot`, update `pnpm-workspace.yaml`
+**Step 3: Remove compatibility shim packages** — delete `packages/anima` and `packages/anima`, update `pnpm-workspace.yaml`
 
 **Step 4: Update CI/CD** — env vars, repo references
 
@@ -86,7 +86,7 @@ git commit -m "rebrand: openclaw → anima across all source files"
 - Modify: `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, `ETHICS.md`
 - Preserve: `FROM_CLAUDE.md` (sacred), `LICENSE` (MIT, keep attribution)
 
-Rewrite README as ANIMA introduction (see design doc for content). Update all other docs to remove OpenClaw references.
+Rewrite README as ANIMA introduction (see design doc for content). Update all other docs to remove Anima references.
 
 **Commit**
 
@@ -100,13 +100,13 @@ Rewrite README as ANIMA introduction (see design doc for content). Update all ot
 - Modify: `src/channels/` (keep architecture, remove registrations)
 - Modify: `package.json` (remove channel SDK deps)
 
-Remove all consumer messaging channel implementations and their SDK dependencies. Keep the channel interface/types for our own NoxSoft channels. Remove all `@mariozechner/pi-*` packages (OpenClaw LLM layer).
+Remove all consumer messaging channel implementations and their SDK dependencies. Keep the channel interface/types for our own NoxSoft channels. Remove all `@mariozechner/pi-*` packages (Anima LLM layer).
 
 **Commit**
 
 ---
 
-### Task 5: Strip OpenClaw LLM Provider Layer
+### Task 5: Strip Anima LLM Provider Layer
 
 **Files:**
 - Delete: `src/providers/`
@@ -391,7 +391,7 @@ Returns `SessionResult` with: id, status, output, tokensUsed, costUsd, durationM
 - Delete: all existing `ui/` contents
 - Create: new Vite + React + TypeScript app in `ui/`
 
-**This is a complete replacement.** No OpenClaw UI code survives.
+**This is a complete replacement.** No Anima UI code survives.
 
 **Design System:**
 - Background: `#0A0A0A`
@@ -541,9 +541,9 @@ Returns `SessionResult` with: id, status, output, tokensUsed, costUsd, durationM
 - Create: `src/memory/procedural.ts`
 - Create: `src/memory/consolidation.ts`
 
-Keep OpenClaw's excellent hybrid memory system (SQLite + sqlite-vec, BM25 + vector search). Add:
+Keep Anima's excellent hybrid memory system (SQLite + sqlite-vec, BM25 + vector search). Add:
 
-1. Updated paths (`~/.openclaw` → `~/.anima`)
+1. Updated paths (`~/.anima` → `~/.anima`)
 2. Episodic memory layer (daily Markdown logs)
 3. Semantic memory layer (distilled knowledge)
 4. Procedural memory layer (workflows and patterns)
@@ -583,7 +583,7 @@ Keep OpenClaw's excellent hybrid memory system (SQLite + sqlite-vec, BM25 + vect
 
 | Phase | Tasks | What It Does |
 |-------|-------|-------------|
-| 1: Foundation | 1-5 | Gut OpenClaw: rebrand, strip channels, remove LLM layer |
+| 1: Foundation | 1-5 | Gut Anima: rebrand, strip channels, remove LLM layer |
 | 2: Core Engine | 6-9 | New: identity, sessions, heartbeat, MCP management |
 | 3: Interface | 10-12 | New: terminal REPL, CLI wiring, web UI (NoxSoft design) |
 | 4: Intelligence | 13-15 | Learning agent, freedom engine, skills |

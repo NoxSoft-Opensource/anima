@@ -1,4 +1,4 @@
-package ai.openclaw.android.voice
+package net.noxsoft.anima.android.voice
 
 import android.Manifest
 import android.content.Context
@@ -20,9 +20,9 @@ import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import androidx.core.content.ContextCompat
-import ai.openclaw.android.gateway.GatewaySession
-import ai.openclaw.android.isCanonicalMainSessionKey
-import ai.openclaw.android.normalizeMainKey
+import net.noxsoft.anima.android.gateway.GatewaySession
+import net.noxsoft.anima.android.isCanonicalMainSessionKey
+import net.noxsoft.anima.android.normalizeMainKey
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.UUID

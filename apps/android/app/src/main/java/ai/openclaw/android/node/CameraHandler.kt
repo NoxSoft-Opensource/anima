@@ -1,11 +1,11 @@
-package ai.openclaw.android.node
+package net.noxsoft.anima.android.node
 
 import android.content.Context
-import ai.openclaw.android.CameraHudKind
-import ai.openclaw.android.BuildConfig
-import ai.openclaw.android.SecurePrefs
-import ai.openclaw.android.gateway.GatewayEndpoint
-import ai.openclaw.android.gateway.GatewaySession
+import net.noxsoft.anima.android.CameraHudKind
+import net.noxsoft.anima.android.BuildConfig
+import net.noxsoft.anima.android.SecurePrefs
+import net.noxsoft.anima.android.gateway.GatewayEndpoint
+import net.noxsoft.anima.android.gateway.GatewaySession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withContext
@@ -29,7 +29,7 @@ class CameraHandler(
       if (!BuildConfig.DEBUG) return
       val ts = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US).format(java.util.Date())
       logFile?.appendText("[$ts] $msg\n")
-      android.util.Log.w("openclaw", "camera.snap: $msg")
+      android.util.Log.w("anima", "camera.snap: $msg")
     }
     try {
       logFile?.writeText("") // clear
@@ -67,7 +67,7 @@ class CameraHandler(
       if (!BuildConfig.DEBUG) return
       val ts = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US).format(java.util.Date())
       clipLogFile?.appendText("[CLIP $ts] $msg\n")
-      android.util.Log.w("openclaw", "camera.clip: $msg")
+      android.util.Log.w("anima", "camera.clip: $msg")
     }
     val includeAudio = paramsJson?.contains("\"includeAudio\":true") != false
     if (includeAudio) externalAudioCaptureActive.value = true

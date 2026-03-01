@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package net.noxsoft.anima.android
 
 import android.content.Context
 import android.os.Build

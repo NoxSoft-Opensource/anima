@@ -1,4 +1,4 @@
-package ai.openclaw.android
+package net.noxsoft.anima.android
 
 import android.app.Notification
 import android.content.Intent

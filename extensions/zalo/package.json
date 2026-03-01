@@ -1,15 +1,15 @@
 {
-  "name": "@openclaw/zalo",
+  "name": "@anima/zalo",
   "version": "2026.2.15",
-  "description": "OpenClaw Zalo channel plugin",
+  "description": "Anima Zalo channel plugin",
   "type": "module",
   "dependencies": {
     "undici": "7.22.0"
   },
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ],
@@ -27,7 +27,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/zalo",
+      "npmSpec": "@anima/zalo",
       "localPath": "extensions/zalo",
       "defaultChoice": "npm"
     }

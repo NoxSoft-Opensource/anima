@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/discord",
+  "name": "@anima/discord",
   "version": "2026.2.15",
-  "description": "OpenClaw Discord channel plugin",
+  "description": "Anima Discord channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "anima": "workspace:*"
   },
-  "openclaw": {
+  "anima": {
     "extensions": [
       "./index.ts"
     ]

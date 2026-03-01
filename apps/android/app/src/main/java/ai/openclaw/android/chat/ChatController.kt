@@ -1,6 +1,6 @@
-package ai.openclaw.android.chat
+package net.noxsoft.anima.android.chat
 
-import ai.openclaw.android.gateway.GatewaySession
+import net.noxsoft.anima.android.gateway.GatewaySession
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineScope

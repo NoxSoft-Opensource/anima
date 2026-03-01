@@ -1,0 +1,26 @@
+# Anima gateway — Podman Quadlet (rootless)
+# Installed by setup-podman.sh into anima's ~/.config/containers/systemd/
+# {{ANIMA_HOME}} is replaced at install time.
+
+[Unit]
+Description=Anima gateway (rootless Podman)
+
+[Container]
+Image=anima:local
+ContainerName=anima
+UserNS=keep-id
+Volume={{ANIMA_HOME}}/.anima:/home/node/.anima
+EnvironmentFile={{ANIMA_HOME}}/.anima/.env
+Environment=HOME=/home/node
+Environment=TERM=xterm-256color
+PublishPort=18789:18789
+PublishPort=18790:18790
+Pull=never
+Exec=node dist/index.js gateway --bind lan --port 18789
+
+[Service]
+TimeoutStartSec=300
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

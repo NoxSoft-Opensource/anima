@@ -1,4 +1,4 @@
-import OpenClawProtocol
+import AnimaProtocol
 import SwiftUI
 
 extension ChannelsSettings {

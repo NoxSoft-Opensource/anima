@@ -34,7 +34,7 @@ Status: production-ready for DMs + channels via Slack app integrations. Default 
         - install app and copy **Bot Token** (`xoxb-...`)
       </Step>
 
-      <Step title="Configure OpenClaw">
+      <Step title="Configure Anima">
 
 ```json5
 {
@@ -74,7 +74,7 @@ SLACK_BOT_TOKEN=xoxb-...
       <Step title="Start gateway">
 
 ```bash
-openclaw gateway
+anima gateway
 ```
 
       </Step>
@@ -92,7 +92,7 @@ openclaw gateway
 
       </Step>
 
-      <Step title="Configure OpenClaw HTTP mode">
+      <Step title="Configure Anima HTTP mode">
 
 ```json5
 {
@@ -152,7 +152,7 @@ For actions/directory reads, user token can be preferred when configured. For wr
     - `dm.groupEnabled` (group DMs default false)
     - `dm.groupChannels` (optional MPIM allowlist)
 
-    Pairing in DMs uses `openclaw pairing approve slack <code>`.
+    Pairing in DMs uses `anima pairing approve slack <code>`.
 
   </Tab>
 
@@ -205,7 +205,7 @@ For actions/directory reads, user token can be preferred when configured. For wr
 Default slash command settings:
 
 - `enabled: false`
-- `name: "openclaw"`
+- `name: "anima"`
 - `sessionPrefix: "slack:slash"`
 - `ephemeral: true`
 
@@ -295,12 +295,12 @@ Available action groups in current Slack tooling:
 ```json
 {
   "display_information": {
-    "name": "OpenClaw",
-    "description": "Slack connector for OpenClaw"
+    "name": "Anima",
+    "description": "Slack connector for Anima"
   },
   "features": {
     "bot_user": {
-      "display_name": "OpenClaw",
+      "display_name": "Anima",
       "always_online": false
     },
     "app_home": {
@@ -309,8 +309,8 @@ Available action groups in current Slack tooling:
     },
     "slash_commands": [
       {
-        "command": "/openclaw",
-        "description": "Send a message to OpenClaw",
+        "command": "/anima",
+        "description": "Send a message to Anima",
         "should_escape": false
       }
     ]
@@ -389,9 +389,9 @@ Available action groups in current Slack tooling:
     Useful commands:
 
 ```bash
-openclaw channels status --probe
-openclaw logs --follow
-openclaw doctor
+anima channels status --probe
+anima logs --follow
+anima doctor
 ```
 
   </Accordion>
@@ -404,7 +404,7 @@ openclaw doctor
     - pairing approvals / allowlist entries
 
 ```bash
-openclaw pairing list slack
+anima pairing list slack
 ```
 
   </Accordion>

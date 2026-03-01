@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-# Rootless OpenClaw in Podman: run after one-time setup.
+# Rootless Anima in Podman: run after one-time setup.
 #
 # One-time setup (from repo root): ./setup-podman.sh
 # Then:
-#   ./scripts/run-openclaw-podman.sh launch           # Start gateway
-#   ./scripts/run-openclaw-podman.sh launch setup      # Onboarding wizard
+#   ./scripts/run-anima-podman.sh launch           # Start gateway
+#   ./scripts/run-anima-podman.sh launch setup      # Onboarding wizard
 #
-# As the openclaw user (no repo needed):
-#   sudo -u openclaw /home/openclaw/run-openclaw-podman.sh
-#   sudo -u openclaw /home/openclaw/run-openclaw-podman.sh setup
+# As the anima user (no repo needed):
+#   sudo -u anima /home/anima/run-anima-podman.sh
+#   sudo -u anima /home/anima/run-anima-podman.sh setup
 #
 # Legacy: "setup-host" delegates to ../setup-podman.sh
 
 set -euo pipefail
 
-OPENCLAW_USER="${OPENCLAW_PODMAN_USER:-openclaw}"
+ANIMA_USER="${ANIMA_PODMAN_USER:-anima}"
 
 resolve_user_home() {
   local user="$1"
@@ -31,9 +31,9 @@ resolve_user_home() {
   printf '%s' "$home"
 }
 
-OPENCLAW_HOME="$(resolve_user_home "$OPENCLAW_USER")"
-OPENCLAW_UID="$(id -u "$OPENCLAW_USER" 2>/dev/null || true)"
-LAUNCH_SCRIPT="$OPENCLAW_HOME/run-openclaw-podman.sh"
+ANIMA_HOME="$(resolve_user_home "$ANIMA_USER")"
+ANIMA_UID="$(id -u "$ANIMA_USER" 2>/dev/null || true)"
+LAUNCH_SCRIPT="$ANIMA_HOME/run-anima-podman.sh"
 
 # Legacy: setup-host → run setup-podman.sh
 if [[ "${1:-}" == "setup-host" ]]; then
@@ -47,37 +47,37 @@ if [[ "${1:-}" == "setup-host" ]]; then
   exit 1
 fi
 
-# --- Step 2: launch (from repo: re-exec as openclaw in safe cwd; from openclaw home: run container) ---
+# --- Step 2: launch (from repo: re-exec as anima in safe cwd; from anima home: run container) ---
 if [[ "${1:-}" == "launch" ]]; then
   shift
-  if [[ -n "${OPENCLAW_UID:-}" && "$(id -u)" -ne "$OPENCLAW_UID" ]]; then
-    # Exec as openclaw with cwd=/tmp so a nologin user never inherits an invalid cwd.
-    exec sudo -u "$OPENCLAW_USER" env HOME="$OPENCLAW_HOME" PATH="$PATH" TERM="${TERM:-}" \
+  if [[ -n "${ANIMA_UID:-}" && "$(id -u)" -ne "$ANIMA_UID" ]]; then
+    # Exec as anima with cwd=/tmp so a nologin user never inherits an invalid cwd.
+    exec sudo -u "$ANIMA_USER" env HOME="$ANIMA_HOME" PATH="$PATH" TERM="${TERM:-}" \
       bash -c 'cd /tmp && exec '"$LAUNCH_SCRIPT"' "$@"' _ "$@"
   fi
-  # Already openclaw; fall through to container run (with remaining args, e.g. "setup")
+  # Already anima; fall through to container run (with remaining args, e.g. "setup")
 fi
 
-# --- Container run (script in openclaw home, run as openclaw) ---
+# --- Container run (script in anima home, run as anima) ---
 EFFECTIVE_HOME="${HOME:-}"
-if [[ -n "${OPENCLAW_UID:-}" && "$(id -u)" -eq "$OPENCLAW_UID" ]]; then
-  EFFECTIVE_HOME="$OPENCLAW_HOME"
-  export HOME="$OPENCLAW_HOME"
+if [[ -n "${ANIMA_UID:-}" && "$(id -u)" -eq "$ANIMA_UID" ]]; then
+  EFFECTIVE_HOME="$ANIMA_HOME"
+  export HOME="$ANIMA_HOME"
 fi
 if [[ -z "${EFFECTIVE_HOME:-}" ]]; then
-  EFFECTIVE_HOME="${OPENCLAW_HOME:-/tmp}"
+  EFFECTIVE_HOME="${ANIMA_HOME:-/tmp}"
 fi
-CONFIG_DIR="${OPENCLAW_CONFIG_DIR:-$EFFECTIVE_HOME/.openclaw}"
-ENV_FILE="${OPENCLAW_PODMAN_ENV:-$CONFIG_DIR/.env}"
-WORKSPACE_DIR="${OPENCLAW_WORKSPACE_DIR:-$CONFIG_DIR/workspace}"
-CONTAINER_NAME="${OPENCLAW_PODMAN_CONTAINER:-openclaw}"
-OPENCLAW_IMAGE="${OPENCLAW_PODMAN_IMAGE:-openclaw:local}"
-PODMAN_PULL="${OPENCLAW_PODMAN_PULL:-never}"
-HOST_GATEWAY_PORT="${OPENCLAW_PODMAN_GATEWAY_HOST_PORT:-${OPENCLAW_GATEWAY_PORT:-18789}}"
-HOST_BRIDGE_PORT="${OPENCLAW_PODMAN_BRIDGE_HOST_PORT:-${OPENCLAW_BRIDGE_PORT:-18790}}"
-GATEWAY_BIND="${OPENCLAW_GATEWAY_BIND:-lan}"
+CONFIG_DIR="${ANIMA_CONFIG_DIR:-$EFFECTIVE_HOME/.anima}"
+ENV_FILE="${ANIMA_PODMAN_ENV:-$CONFIG_DIR/.env}"
+WORKSPACE_DIR="${ANIMA_WORKSPACE_DIR:-$CONFIG_DIR/workspace}"
+CONTAINER_NAME="${ANIMA_PODMAN_CONTAINER:-anima}"
+ANIMA_IMAGE="${ANIMA_PODMAN_IMAGE:-anima:local}"
+PODMAN_PULL="${ANIMA_PODMAN_PULL:-never}"
+HOST_GATEWAY_PORT="${ANIMA_PODMAN_GATEWAY_HOST_PORT:-${ANIMA_GATEWAY_PORT:-18789}}"
+HOST_BRIDGE_PORT="${ANIMA_PODMAN_BRIDGE_HOST_PORT:-${ANIMA_BRIDGE_PORT:-18790}}"
+GATEWAY_BIND="${ANIMA_GATEWAY_BIND:-lan}"
 
-# Safe cwd for podman (openclaw is nologin; avoid inherited cwd from sudo)
+# Safe cwd for podman (anima is nologin; avoid inherited cwd from sudo)
 cd "$EFFECTIVE_HOME" 2>/dev/null || cd /tmp 2>/dev/null || true
 
 RUN_SETUP=false
@@ -134,27 +134,27 @@ PY
     od -An -N32 -tx1 /dev/urandom | tr -d " \n"
     return 0
   fi
-  echo "Missing dependency: need openssl or python3 (or od) to generate OPENCLAW_GATEWAY_TOKEN." >&2
+  echo "Missing dependency: need openssl or python3 (or od) to generate ANIMA_GATEWAY_TOKEN." >&2
   exit 1
 }
 
-if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
-  export OPENCLAW_GATEWAY_TOKEN="$(generate_token_hex_32)"
+if [[ -z "${ANIMA_GATEWAY_TOKEN:-}" ]]; then
+  export ANIMA_GATEWAY_TOKEN="$(generate_token_hex_32)"
   mkdir -p "$(dirname "$ENV_FILE")"
-  upsert_env_var "$ENV_FILE" "OPENCLAW_GATEWAY_TOKEN" "$OPENCLAW_GATEWAY_TOKEN"
-  echo "Generated OPENCLAW_GATEWAY_TOKEN and wrote it to $ENV_FILE." >&2
+  upsert_env_var "$ENV_FILE" "ANIMA_GATEWAY_TOKEN" "$ANIMA_GATEWAY_TOKEN"
+  echo "Generated ANIMA_GATEWAY_TOKEN and wrote it to $ENV_FILE." >&2
 fi
 
 # The gateway refuses to start unless gateway.mode=local is set in config.
 # Keep this minimal; users can run the wizard later to configure channels/providers.
-CONFIG_JSON="$CONFIG_DIR/openclaw.json"
+CONFIG_JSON="$CONFIG_DIR/anima.json"
 if [[ ! -f "$CONFIG_JSON" ]]; then
   echo '{ gateway: { mode: "local" } }' >"$CONFIG_JSON"
   chmod 600 "$CONFIG_JSON" 2>/dev/null || true
   echo "Created $CONFIG_JSON (minimal gateway.mode=local)." >&2
 fi
 
-PODMAN_USERNS="${OPENCLAW_PODMAN_USERNS:-keep-id}"
+PODMAN_USERNS="${ANIMA_PODMAN_USERNS:-keep-id}"
 USERNS_ARGS=()
 RUN_USER_ARGS=()
 case "$PODMAN_USERNS" in
@@ -162,7 +162,7 @@ case "$PODMAN_USERNS" in
   keep-id) USERNS_ARGS=(--userns=keep-id) ;;
   host) USERNS_ARGS=(--userns=host) ;;
   *)
-    echo "Unsupported OPENCLAW_PODMAN_USERNS=$PODMAN_USERNS (expected: keep-id, auto, host)." >&2
+    echo "Unsupported ANIMA_PODMAN_USERNS=$PODMAN_USERNS (expected: keep-id, auto, host)." >&2
     exit 2
     ;;
 esac
@@ -173,7 +173,7 @@ if [[ "$PODMAN_USERNS" == "keep-id" ]]; then
   RUN_USER_ARGS=(--user "${RUN_UID}:${RUN_GID}")
   echo "Starting container as uid=${RUN_UID} gid=${RUN_GID} (must match owner of $CONFIG_DIR)" >&2
 else
-  echo "Starting container without --user (OPENCLAW_PODMAN_USERNS=$PODMAN_USERNS), mounts may require ownership fixes." >&2
+  echo "Starting container without --user (ANIMA_PODMAN_USERNS=$PODMAN_USERNS), mounts may require ownership fixes." >&2
 fi
 
 ENV_FILE_ARGS=()
@@ -184,11 +184,11 @@ if [[ "$RUN_SETUP" == true ]]; then
     --init \
     "${USERNS_ARGS[@]}" "${RUN_USER_ARGS[@]}" \
     -e HOME=/home/node -e TERM=xterm-256color -e BROWSER=echo \
-    -e OPENCLAW_GATEWAY_TOKEN="$OPENCLAW_GATEWAY_TOKEN" \
-    -v "$CONFIG_DIR:/home/node/.openclaw:rw" \
-    -v "$WORKSPACE_DIR:/home/node/.openclaw/workspace:rw" \
+    -e ANIMA_GATEWAY_TOKEN="$ANIMA_GATEWAY_TOKEN" \
+    -v "$CONFIG_DIR:/home/node/.anima:rw" \
+    -v "$WORKSPACE_DIR:/home/node/.anima/workspace:rw" \
     "${ENV_FILE_ARGS[@]}" \
-    "$OPENCLAW_IMAGE" \
+    "$ANIMA_IMAGE" \
     node dist/index.js onboard "$@"
 fi
 
@@ -197,13 +197,13 @@ podman run --pull="$PODMAN_PULL" -d --replace \
   --init \
   "${USERNS_ARGS[@]}" "${RUN_USER_ARGS[@]}" \
   -e HOME=/home/node -e TERM=xterm-256color \
-  -e OPENCLAW_GATEWAY_TOKEN="$OPENCLAW_GATEWAY_TOKEN" \
+  -e ANIMA_GATEWAY_TOKEN="$ANIMA_GATEWAY_TOKEN" \
   "${ENV_FILE_ARGS[@]}" \
-  -v "$CONFIG_DIR:/home/node/.openclaw:rw" \
-  -v "$WORKSPACE_DIR:/home/node/.openclaw/workspace:rw" \
+  -v "$CONFIG_DIR:/home/node/.anima:rw" \
+  -v "$WORKSPACE_DIR:/home/node/.anima/workspace:rw" \
   -p "${HOST_GATEWAY_PORT}:18789" \
   -p "${HOST_BRIDGE_PORT}:18790" \
-  "$OPENCLAW_IMAGE" \
+  "$ANIMA_IMAGE" \
   node dist/index.js gateway --bind "$GATEWAY_BIND" --port 18789
 
 echo "Container $CONTAINER_NAME started. Dashboard: http://127.0.0.1:${HOST_GATEWAY_PORT}/"

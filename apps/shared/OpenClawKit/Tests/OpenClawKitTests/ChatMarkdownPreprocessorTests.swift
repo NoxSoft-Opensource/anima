@@ -1,5 +1,5 @@
 import Testing
-@testable import OpenClawChatUI
+@testable import AnimaChatUI
 
 @Suite("ChatMarkdownPreprocessor")
 struct ChatMarkdownPreprocessorTests {

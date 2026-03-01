@@ -1,4 +1,4 @@
-package ai.openclaw.android.voice
+package net.noxsoft.anima.android.voice
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

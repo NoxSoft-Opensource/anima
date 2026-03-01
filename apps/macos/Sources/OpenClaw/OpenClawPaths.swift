@@ -1,6 +1,6 @@
 import Foundation
 
-enum OpenClawEnv {
+enum AnimaEnv {
     static func path(_ key: String) -> String? {
         // Normalize env overrides once so UI + file IO stay consistent.
         guard let raw = getenv(key) else { return nil }
@@ -13,30 +13,30 @@ enum OpenClawEnv {
     }
 }
 
-enum OpenClawPaths {
-    private static let configPathEnv = ["OPENCLAW_CONFIG_PATH"]
-    private static let stateDirEnv = ["OPENCLAW_STATE_DIR"]
+enum AnimaPaths {
+    private static let configPathEnv = ["ANIMA_CONFIG_PATH"]
+    private static let stateDirEnv = ["ANIMA_STATE_DIR"]
 
     static var stateDirURL: URL {
         for key in self.stateDirEnv {
-            if let override = OpenClawEnv.path(key) {
+            if let override = AnimaEnv.path(key) {
                 return URL(fileURLWithPath: override, isDirectory: true)
             }
         }
         let home = FileManager().homeDirectoryForCurrentUser
-        return home.appendingPathComponent(".openclaw", isDirectory: true)
+        return home.appendingPathComponent(".anima", isDirectory: true)
     }
 
     private static func resolveConfigCandidate(in dir: URL) -> URL? {
         let candidates = [
-            dir.appendingPathComponent("openclaw.json"),
+            dir.appendingPathComponent("anima.json"),
         ]
         return candidates.first(where: { FileManager().fileExists(atPath: $0.path) })
     }
 
     static var configURL: URL {
         for key in self.configPathEnv {
-            if let override = OpenClawEnv.path(key) {
+            if let override = AnimaEnv.path(key) {
                 return URL(fileURLWithPath: override)
             }
         }
@@ -44,7 +44,7 @@ enum OpenClawPaths {
         if let existing = self.resolveConfigCandidate(in: stateDir) {
             return existing
         }
-        return stateDir.appendingPathComponent("openclaw.json")
+        return stateDir.appendingPathComponent("anima.json")
     }
 
     static var workspaceURL: URL {

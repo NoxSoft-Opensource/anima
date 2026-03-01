@@ -1,5 +1,5 @@
 import XCTest
-@testable import OpenClawKit
+@testable import AnimaKit
 
 final class TalkHistoryTimestampTests: XCTestCase {
     func testSecondsTimestampsAreAcceptedWithSmallTolerance() {
