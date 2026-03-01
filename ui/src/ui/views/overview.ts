@@ -56,7 +56,7 @@ export function renderOverview(props: OverviewProps) {
           <div style="margin-top: 6px">
             <a
               class="session-link"
-              href="https://docs.anima.ai/web/dashboard"
+              href="https://docs.noxsoft.net/anima/web/dashboard"
               target="_blank"
               rel="noreferrer"
               title="Control UI auth docs (opens in new tab)"
@@ -72,7 +72,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px">
           <a
             class="session-link"
-            href="https://docs.anima.ai/web/dashboard"
+            href="https://docs.noxsoft.net/anima/web/dashboard"
             target="_blank"
             rel="noreferrer"
             title="Control UI auth docs (opens in new tab)"
@@ -105,7 +105,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px">
           <a
             class="session-link"
-            href="https://docs.anima.ai/gateway/tailscale"
+            href="https://docs.noxsoft.net/anima/gateway/tailscale"
             target="_blank"
             rel="noreferrer"
             title="Tailscale Serve docs (opens in new tab)"
@@ -114,7 +114,7 @@ export function renderOverview(props: OverviewProps) {
           <span class="muted"> · </span>
           <a
             class="session-link"
-            href="https://docs.anima.ai/web/control-ui#insecure-http"
+            href="https://docs.noxsoft.net/anima/web/control-ui#insecure-http"
             target="_blank"
             rel="noreferrer"
             title="Insecure HTTP docs (opens in new tab)"

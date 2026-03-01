@@ -127,7 +127,7 @@ export function renderApp(state: AppViewState) {
             </div>
             <div class="brand-text">
               <div class="brand-title">ANIMA</div>
-              <div class="brand-sub">Gateway Dashboard</div>
+              <div class="brand-sub">Control Panel</div>
             </div>
           </div>
         </div>
@@ -174,7 +174,7 @@ export function renderApp(state: AppViewState) {
           <div class="nav-group__items">
             <a
               class="nav-item nav-item--external"
-              href="https://docs.anima.ai"
+              href="https://docs.noxsoft.net/anima"
               target="_blank"
               rel="noreferrer"
               title="Docs (opens in new tab)"
