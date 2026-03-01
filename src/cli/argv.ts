@@ -116,12 +116,7 @@ export function buildParseArgv(params: {
         ? params.fallbackArgv
         : process.argv;
   const programName = params.programName ?? "";
-  const normalizedArgv =
-    programName && baseArgv[0] === programName
-      ? baseArgv.slice(1)
-      : baseArgv[0]?.endsWith("openclaw")
-        ? baseArgv.slice(1)
-        : baseArgv;
+  const normalizedArgv = programName && baseArgv[0] === programName ? baseArgv.slice(1) : baseArgv;
   const executable = (normalizedArgv[0]?.split(/[/\\]/).pop() ?? "").toLowerCase();
   const looksLikeNode =
     normalizedArgv.length >= 2 && (isNodeExecutable(executable) || isBunExecutable(executable));
