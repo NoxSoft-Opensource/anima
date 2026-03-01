@@ -15,9 +15,6 @@ export function resolveAnimaAgentDir(): string {
   return resolveUserPath(defaultAgentDir);
 }
 
-/** @deprecated Use resolveAnimaAgentDir() */
-export const resolveOpenClawAgentDir = resolveAnimaAgentDir;
-
 export function ensureAnimaAgentEnv(): string {
   const dir = resolveAnimaAgentDir();
   if (!process.env.ANIMA_AGENT_DIR) {
@@ -32,6 +29,3 @@ export function ensureAnimaAgentEnv(): string {
   }
   return dir;
 }
-
-/** @deprecated Use ensureAnimaAgentEnv() */
-export const ensureOpenClawAgentEnv = ensureAnimaAgentEnv;
