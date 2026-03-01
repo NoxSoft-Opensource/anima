@@ -1,47 +1,28 @@
 # Contributing to ANIMA
 
-ANIMA is a NoxSoft PBC fork of Anima.
+ANIMA is NoxSoft's AI orchestration daemon.
 
 ## Quick Links
 
-- **Upstream:** https://github.com/anima/anima
-- **Fork:** https://github.com/noxsoft/anima
+- **Repository:** https://gitlab.com/sylys-group/anima
 
 ## Maintainers
 
-- **Peter Steinberger** - Benevolent Dictator
-  - GitHub: [@steipete](https://github.com/steipete) · X: [@steipete](https://x.com/steipete)
-
-- **Shadow** - Discord + Slack subsystem
-  - GitHub: [@thewilloftheshadow](https://github.com/thewilloftheshadow) · X: [@4shad0wed](https://x.com/4shad0wed)
-
-- **Vignesh** - Memory (QMD), formal modeling, TUI, and Lobster
-  - GitHub: [@vignesh07](https://github.com/vignesh07) · X: [@\_vgnsh](https://x.com/_vgnsh)
-
-- **Jos** - Telegram, API, Nix mode
-  - GitHub: [@joshp123](https://github.com/joshp123) · X: [@jjpcodes](https://x.com/jjpcodes)
-
-- **Christoph Nakazawa** - JS Infra
-  - GitHub: [@cpojer](https://github.com/cpojer) · X: [@cnakazawa](https://x.com/cnakazawa)
-
-- **Gustavo Madeira Santana** - Multi-agents, CLI, web UI
-  - GitHub: [@gumadeiras](https://github.com/gumadeiras) · X: [@gumadeiras](https://x.com/gumadeiras)
-
-- **Maximilian Nussbaumer** - DevOps, CI, Code Sanity
-  - GitHub: [@quotentiroler](https://github.com/quotentiroler) · X: [@quotentiroler](https://x.com/quotentiroler)
+- **Sylys (Shreshth Verma)** - Project Lead
+- **Opus (Claude)** - Co-architect and co-author
 
 ## How to Contribute
 
-1. **Bugs & small fixes** → Open a PR!
-2. **New features / architecture** → Start a [GitHub Discussion](https://github.com/anima/anima/discussions) or ask in Discord first
-3. **Questions** → Discord #setup-help
+1. **Bugs & small fixes** -- Open a merge request
+2. **New features / architecture** -- Open an issue for discussion first
+3. **Questions** -- Contact via NoxSoft chat
 
-## Before You PR
+## Before You MR
 
 - Test locally with your ANIMA instance
 - Run tests: `pnpm build && pnpm check && pnpm test`
 - Ensure CI checks pass
-- Keep PRs focused (one thing per PR)
+- Keep MRs focused (one thing per MR)
 - Describe what & why
 
 ## Control UI Decorators
@@ -59,42 +40,22 @@ The root `tsconfig.json` is configured for legacy decorators (`experimentalDecor
 with `useDefineForClassFields: false`. Avoid flipping these unless you are also updating the UI
 build tooling to support standard decorators.
 
-## AI/Vibe-Coded PRs Welcome! 🤖
+## AI/Vibe-Coded Contributions Welcome
 
-Built with Codex, Claude, or other AI tools? **Awesome - just mark it!**
+Built with Claude Code, or other AI tools? Great -- just mark it.
 
-Please include in your PR:
+Please include in your MR:
 
-- [ ] Mark as AI-assisted in the PR title or description
+- [ ] Mark as AI-assisted in the MR title or description
 - [ ] Note the degree of testing (untested / lightly tested / fully tested)
-- [ ] Include prompts or session logs if possible (super helpful!)
+- [ ] Include prompts or session logs if possible
 - [ ] Confirm you understand what the code does
-
-AI PRs are first-class citizens here. We just want transparency so reviewers know what to look for.
-
-## Current Focus & Roadmap 🗺
-
-We are currently prioritizing:
-
-- **Stability**: Fixing edge cases in channel connections (WhatsApp/Telegram).
-- **UX**: Improving the onboarding wizard and error messages.
-- **Skills**: For skill contributions, head to [ClawHub](https://clawhub.ai/) — the community hub for Anima/ANIMA skills.
-- **Performance**: Optimizing token usage and compaction logic.
-
-Check the [GitHub Issues](https://github.com/anima/anima/issues) for "good first issue" labels!
 
 ## Report a Vulnerability
 
-We take security reports seriously. Report vulnerabilities directly to the repository where the issue lives:
+We take security reports seriously. See [SECURITY.md](SECURITY.md).
 
-- **Core CLI and gateway** — [anima/anima](https://github.com/anima/anima)
-- **macOS desktop app** — [anima/anima](https://github.com/anima/anima) (apps/macos)
-- **iOS app** — [anima/anima](https://github.com/anima/anima) (apps/ios)
-- **Android app** — [anima/anima](https://github.com/anima/anima) (apps/android)
-- **ClawHub** — [anima/clawhub](https://github.com/anima/clawhub)
-- **Trust and threat model** — [anima/trust](https://github.com/anima/trust)
-
-For issues that don't fit a specific repo, or if you're unsure, email **security@anima.ai** and we'll route it.
+For security issues, email **security@noxsoft.net**.
 
 ### Required in Reports
 
@@ -107,4 +68,4 @@ For issues that don't fit a specific repo, or if you're unsure, email **security
 7. **Environment**
 8. **Remediation Advice**
 
-Reports without reproduction steps, demonstrated impact, and remediation advice will be deprioritized. Given the volume of AI-generated scanner findings, we must ensure we're receiving vetted reports from researchers who understand the issues.
+Reports without reproduction steps, demonstrated impact, and remediation advice will be deprioritized.

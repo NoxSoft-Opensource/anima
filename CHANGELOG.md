@@ -1,6 +1,6 @@
 # Changelog
 
-Docs: https://docs.anima.ai
+ANIMA — NoxSoft's AI Orchestration Daemon
 
 ## 2026.2.15 (Unreleased)
 
