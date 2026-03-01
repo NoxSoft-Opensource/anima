@@ -251,8 +251,9 @@ export const imessageOnboardingAdapter: ChannelOnboardingAdapter = {
 
     await prompter.note(
       [
+        "Connect your ANIMA instance to iMessage:",
         "This is still a work in progress.",
-        "Ensure Anima has Full Disk Access to Messages DB.",
+        "Ensure ANIMA has Full Disk Access to Messages DB.",
         "Grant Automation permission for Messages when prompted.",
         "List chats with: imsg chats --limit 20",
         `Docs: ${formatDocsLink("/imessage", "imessage")}`,

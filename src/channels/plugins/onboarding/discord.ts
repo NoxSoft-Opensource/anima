@@ -45,6 +45,7 @@ function setDiscordDmPolicy(cfg: AnimaConfig, dmPolicy: DmPolicy) {
 async function noteDiscordTokenHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
+      "Connect your ANIMA instance to Discord:",
       "1) Discord Developer Portal → Applications → New Application",
       "2) Bot → Add Bot → Reset Token → copy token",
       "3) OAuth2 → URL Generator → scope 'bot' → invite to your server",

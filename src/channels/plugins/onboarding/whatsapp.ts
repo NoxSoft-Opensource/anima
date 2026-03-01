@@ -44,7 +44,7 @@ async function promptWhatsAppOwnerAllowFrom(params: {
   const { prompter, existingAllowFrom } = params;
 
   await prompter.note(
-    "We need the sender/owner number so Anima can allowlist you.",
+    "We need the sender/owner number so your ANIMA instance can allowlist you.",
     "WhatsApp number",
   );
   const entry = await prompter.text({
@@ -122,7 +122,7 @@ async function promptWhatsAppAllowFrom(
     message: "WhatsApp phone setup",
     options: [
       { value: "personal", label: "This is my personal phone number" },
-      { value: "separate", label: "Separate phone just for Anima" },
+      { value: "separate", label: "Separate phone just for ANIMA" },
     ],
   });
 
@@ -303,6 +303,7 @@ export const whatsappOnboardingAdapter: ChannelOnboardingAdapter = {
     if (!linked) {
       await prompter.note(
         [
+          "Connect your ANIMA instance to WhatsApp:",
           "Scan the QR with WhatsApp on your phone.",
           `Credentials are stored under ${authDir}/ for future runs.`,
           `Docs: ${formatDocsLink("/whatsapp", "whatsapp")}`,

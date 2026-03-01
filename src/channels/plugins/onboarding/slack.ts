@@ -37,11 +37,11 @@ function setSlackDmPolicy(cfg: AnimaConfig, dmPolicy: DmPolicy) {
 }
 
 function buildSlackManifest(botName: string) {
-  const safeName = botName.trim() || "Anima";
+  const safeName = botName.trim() || "ANIMA";
   const manifest = {
     display_information: {
       name: safeName,
-      description: `${safeName} connector for Anima`,
+      description: `${safeName} — powered by ANIMA, NoxSoft's AI orchestration daemon`,
     },
     features: {
       bot_user: {
@@ -55,7 +55,7 @@ function buildSlackManifest(botName: string) {
       slash_commands: [
         {
           command: "/anima",
-          description: "Send a message to Anima",
+          description: "Send a message to your ANIMA instance",
           should_escape: false,
         },
       ],
@@ -109,6 +109,7 @@ async function noteSlackTokenHelp(prompter: WizardPrompter, botName: string): Pr
   const manifest = buildSlackManifest(botName);
   await prompter.note(
     [
+      "Connect your ANIMA instance to Slack:",
       "1) Slack API → Create App → From scratch",
       "2) Add Socket Mode + enable it to get the app-level token (xapp-...)",
       "3) OAuth & Permissions → install app to workspace (xoxb- bot token)",
@@ -372,7 +373,7 @@ export const slackOnboardingAdapter: ChannelOnboardingAdapter = {
     const slackBotName = String(
       await prompter.text({
         message: "Slack bot display name (used for manifest)",
-        initialValue: "Anima",
+        initialValue: "ANIMA",
       }),
     ).trim();
     if (!accountConfigured) {

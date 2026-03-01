@@ -33,12 +33,13 @@ function setTelegramDmPolicy(cfg: AnimaConfig, dmPolicy: DmPolicy) {
 async function noteTelegramTokenHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
+      "Connect your ANIMA instance to Telegram:",
       "1) Open Telegram and chat with @BotFather",
       "2) Run /newbot (or /mybots)",
       "3) Copy the token (looks like 123456:ABC...)",
       "Tip: you can also set TELEGRAM_BOT_TOKEN in your env.",
       `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://noxsoft.net",
+      "Powered by ANIMA — NoxSoft's AI orchestration daemon",
     ].join("\n"),
     "Telegram bot token",
   );
@@ -51,7 +52,7 @@ async function noteTelegramUserIdHelp(prompter: WizardPrompter): Promise<void> {
       "2) Or call https://api.telegram.org/bot<bot_token>/getUpdates and read message.from.id",
       "3) Third-party: DM @userinfobot or @getidsbot",
       `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://noxsoft.net",
+      "Powered by ANIMA — NoxSoft's AI orchestration daemon",
     ].join("\n"),
     "Telegram user id",
   );

@@ -54,11 +54,7 @@ function setSignalDmPolicy(cfg: AnimaConfig, dmPolicy: DmPolicy) {
   };
 }
 
-function setSignalAllowFrom(
-  cfg: AnimaConfig,
-  accountId: string,
-  allowFrom: string[],
-): AnimaConfig {
+function setSignalAllowFrom(cfg: AnimaConfig, accountId: string, allowFrom: string[]): AnimaConfig {
   if (accountId === DEFAULT_ACCOUNT_ID) {
     return {
       ...cfg,
@@ -335,7 +331,8 @@ export const signalOnboardingAdapter: ChannelOnboardingAdapter = {
 
     await prompter.note(
       [
-        'Link device with: signal-cli link -n "Anima"',
+        "Connect your ANIMA instance to Signal:",
+        'Link device with: signal-cli link -n "ANIMA"',
         "Scan QR in Signal → Linked Devices",
         `Then run: ${formatCliCommand("anima gateway call channels.status --params '{\"probe\":true}'")}`,
         `Docs: ${formatDocsLink("/signal", "signal")}`,
