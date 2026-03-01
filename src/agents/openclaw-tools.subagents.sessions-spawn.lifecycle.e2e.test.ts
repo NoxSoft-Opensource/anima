@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { emitAgentEvent } from "../infra/agent-events.js";
 import { sleep } from "../utils.js";
-import { createOpenClawTools } from "./openclaw-tools.js";
+import { createAnimaTools } from "./anima-tools.js";
 import "./test-helpers/fast-core-tools.js";
 import { resetSubagentRegistryForTests } from "./subagent-registry.js";
 
@@ -52,7 +52,7 @@ vi.mock("../../config/config.js", async (importOriginal) => {
   };
 });
 
-describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
+describe("anima-tools: subagents (sessions_spawn lifecycle)", () => {
   beforeEach(() => {
     resetConfigOverride();
   });
@@ -131,7 +131,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -244,7 +244,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -383,7 +383,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -469,7 +469,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -541,7 +541,7 @@ describe("openclaw-tools: subagents (sessions_spawn lifecycle)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
       agentAccountId: "kev",

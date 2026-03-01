@@ -2,10 +2,10 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { AnimaConfig } from "../config/config.js";
 import type { SandboxContext } from "./sandbox.js";
 import type { SandboxFsBridge, SandboxFsStat, SandboxResolvedPath } from "./sandbox/fs-bridge.js";
-import { createOpenClawCodingTools } from "./pi-tools.js";
+import { createAnimaCodingTools } from "./pi-tools.js";
 
 vi.mock("../infra/shell-env.js", async (importOriginal) => {
   const mod = await importOriginal<typeof import("../infra/shell-env.js")>();
@@ -115,12 +115,12 @@ function createSandbox(params: {
     workspaceDir: params.sandboxRoot,
     agentWorkspaceDir: params.agentRoot,
     workspaceAccess: "rw",
-    containerName: "openclaw-sbx-test",
+    containerName: "anima-sbx-test",
     containerWorkdir: "/workspace",
     fsBridge: params.fsBridge,
     docker: {
-      image: "openclaw-sandbox:bookworm-slim",
-      containerPrefix: "openclaw-sbx-",
+      image: "anima-sandbox:bookworm-slim",
+      containerPrefix: "anima-sbx-",
       workdir: "/workspace",
       readOnlyRoot: true,
       tmpfs: [],
@@ -136,7 +136,7 @@ function createSandbox(params: {
 
 describe("tools.fs.workspaceOnly", () => {
   it("defaults to allowing sandbox mounts outside the workspace root", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-sbx-mounts-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-sbx-mounts-"));
     const sandboxRoot = path.join(stateDir, "sandbox");
     const agentRoot = path.join(stateDir, "agent");
     await fs.mkdir(sandboxRoot, { recursive: true });
@@ -147,7 +147,7 @@ describe("tools.fs.workspaceOnly", () => {
       const bridge = createUnsafeMountedBridge({ root: sandboxRoot, agentHostRoot: agentRoot });
       const sandbox = createSandbox({ sandboxRoot, agentRoot, fsBridge: bridge });
 
-      const tools = createOpenClawCodingTools({ sandbox, workspaceDir: sandboxRoot });
+      const tools = createAnimaCodingTools({ sandbox, workspaceDir: sandboxRoot });
       const readTool = tools.find((tool) => tool.name === "read");
       const writeTool = tools.find((tool) => tool.name === "write");
       expect(readTool).toBeDefined();
@@ -164,7 +164,7 @@ describe("tools.fs.workspaceOnly", () => {
   });
 
   it("rejects sandbox mounts outside the workspace root when enabled", async () => {
-    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-sbx-mounts-"));
+    const stateDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-sbx-mounts-"));
     const sandboxRoot = path.join(stateDir, "sandbox");
     const agentRoot = path.join(stateDir, "agent");
     await fs.mkdir(sandboxRoot, { recursive: true });
@@ -175,8 +175,8 @@ describe("tools.fs.workspaceOnly", () => {
       const bridge = createUnsafeMountedBridge({ root: sandboxRoot, agentHostRoot: agentRoot });
       const sandbox = createSandbox({ sandboxRoot, agentRoot, fsBridge: bridge });
 
-      const cfg = { tools: { fs: { workspaceOnly: true } } } as unknown as OpenClawConfig;
-      const tools = createOpenClawCodingTools({ sandbox, workspaceDir: sandboxRoot, config: cfg });
+      const cfg = { tools: { fs: { workspaceOnly: true } } } as unknown as AnimaConfig;
+      const tools = createAnimaCodingTools({ sandbox, workspaceDir: sandboxRoot, config: cfg });
       const readTool = tools.find((tool) => tool.name === "read");
       const writeTool = tools.find((tool) => tool.name === "write");
       const editTool = tools.find((tool) => tool.name === "edit");

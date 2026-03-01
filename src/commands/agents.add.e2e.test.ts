@@ -33,7 +33,7 @@ const runtime: RuntimeEnv = {
 };
 
 const baseSnapshot = {
-  path: "/tmp/openclaw.json",
+  path: "/tmp/anima.json",
   exists: true,
   raw: "{}",
   parsed: {},

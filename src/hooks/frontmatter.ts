@@ -1,5 +1,5 @@
 import type {
-  OpenClawHookMetadata,
+  AnimaHookMetadata,
   HookEntry,
   HookInstallSpec,
   HookInvocationPolicy,
@@ -10,7 +10,7 @@ import {
   getFrontmatterString,
   normalizeStringList,
   parseFrontmatterBool,
-  resolveOpenClawManifestBlock,
+  resolveAnimaManifestBlock,
 } from "../shared/frontmatter.js";
 
 export function parseFrontmatter(content: string): ParsedHookFrontmatter {
@@ -53,10 +53,10 @@ function parseInstallSpec(input: unknown): HookInstallSpec | undefined {
   return spec;
 }
 
-export function resolveOpenClawMetadata(
+export function resolveAnimaMetadata(
   frontmatter: ParsedHookFrontmatter,
-): OpenClawHookMetadata | undefined {
-  const metadataObj = resolveOpenClawManifestBlock({ frontmatter });
+): AnimaHookMetadata | undefined {
+  const metadataObj = resolveAnimaManifestBlock({ frontmatter });
   if (!metadataObj) {
     return undefined;
   }

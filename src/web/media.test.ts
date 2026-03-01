@@ -41,7 +41,7 @@ async function createLargeTestJpeg(): Promise<{ buffer: Buffer; file: string }> 
 }
 
 beforeAll(async () => {
-  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-media-test-"));
+  fixtureRoot = await fs.mkdtemp(path.join(os.tmpdir(), "anima-media-test-"));
   largeJpegBuffer = await sharp({
     create: {
       width: 800,
@@ -345,7 +345,7 @@ describe("local media root guard", () => {
     ).rejects.toThrow(/refuses filesystem root/i);
   });
 
-  it("allows default OpenClaw state workspace and sandbox roots", async () => {
+  it("allows default Anima state workspace and sandbox roots", async () => {
     const { STATE_DIR } = await import("../config/paths.js");
     const readFile = vi.fn(async () => Buffer.from("generated-media"));
 

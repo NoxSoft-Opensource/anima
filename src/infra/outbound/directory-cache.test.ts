@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { AnimaConfig } from "../../config/config.js";
 import { DirectoryCache } from "./directory-cache.js";
 
 describe("DirectoryCache", () => {
-  const cfg = {} as OpenClawConfig;
+  const cfg = {} as AnimaConfig;
 
   it("expires entries after ttl", () => {
     vi.useFakeTimers();

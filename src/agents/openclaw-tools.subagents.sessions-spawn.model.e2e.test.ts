@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "./defaults.js";
 import "./test-helpers/fast-core-tools.js";
-import { createOpenClawTools } from "./openclaw-tools.js";
+import { createAnimaTools } from "./anima-tools.js";
 import { resetSubagentRegistryForTests } from "./subagent-registry.js";
 
 type SessionsSpawnTestConfig = ReturnType<(typeof import("../config/config.js"))["loadConfig"]>;
@@ -55,7 +55,7 @@ vi.mock("../../config/config.js", async (importOriginal) => {
   };
 });
 
-describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
+describe("anima-tools: subagents (sessions_spawn model + thinking)", () => {
   beforeEach(() => {
     resetConfigOverride();
   });
@@ -90,7 +90,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -137,7 +137,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -170,7 +170,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "discord:group:req",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -210,7 +210,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "agent:main:main",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -251,7 +251,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "agent:main:main",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -299,7 +299,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "agent:research:main",
       agentChannel: "discord",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -351,7 +351,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -389,7 +389,7 @@ describe("openclaw-tools: subagents (sessions_spawn model + thinking)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");

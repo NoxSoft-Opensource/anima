@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { AnimaConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { getChannelPlugin, listChannelPlugins } from "../channels/plugins/index.js";
 import { formatCliCommand } from "../cli/command-format.js";
@@ -9,9 +9,9 @@ import { confirm, select } from "./configure.shared.js";
 import { guardCancel } from "./onboard-helpers.js";
 
 export async function removeChannelConfigWizard(
-  cfg: OpenClawConfig,
+  cfg: AnimaConfig,
   runtime: RuntimeEnv,
-): Promise<OpenClawConfig> {
+): Promise<AnimaConfig> {
   let next = { ...cfg };
 
   const listConfiguredChannels = () =>
@@ -24,8 +24,8 @@ export async function removeChannelConfigWizard(
     if (configured.length === 0) {
       note(
         [
-          "No channel config found in openclaw.json.",
-          `Tip: \`${formatCliCommand("openclaw channels status")}\` shows what is configured and enabled.`,
+          "No channel config found in anima.json.",
+          `Tip: \`${formatCliCommand("anima channels status")}\` shows what is configured and enabled.`,
         ].join("\n"),
         "Remove channel",
       );
@@ -68,7 +68,7 @@ export async function removeChannelConfigWizard(
     next = {
       ...next,
       channels: Object.keys(nextChannels).length
-        ? (nextChannels as OpenClawConfig["channels"])
+        ? (nextChannels as AnimaConfig["channels"])
         : undefined,
     };
 

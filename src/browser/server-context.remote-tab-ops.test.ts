@@ -7,10 +7,10 @@ import * as cdpModule from "./cdp.js";
 import * as pwAiModule from "./pw-ai-module.js";
 import { createBrowserRouteContext } from "./server-context.js";
 
-const chromeUserDataDir = vi.hoisted(() => ({ dir: "/tmp/openclaw" }));
+const chromeUserDataDir = vi.hoisted(() => ({ dir: "/tmp/anima" }));
 
 beforeAll(async () => {
-  chromeUserDataDir.dir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-chrome-user-data-"));
+  chromeUserDataDir.dir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-chrome-user-data-"));
 });
 
 afterAll(async () => {
@@ -20,11 +20,11 @@ afterAll(async () => {
 vi.mock("./chrome.js", () => ({
   isChromeCdpReady: vi.fn(async () => true),
   isChromeReachable: vi.fn(async () => true),
-  launchOpenClawChrome: vi.fn(async () => {
+  launchAnimaChrome: vi.fn(async () => {
     throw new Error("unexpected launch");
   }),
-  resolveOpenClawUserDataDir: vi.fn(() => chromeUserDataDir.dir),
-  stopOpenClawChrome: vi.fn(async () => {}),
+  resolveAnimaUserDataDir: vi.fn(() => chromeUserDataDir.dir),
+  stopAnimaChrome: vi.fn(async () => {}),
 }));
 
 const originalFetch = globalThis.fetch;
@@ -35,7 +35,7 @@ afterEach(() => {
 });
 
 function makeState(
-  profile: "remote" | "openclaw",
+  profile: "remote" | "anima",
 ): BrowserServerState & { profiles: Map<string, { lastTargetId?: string | null }> } {
   return {
     // oxlint-disable-next-line typescript/no-explicit-any
@@ -60,7 +60,7 @@ function makeState(
           cdpPort: 443,
           color: "#00AA00",
         },
-        openclaw: { cdpPort: 18800, color: "#FF4500" },
+        anima: { cdpPort: 18800, color: "#FF4500" },
       },
     },
     profiles: new Map(),
@@ -277,12 +277,12 @@ describe("browser server-context tab selection state", () => {
 
     global.fetch = fetchMock;
 
-    const state = makeState("openclaw");
+    const state = makeState("anima");
     const ctx = createBrowserRouteContext({ getState: () => state });
-    const openclaw = ctx.forProfile("openclaw");
+    const anima = ctx.forProfile("anima");
 
-    const opened = await openclaw.openTab("https://created.example");
+    const opened = await anima.openTab("https://created.example");
     expect(opened.targetId).toBe("CREATED");
-    expect(state.profiles.get("openclaw")?.lastTargetId).toBe("CREATED");
+    expect(state.profiles.get("anima")?.lastTargetId).toBe("CREATED");
   });
 });

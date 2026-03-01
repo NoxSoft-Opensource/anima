@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { AnimaConfig } from "../config/config.js";
 import { peekSystemEvents } from "../infra/system-events.js";
 import { resolveAgentRoute } from "../routing/resolve-route.js";
 import { normalizeE164 } from "../utils.js";
@@ -358,7 +358,7 @@ describe("monitorSignalProvider tool results", () => {
     await flush();
 
     const route = resolveAgentRoute({
-      cfg: config as OpenClawConfig,
+      cfg: config as AnimaConfig,
       channel: "signal",
       accountId: "default",
       peer: { kind: "direct", id: normalizeE164("+15550001111") },
@@ -414,7 +414,7 @@ describe("monitorSignalProvider tool results", () => {
     await flush();
 
     const route = resolveAgentRoute({
-      cfg: config as OpenClawConfig,
+      cfg: config as AnimaConfig,
       channel: "signal",
       accountId: "default",
       peer: { kind: "direct", id: normalizeE164("+15550001111") },

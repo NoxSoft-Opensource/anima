@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createOpenClawTools } from "./openclaw-tools.js";
+import { createAnimaTools } from "./anima-tools.js";
 import "./test-helpers/fast-core-tools.js";
 import { resetSubagentRegistryForTests } from "./subagent-registry.js";
 
@@ -54,7 +54,7 @@ vi.mock("../../config/config.js", async (importOriginal) => {
   };
 });
 
-describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
+describe("anima-tools: subagents (sessions_spawn allowlist)", () => {
   beforeEach(() => {
     resetConfigOverride();
   });
@@ -63,7 +63,7 @@ describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
     resetSubagentRegistryForTests();
     callGatewayMock.mockReset();
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -101,7 +101,7 @@ describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
       },
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -153,7 +153,7 @@ describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -207,7 +207,7 @@ describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
@@ -261,7 +261,7 @@ describe("openclaw-tools: subagents (sessions_spawn allowlist)", () => {
       return {};
     });
 
-    const tool = createOpenClawTools({
+    const tool = createAnimaTools({
       agentSessionKey: "main",
       agentChannel: "whatsapp",
     }).find((candidate) => candidate.name === "sessions_spawn");
