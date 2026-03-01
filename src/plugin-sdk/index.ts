@@ -76,8 +76,6 @@ export { normalizePluginHttpPath } from "../plugins/http-path.js";
 export { registerPluginHttpRoute } from "../plugins/http-registry.js";
 export { emptyPluginConfigSchema } from "../plugins/config-schema.js";
 export type { AnimaConfig } from "../config/config.js";
-/** @deprecated Use AnimaConfig instead */
-export type { AnimaConfig as AnimaConfig } from "../config/config.js";
 
 export type { FileLockHandle, FileLockOptions } from "./file-lock.js";
 export { acquireFileLock, withFileLock } from "./file-lock.js";
@@ -295,7 +293,7 @@ export type {
 export { detectMime, extensionForMime, getFileExtension } from "../media/mime.js";
 export { extractOriginalFilename } from "../media/store.js";
 
-// Channel: Discord
+// Channel: Discord (stubbed — channel removed)
 export {
   listDiscordAccountIds,
   resolveDefaultDiscordAccountId,
@@ -310,7 +308,7 @@ export {
 } from "../channels/plugins/normalize/discord.js";
 export { collectDiscordStatusIssues } from "../channels/plugins/status-issues/discord.js";
 
-// Channel: iMessage
+// Channel: iMessage (stubbed — channel removed)
 export {
   listIMessageAccountIds,
   resolveDefaultIMessageAccountId,
@@ -329,7 +327,7 @@ export {
   resolveServicePrefixedTarget,
 } from "../imessage/target-parsing-helpers.js";
 
-// Channel: Slack
+// Channel: Slack (stubbed — channel removed)
 export {
   listEnabledSlackAccounts,
   listSlackAccountIds,
@@ -346,7 +344,7 @@ export {
 } from "../channels/plugins/normalize/slack.js";
 export { buildSlackThreadingToolContext } from "../slack/threading-tool-context.js";
 
-// Channel: Telegram
+// Channel: Telegram (stubbed — channel removed)
 export {
   listTelegramAccountIds,
   resolveDefaultTelegramAccountId,
@@ -365,7 +363,7 @@ export {
 } from "../telegram/outbound-params.js";
 export { type TelegramProbe } from "../telegram/probe.js";
 
-// Channel: Signal
+// Channel: Signal (stubbed — channel removed)
 export {
   listSignalAccountIds,
   resolveDefaultSignalAccountId,
@@ -398,7 +396,7 @@ export { collectWhatsAppStatusIssues } from "../channels/plugins/status-issues/w
 // Channel: BlueBubbles
 export { collectBlueBubblesStatusIssues } from "../channels/plugins/status-issues/bluebubbles.js";
 
-// Channel: LINE
+// Channel: LINE (stubbed — channel removed)
 export {
   listLineAccountIds,
   normalizeAccountId as normalizeLineAccountId,
