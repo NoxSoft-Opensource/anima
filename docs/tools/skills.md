@@ -47,22 +47,22 @@ You can gate them via `metadata.anima.requires.config` on the plugin’s config
 entry. See [Plugins](/tools/plugin) for discovery/config and [Tools](/tools) for the
 tool surface those skills teach.
 
-## AnimaHub (install + sync)
+## NoxHub (install + sync)
 
-AnimaHub is the public skills registry for Anima. Browse at
-[https://animahub.com](https://animahub.com). Use it to discover, install, update, and back up skills.
-Full guide: [AnimaHub](/tools/animahub).
+NoxHub is the public skills registry for Anima. Browse at
+[https://noxhub.com](https://noxhub.com). Use it to discover, install, update, and back up skills.
+Full guide: [NoxHub](/tools/noxhub).
 
 Common flows:
 
 - Install a skill into your workspace:
-  - `animahub install <skill-slug>`
+  - `noxhub install <skill-slug>`
 - Update all installed skills:
-  - `animahub update --all`
+  - `noxhub update --all`
 - Sync (scan + publish updates):
-  - `animahub sync --all`
+  - `noxhub sync --all`
 
-By default, `animahub` installs into `./skills` under your current working
+By default, `noxhub` installs into `./skills` under your current working
 directory (or falls back to the configured Anima workspace). Anima picks
 that up as `<workspace>/skills` on the next session.
 
@@ -295,6 +295,6 @@ See [Skills config](/tools/skills-config) for the full configuration schema.
 
 ## Looking for more skills?
 
-Browse [https://animahub.com](https://animahub.com).
+Browse [https://noxhub.com](https://noxhub.com).
 
 ---

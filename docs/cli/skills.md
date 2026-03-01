@@ -14,7 +14,7 @@ Related:
 
 - Skills system: [Skills](/tools/skills)
 - Skills config: [Skills config](/tools/skills-config)
-- AnimaHub installs: [AnimaHub](/tools/animahub)
+- NoxHub installs: [NoxHub](/tools/noxhub)
 
 ## Commands
 

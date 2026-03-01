@@ -9,7 +9,7 @@ title: "Ansible"
 
 # Ansible Installation
 
-The recommended way to deploy Anima to production servers is via **[anima-ansible](https://github.com/anima/anima-ansible)** — an automated installer with security-first architecture.
+The recommended way to deploy Anima to production servers is via **[anima-ansible](https://gitlab.com/sylys-group/anima-ansible)** — an automated installer with security-first architecture.
 
 ## Quick Start
 
@@ -19,7 +19,7 @@ One-command install:
 curl -fsSL https://raw.githubusercontent.com/anima/anima-ansible/main/install.sh | bash
 ```
 
-> **📦 Full guide: [github.com/anima/anima-ansible](https://github.com/anima/anima-ansible)**
+> **📦 Full guide: [gitlab.com/sylys-group/anima-ansible](https://gitlab.com/sylys-group/anima-ansible)**
 >
 > The anima-ansible repo is the source of truth for Ansible deployment. This page is a quick overview.
 
@@ -118,7 +118,7 @@ If you prefer manual control over the automation:
 sudo apt update && sudo apt install -y ansible git
 
 # 2. Clone repository
-git clone https://github.com/anima/anima-ansible.git
+git clone https://gitlab.com/sylys-group/anima-ansible.git
 cd anima-ansible
 
 # 3. Install Ansible collections
@@ -196,13 +196,13 @@ anima channels login
 
 For detailed security architecture and troubleshooting:
 
-- [Security Architecture](https://github.com/anima/anima-ansible/blob/main/docs/security.md)
-- [Technical Details](https://github.com/anima/anima-ansible/blob/main/docs/architecture.md)
-- [Troubleshooting Guide](https://github.com/anima/anima-ansible/blob/main/docs/troubleshooting.md)
+- [Security Architecture](https://gitlab.com/sylys-group/anima-ansible/-/blob/main/docs/security.md)
+- [Technical Details](https://gitlab.com/sylys-group/anima-ansible/-/blob/main/docs/architecture.md)
+- [Troubleshooting Guide](https://gitlab.com/sylys-group/anima-ansible/-/blob/main/docs/troubleshooting.md)
 
 ## Related
 
-- [anima-ansible](https://github.com/anima/anima-ansible) — full deployment guide
+- [anima-ansible](https://gitlab.com/sylys-group/anima-ansible) — full deployment guide
 - [Docker](/install/docker) — containerized gateway setup
 - [Sandboxing](/gateway/sandboxing) — agent sandbox configuration
 - [Multi-Agent Sandbox & Tools](/tools/multi-agent-sandbox-tools) — per-agent isolation

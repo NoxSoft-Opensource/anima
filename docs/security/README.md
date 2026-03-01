@@ -1,6 +1,6 @@
 # Anima Security & Trust
 
-**Live:** [trust.anima.ai](https://trust.anima.ai)
+**Live:** [trust.noxsoft.net](https://trust.noxsoft.net)
 
 ## Documents
 
@@ -9,7 +9,7 @@
 
 ## Reporting Vulnerabilities
 
-See the [Trust page](https://trust.anima.ai) for full reporting instructions covering all repos.
+See the [Trust page](https://trust.noxsoft.net) for full reporting instructions covering all repos.
 
 ## Contact
 

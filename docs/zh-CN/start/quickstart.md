@@ -61,7 +61,7 @@ Anima 需要 Node 22 或更新版本。
 ## 从源码安装（开发）
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm ui:build # 首次运行时会自动安装 UI 依赖

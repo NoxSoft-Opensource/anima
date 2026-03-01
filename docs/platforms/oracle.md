@@ -99,7 +99,7 @@ tailscale status
 ## 5) Install Anima
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 source ~/.bashrc
 ```
 

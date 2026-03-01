@@ -20,13 +20,13 @@ x-i18n:
 ## 快速安装（推荐）
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-iwr -useb https://anima.ai/install.ps1 | iex
+iwr -useb https://noxsoft.net/install.ps1 | iex
 ```
 
 下一步（如果你跳过了新手引导）：
@@ -48,13 +48,13 @@ anima onboard --install-daemon
 通过 npm 全局安装 `anima` 并运行新手引导。
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 安装器标志：
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --help
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --help
 ```
 
 详情：[安装器内部原理](/install/installer)。
@@ -62,7 +62,7 @@ curl -fsSL https://anima.ai/install.sh | bash -s -- --help
 非交互式（跳过新手引导）：
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --no-onboard
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --no-onboard
 ```
 
 ### 2）全局安装（手动）
@@ -100,7 +100,7 @@ anima onboard --install-daemon
 ### 3）从源代码（贡献者/开发）
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm ui:build # 首次运行时自动安装 UI 依赖
@@ -135,10 +135,10 @@ anima onboard --install-daemon
 
 ```bash
 # 显式 npm
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method npm
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method npm
 
 # 从 GitHub 安装（源代码 checkout）
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git
 ```
 
 常用标志：

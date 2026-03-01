@@ -99,7 +99,7 @@ docker compose version
 ## 3) Clone the Anima repository
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 ```
 
@@ -313,18 +313,18 @@ Paste your gateway token.
 Anima runs in Docker, but Docker is not the source of truth.
 All long-lived state must survive restarts, rebuilds, and reboots.
 
-| Component           | Location                          | Persistence mechanism  | Notes                            |
-| ------------------- | --------------------------------- | ---------------------- | -------------------------------- |
-| Gateway config      | `/home/node/.anima/`           | Host volume mount      | Includes `anima.json`, tokens |
-| Model auth profiles | `/home/node/.anima/`           | Host volume mount      | OAuth tokens, API keys           |
-| Skill configs       | `/home/node/.anima/skills/`    | Host volume mount      | Skill-level state                |
-| Agent workspace     | `/home/node/.anima/workspace/` | Host volume mount      | Code and agent artifacts         |
-| WhatsApp session    | `/home/node/.anima/`           | Host volume mount      | Preserves QR login               |
-| Gmail keyring       | `/home/node/.anima/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD`  |
-| External binaries   | `/usr/local/bin/`                 | Docker image           | Must be baked at build time      |
-| Node runtime        | Container filesystem              | Docker image           | Rebuilt every image build        |
-| OS packages         | Container filesystem              | Docker image           | Do not install at runtime        |
-| Docker container    | Ephemeral                         | Restartable            | Safe to destroy                  |
+| Component           | Location                       | Persistence mechanism  | Notes                           |
+| ------------------- | ------------------------------ | ---------------------- | ------------------------------- |
+| Gateway config      | `/home/node/.anima/`           | Host volume mount      | Includes `anima.json`, tokens   |
+| Model auth profiles | `/home/node/.anima/`           | Host volume mount      | OAuth tokens, API keys          |
+| Skill configs       | `/home/node/.anima/skills/`    | Host volume mount      | Skill-level state               |
+| Agent workspace     | `/home/node/.anima/workspace/` | Host volume mount      | Code and agent artifacts        |
+| WhatsApp session    | `/home/node/.anima/`           | Host volume mount      | Preserves QR login              |
+| Gmail keyring       | `/home/node/.anima/`           | Host volume + password | Requires `GOG_KEYRING_PASSWORD` |
+| External binaries   | `/usr/local/bin/`              | Docker image           | Must be baked at build time     |
+| Node runtime        | Container filesystem           | Docker image           | Rebuilt every image build       |
+| OS packages         | Container filesystem           | Docker image           | Do not install at runtime       |
+| Docker container    | Ephemeral                      | Restartable            | Safe to destroy                 |
 
 ---
 

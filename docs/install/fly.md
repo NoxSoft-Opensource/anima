@@ -25,7 +25,7 @@ description: Deploy Anima on Fly.io
 
 ```bash
 # Clone the repo
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 
 # Create a new Fly app (pick your own name)
@@ -78,13 +78,13 @@ primary_region = "iad"
 
 **Key settings:**
 
-| Setting                        | Why                                                                         |
-| ------------------------------ | --------------------------------------------------------------------------- |
-| `--bind lan`                   | Binds to `0.0.0.0` so Fly's proxy can reach the gateway                     |
-| `--allow-unconfigured`         | Starts without a config file (you'll create one after)                      |
-| `internal_port = 3000`         | Must match `--port 3000` (or `ANIMA_GATEWAY_PORT`) for Fly health checks |
-| `memory = "2048mb"`            | 512MB is too small; 2GB recommended                                         |
-| `ANIMA_STATE_DIR = "/data"` | Persists state on the volume                                                |
+| Setting                     | Why                                                                      |
+| --------------------------- | ------------------------------------------------------------------------ |
+| `--bind lan`                | Binds to `0.0.0.0` so Fly's proxy can reach the gateway                  |
+| `--allow-unconfigured`      | Starts without a config file (you'll create one after)                   |
+| `internal_port = 3000`      | Must match `--port 3000` (or `ANIMA_GATEWAY_PORT`) for Fly health checks |
+| `memory = "2048mb"`         | 512MB is too small; 2GB recommended                                      |
+| `ANIMA_STATE_DIR = "/data"` | Persists state on the volume                                             |
 
 ## 3) Set secrets
 

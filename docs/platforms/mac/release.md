@@ -70,7 +70,7 @@ Use the release note generator so Sparkle renders formatted HTML notes:
 SPARKLE_PRIVATE_KEY_FILE=/path/to/ed25519-private-key scripts/make_appcast.sh dist/Anima-2026.2.15.zip https://raw.githubusercontent.com/anima/anima/main/appcast.xml
 ```
 
-Generates HTML release notes from `CHANGELOG.md` (via [`scripts/changelog-to-html.sh`](https://github.com/anima/anima/blob/main/scripts/changelog-to-html.sh)) and embeds them in the appcast entry.
+Generates HTML release notes from `CHANGELOG.md` (via [`scripts/changelog-to-html.sh`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/changelog-to-html.sh)) and embeds them in the appcast entry.
 Commit the updated `appcast.xml` alongside the release assets (zip + dSYM) when publishing.
 
 ## Publish & verify

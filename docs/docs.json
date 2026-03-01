@@ -35,13 +35,13 @@
   "navbar": {
     "links": [
       {
-        "label": "GitHub",
-        "href": "https://github.com/anima/anima",
-        "icon": "github"
+        "label": "GitLab",
+        "href": "https://gitlab.com/sylys-group/anima",
+        "icon": "gitlab"
       },
       {
         "label": "Releases",
-        "href": "https://github.com/anima/anima/releases",
+        "href": "https://gitlab.com/sylys-group/anima/-/releases",
         "icon": "package"
       }
     ]
@@ -272,16 +272,16 @@
       "destination": "/start/anima"
     },
     {
-      "source": "/animahub",
-      "destination": "/tools/animahub"
+      "source": "/noxhub",
+      "destination": "/tools/noxhub"
     },
     {
       "source": "/clawdhub",
-      "destination": "/tools/animahub"
+      "destination": "/tools/noxhub"
     },
     {
       "source": "/tools/clawdhub",
-      "destination": "/tools/animahub"
+      "destination": "/tools/noxhub"
     },
     {
       "source": "/configuration",
@@ -996,7 +996,7 @@
                   "tools/slash-commands",
                   "tools/skills",
                   "tools/skills-config",
-                  "tools/animahub",
+                  "tools/noxhub",
                   "tools/plugin"
                 ]
               },
@@ -1513,7 +1513,7 @@
                   "zh-CN/tools/slash-commands",
                   "zh-CN/tools/skills",
                   "zh-CN/tools/skills-config",
-                  "zh-CN/tools/animahub",
+                  "zh-CN/tools/noxhub",
                   "zh-CN/tools/plugin"
                 ]
               },

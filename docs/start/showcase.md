@@ -9,7 +9,7 @@ summary: "Community-built projects and integrations powered by Anima"
 Real projects from the community. See what people are building with Anima.
 
 <Info>
-**Want to be featured?** Share your project in [#showcase on Discord](https://discord.gg/clawd) or [tag @anima on X](https://x.com/anima).
+**Want to be featured?** Share your project in [#showcase on Discord](https://discord.gg/noxsoft) or [tag @noxsoft on X](https://x.com/noxsoft).
 </Info>
 
 ## 🎥 Anima in Action
@@ -134,28 +134,28 @@ Wraps papla.media TTS and sends results as Telegram voice notes (no annoying aut
   <img src="/assets/showcase/papla-tts.jpg" alt="Telegram voice note output from TTS" />
 </Card>
 
-<Card title="CodexMonitor" icon="eye" href="https://animahub.com/odrobnik/codexmonitor">
+<Card title="CodexMonitor" icon="eye" href="https://noxhub.com/odrobnik/codexmonitor">
   **@odrobnik** • `devtools` `codex` `brew`
 
 Homebrew-installed helper to list/inspect/watch local OpenAI Codex sessions (CLI + VS Code).
 
-  <img src="/assets/showcase/codexmonitor.png" alt="CodexMonitor on AnimaHub" />
+  <img src="/assets/showcase/codexmonitor.png" alt="CodexMonitor on NoxHub" />
 </Card>
 
-<Card title="Bambu 3D Printer Control" icon="print" href="https://animahub.com/tobiasbischoff/bambu-cli">
+<Card title="Bambu 3D Printer Control" icon="print" href="https://noxhub.com/tobiasbischoff/bambu-cli">
   **@tobiasbischoff** • `hardware` `3d-printing` `skill`
 
 Control and troubleshoot BambuLab printers: status, jobs, camera, AMS, calibration, and more.
 
-  <img src="/assets/showcase/bambu-cli.png" alt="Bambu CLI skill on AnimaHub" />
+  <img src="/assets/showcase/bambu-cli.png" alt="Bambu CLI skill on NoxHub" />
 </Card>
 
-<Card title="Vienna Transport (Wiener Linien)" icon="train" href="https://animahub.com/hjanuschka/wienerlinien">
+<Card title="Vienna Transport (Wiener Linien)" icon="train" href="https://noxhub.com/hjanuschka/wienerlinien">
   **@hjanuschka** • `travel` `transport` `skill`
 
 Real-time departures, disruptions, elevator status, and routing for Vienna's public transport.
 
-  <img src="/assets/showcase/wienerlinien.png" alt="Wiener Linien skill on AnimaHub" />
+  <img src="/assets/showcase/wienerlinien.png" alt="Wiener Linien skill on NoxHub" />
 </Card>
 
 <Card title="ParentPay School Meals" icon="utensils" href="#">
@@ -164,7 +164,7 @@ Real-time departures, disruptions, elevator status, and routing for Vienna's pub
 Automated UK school meal booking via ParentPay. Uses mouse coordinates for reliable table cell clicking.
 </Card>
 
-<Card title="R2 Upload (Send Me My Files)" icon="cloud-arrow-up" href="https://animahub.com/skills/r2-upload">
+<Card title="R2 Upload (Send Me My Files)" icon="cloud-arrow-up" href="https://noxhub.com/skills/r2-upload">
   **@julianengel** • `files` `r2` `presigned-urls`
 
 Upload to Cloudflare R2/S3 and generate secure presigned download links. Perfect for remote Anima instances.
@@ -260,7 +260,7 @@ Searches job listings, matches against CV keywords, and returns relevant opportu
 <Card title="Jira Skill Builder" icon="diagram-project" href="https://x.com/jdrhyne/status/2008336434827002232">
   **@jdrhyne** • `automation` `jira` `skill` `devtools`
 
-Anima connected to Jira, then generated a new skill on the fly (before it existed on AnimaHub).
+Anima connected to Jira, then generated a new skill on the fly (before it existed on NoxHub).
 </Card>
 
 <Card title="Todoist Skill via Telegram" icon="list-check" href="https://x.com/iamsubhrajyoti/status/2009949389884920153">
@@ -325,10 +325,10 @@ Watches company Slack channel, responds helpfully, and forwards notifications to
   Vapi voice assistant ↔ Anima HTTP bridge. Near real-time phone calls with your agent.
 </Card>
 
-<Card title="OpenRouter Transcription" icon="microphone" href="https://animahub.com/obviyus/openrouter-transcribe">
+<Card title="OpenRouter Transcription" icon="microphone" href="https://noxhub.com/obviyus/openrouter-transcribe">
   **@obviyus** • `transcription` `multilingual` `skill`
 
-Multi-lingual audio transcription via OpenRouter (Gemini, etc). Available on AnimaHub.
+Multi-lingual audio transcription via OpenRouter (Gemini, etc). Available on NoxHub.
 </Card>
 
 </CardGroup>
@@ -343,20 +343,20 @@ Multi-lingual audio transcription via OpenRouter (Gemini, etc). Available on Ani
   Anima gateway running on Home Assistant OS with SSH tunnel support and persistent state.
 </Card>
 
-<Card title="Home Assistant Skill" icon="toggle-on" href="https://animahub.com/skills/homeassistant">
-  **AnimaHub** • `homeassistant` `skill` `automation`
+<Card title="Home Assistant Skill" icon="toggle-on" href="https://noxhub.com/skills/homeassistant">
+  **NoxHub** • `homeassistant` `skill` `automation`
   
   Control and automate Home Assistant devices via natural language.
 </Card>
 
-<Card title="Nix Packaging" icon="snowflake" href="https://github.com/anima/nix-anima">
+<Card title="Nix Packaging" icon="snowflake" href="https://gitlab.com/sylys-group/nix-anima">
   **@anima** • `nix` `packaging` `deployment`
   
   Batteries-included nixified Anima configuration for reproducible deployments.
 </Card>
 
-<Card title="CalDAV Calendar" icon="calendar" href="https://animahub.com/skills/caldav-calendar">
-  **AnimaHub** • `calendar` `caldav` `skill`
+<Card title="CalDAV Calendar" icon="calendar" href="https://noxhub.com/skills/caldav-calendar">
+  **NoxHub** • `calendar` `caldav` `skill`
   
   Calendar skill using khal/vdirsyncer. Self-hosted calendar integration.
 </Card>
@@ -405,7 +405,7 @@ Have something to share? We'd love to feature it!
 
 <Steps>
   <Step title="Share It">
-    Post in [#showcase on Discord](https://discord.gg/clawd) or [tweet @anima](https://x.com/anima)
+    Post in [#showcase on Discord](https://discord.gg/noxsoft) or [tweet @noxsoft](https://x.com/noxsoft)
   </Step>
   <Step title="Include Details">
     Tell us what it does, link to the repo/demo, share a screenshot if you have one

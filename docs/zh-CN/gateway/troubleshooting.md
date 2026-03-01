@@ -24,8 +24,8 @@ x-i18n:
 
 快速分类命令（按顺序）：
 
-| 命令                               | 它告诉你什么                                                                          | 何时使用                              |
-| ---------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------- |
+| 命令                            | 它告诉你什么                                                                          | 何时使用                              |
+| ------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------- |
 | `anima status`                  | 本地摘要：操作系统 + 更新、Gateway 网关可达性/模式、服务、智能体/会话、提供商配置状态 | 首次检查，快速概览                    |
 | `anima status --all`            | 完整本地诊断（只读、可粘贴、相对安全）包括日志尾部                                    | 当你需要分享调试报告时                |
 | `anima status --deep`           | 运行 Gateway 网关健康检查（包括提供商探测；需要可达的 Gateway 网关）                  | 当"已配置"不意味着"正常工作"时        |
@@ -517,7 +517,7 @@ anima channels login
 
 1. `git pull origin main && pnpm install`
 2. `anima doctor`
-3. 检查 GitHub issues 或 Discord
+3. 检查 GitLab issues 或 Discord
 4. 临时变通方法：检出较旧的提交
 
 ### npm install 失败（allow-build-scripts / 缺少 tar 或 yargs）。现在怎么办？
@@ -545,13 +545,13 @@ anima gateway restart
 切换**到 git 安装**：
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git --no-onboard
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git --no-onboard
 ```
 
 切换**到 npm 全局**：
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 注意事项：
@@ -631,7 +631,7 @@ tccutil reset All bot.molt.mac.debug
 ```
 
 **修复 2：强制使用新的 Bundle ID**
-如果重置不起作用，在 [`scripts/package-mac-app.sh`](https://github.com/anima/anima/blob/main/scripts/package-mac-app.sh) 中更改 `BUNDLE_ID`（例如，添加 `.test` 后缀）并重新构建。这会强制 macOS 将其视为新应用。
+如果重置不起作用，在 [`scripts/package-mac-app.sh`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/package-mac-app.sh) 中更改 `BUNDLE_ID`（例如，添加 `.test` 后缀）并重新构建。这会强制 macOS 将其视为新应用。
 
 ### Gateway 网关卡在"Starting..."
 
@@ -683,13 +683,13 @@ anima channels login --verbose
 
 ## 日志位置
 
-| 日志                             | 位置                                                                                                                                                                                                                                                                                                                      |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Gateway 网关文件日志（结构化）   | `/tmp/anima/anima-YYYY-MM-DD.log`（或 `logging.file`）                                                                                                                                                                                                                                                              |
+| 日志                             | 位置                                                                                                                                                                                                                                                                                                       |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gateway 网关文件日志（结构化）   | `/tmp/anima/anima-YYYY-MM-DD.log`（或 `logging.file`）                                                                                                                                                                                                                                                     |
 | Gateway 网关服务日志（监管程序） | macOS：`$ANIMA_STATE_DIR/logs/gateway.log` + `gateway.err.log`（默认：`~/.anima/logs/...`；配置文件使用 `~/.anima-<profile>/logs/...`）<br />Linux：`journalctl --user -u anima-gateway[-<profile>].service -n 200 --no-pager`<br />Windows：`schtasks /Query /TN "Anima Gateway (<profile>)" /V /FO LIST` |
-| 会话文件                         | `$ANIMA_STATE_DIR/agents/<agentId>/sessions/`                                                                                                                                                                                                                                                                          |
-| 媒体缓存                         | `$ANIMA_STATE_DIR/media/`                                                                                                                                                                                                                                                                                              |
-| 凭证                             | `$ANIMA_STATE_DIR/credentials/`                                                                                                                                                                                                                                                                                        |
+| 会话文件                         | `$ANIMA_STATE_DIR/agents/<agentId>/sessions/`                                                                                                                                                                                                                                                              |
+| 媒体缓存                         | `$ANIMA_STATE_DIR/media/`                                                                                                                                                                                                                                                                                  |
+| 凭证                             | `$ANIMA_STATE_DIR/credentials/`                                                                                                                                                                                                                                                                            |
 
 ## 健康检查
 

@@ -123,7 +123,7 @@ Remove-Item -Force "$env:USERPROFILE\.anima\gateway.cmd"
 
 ### 普通安装（install.sh / npm / pnpm / bun）
 
-如果你使用了 `https://anima.ai/install.sh` 或 `install.ps1`，CLI 是通过 `npm install -g anima@latest` 安装的。
+如果你使用了 `https://noxsoft.net/install.sh` 或 `install.ps1`，CLI 是通过 `npm install -g anima@latest` 安装的。
 使用 `npm rm -g anima` 移除（或 `pnpm remove -g` / `bun remove -g`，如果你是用那种方式安装的）。
 
 ### 源码检出（git clone）

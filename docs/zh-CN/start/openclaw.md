@@ -45,7 +45,7 @@ npm install -g anima@latest
 从源代码（开发）：
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm ui:build # 首次运行时自动安装 UI 依赖

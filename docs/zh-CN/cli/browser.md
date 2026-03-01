@@ -63,7 +63,7 @@ anima browser --browser-profile work tabs
 
 ```bash
 anima browser tabs
-anima browser open https://docs.anima.ai
+anima browser open https://docs.noxsoft.net/anima
 anima browser focus <targetId>
 anima browser close <targetId>
 ```

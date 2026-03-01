@@ -20,7 +20,7 @@ Quick answers plus deeper troubleshooting for real-world setups (local dev, VPS,
   - [It is stuck on "wake up my friend" / onboarding will not hatch. What now?](#it-is-stuck-on-wake-up-my-friend-onboarding-will-not-hatch-what-now)
   - [Can I migrate my setup to a new machine (Mac mini) without redoing onboarding?](#can-i-migrate-my-setup-to-a-new-machine-mac-mini-without-redoing-onboarding)
   - [Where do I see what is new in the latest version?](#where-do-i-see-what-is-new-in-the-latest-version)
-  - [I can't access docs.anima.ai (SSL error). What now?](#i-cant-access-docsanimaai-ssl-error-what-now)
+  - [I can't access docs.noxsoft.net/anima (SSL error). What now?](#i-cant-access-docsanimaai-ssl-error-what-now)
   - [What's the difference between stable and beta?](#whats-the-difference-between-stable-and-beta)
   - [How do I install the beta version, and what's the difference between beta and dev?](#how-do-i-install-the-beta-version-and-whats-the-difference-between-beta-and-dev)
   - [How do I try the latest bits?](#how-do-i-try-the-latest-bits)
@@ -276,7 +276,7 @@ setup (PATH, services, permissions, auth files). Give them the **full source che
 the hackable (git) install:
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git
 ```
 
 This installs Anima **from a git checkout**, so the agent can read the code + docs and
@@ -286,9 +286,9 @@ by re-running the installer without `--install-method git`.
 Tip: ask the agent to **plan and supervise** the fix (step-by-step), then execute only the
 necessary commands. That keeps changes small and easier to audit.
 
-If you discover a real bug or fix, please file a GitHub issue or send a PR:
-[https://github.com/anima/anima/issues](https://github.com/anima/anima/issues)
-[https://github.com/anima/anima/pulls](https://github.com/anima/anima/pulls)
+If you discover a real bug or fix, please file a GitLab issue or send a merge request:
+[https://gitlab.com/sylys-group/anima/-/issues](https://gitlab.com/sylys-group/anima/-/issues)
+[https://gitlab.com/sylys-group/anima/-/merge_requests](https://gitlab.com/sylys-group/anima/-/merge_requests)
 
 Start with these commands (share outputs when asking for help):
 
@@ -315,7 +315,7 @@ Install docs: [Install](/install), [Installer flags](/install/installer), [Updat
 The repo recommends running from source and using the onboarding wizard:
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 anima onboard --install-daemon
 ```
 
@@ -324,7 +324,7 @@ The wizard can also build UI assets automatically. After onboarding, you typical
 From source (contributors/dev):
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm build
@@ -433,22 +433,22 @@ Related: [Migrating](/install/migrating), [Where things live on disk](/help/faq#
 
 ### Where do I see what is new in the latest version
 
-Check the GitHub changelog:
-[https://github.com/anima/anima/blob/main/CHANGELOG.md](https://github.com/anima/anima/blob/main/CHANGELOG.md)
+Check the GitLab changelog:
+[https://gitlab.com/sylys-group/anima/-/blob/main/CHANGELOG.md](https://gitlab.com/sylys-group/anima/-/blob/main/CHANGELOG.md)
 
 Newest entries are at the top. If the top section is marked **Unreleased**, the next dated
 section is the latest shipped version. Entries are grouped by **Highlights**, **Changes**, and
 **Fixes** (plus docs/other sections when needed).
 
-### I cant access docs.anima.ai SSL error What now
+### I cant access docs.noxsoft.net/anima SSL error What now
 
-Some Comcast/Xfinity connections incorrectly block `docs.anima.ai` via Xfinity
-Advanced Security. Disable it or allowlist `docs.anima.ai`, then retry. More
+Some Comcast/Xfinity connections incorrectly block `docs.noxsoft.net/anima` via Xfinity
+Advanced Security. Disable it or allowlist `docs.noxsoft.net/anima`, then retry. More
 detail: [Troubleshooting](/help/troubleshooting#docsanimaai-shows-an-ssl-error-comcastxfinity).
 Please help us unblock it by reporting here: [https://spa.xfinity.com/check_url_status](https://spa.xfinity.com/check_url_status).
 
-If you still can't reach the site, the docs are mirrored on GitHub:
-[https://github.com/anima/anima/tree/main/docs](https://github.com/anima/anima/tree/main/docs)
+If you still can't reach the site, the docs are mirrored on GitLab:
+[https://gitlab.com/sylys-group/anima/-/tree/main/docs](https://gitlab.com/sylys-group/anima/-/tree/main/docs)
 
 ### What's the difference between stable and beta
 
@@ -462,7 +462,7 @@ that same version to `latest`**. That's why beta and stable can point at the
 **same version**.
 
 See what changed:
-[https://github.com/anima/anima/blob/main/CHANGELOG.md](https://github.com/anima/anima/blob/main/CHANGELOG.md)
+[https://gitlab.com/sylys-group/anima/-/blob/main/CHANGELOG.md](https://gitlab.com/sylys-group/anima/-/blob/main/CHANGELOG.md)
 
 ### How do I install the beta version and whats the difference between beta and dev
 
@@ -472,15 +472,15 @@ See what changed:
 One-liners (macOS/Linux):
 
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --beta
+curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --beta
 ```
 
 ```bash
-curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --install-method git
+curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --install-method git
 ```
 
 Windows installer (PowerShell):
-[https://anima.ai/install.ps1](https://anima.ai/install.ps1)
+[https://noxsoft.net/install.ps1](https://noxsoft.net/install.ps1)
 
 More detail: [Development channels](/install/development-channels) and [Installer flags](/install/installer).
 
@@ -509,7 +509,7 @@ This switches to the `main` branch and updates from source.
 2. **Hackable install (from the installer site):**
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git
 ```
 
 That gives you a local repo you can edit, then update via git.
@@ -517,7 +517,7 @@ That gives you a local repo you can edit, then update via git.
 If you prefer a clean clone manually, use:
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm build
@@ -531,19 +531,19 @@ Docs: [Update](/cli/update), [Development channels](/install/development-channel
 Re-run the installer with **verbose output**:
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --verbose
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --verbose
 ```
 
 Beta install with verbose:
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --beta --verbose
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --beta --verbose
 ```
 
 For a hackable (git) install:
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git --verbose
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git --verbose
 ```
 
 Windows (PowerShell) equivalent:
@@ -551,7 +551,7 @@ Windows (PowerShell) equivalent:
 ```powershell
 # install.ps1 has no dedicated -Verbose flag yet.
 Set-PSDebug -Trace 1
-& ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -NoOnboard
+& ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -NoOnboard
 Set-PSDebug -Trace 0
 ```
 
@@ -587,7 +587,7 @@ Use the **hackable (git) install** so you have the full source and docs locally,
 your bot (or Claude/Codex) _from that folder_ so it can read the repo and answer precisely.
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git
+curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git
 ```
 
 More detail: [Install](/install) and [Installer flags](/install/installer).
@@ -852,7 +852,7 @@ This **does not delete your data** - it only changes the Anima code install. You
 From npm → git:
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm build
@@ -1003,7 +1003,7 @@ Advantages:
 - **Always-on Gateway** (run on a VPS, interact from anywhere)
 - **Nodes** for local browser/screen/camera/exec
 
-Showcase: [https://anima.ai/showcase](https://anima.ai/showcase)
+Showcase: [https://noxsoft.net/showcase](https://noxsoft.net/showcase)
 
 ## Skills and automation
 
@@ -1013,7 +1013,7 @@ Use managed overrides instead of editing the repo copy. Put your changes in `~/.
 
 ### Can I load skills from a custom folder
 
-Yes. Add extra directories via `skills.load.extraDirs` in `~/.anima/anima.json` (lowest precedence). Default precedence remains: `<workspace>/skills` → `~/.anima/skills` → bundled → `skills.load.extraDirs`. `animahub` installs into `./skills` by default, which Anima treats as `<workspace>/skills`.
+Yes. Add extra directories via `skills.load.extraDirs` in `~/.anima/anima.json` (lowest precedence). Default precedence remains: `<workspace>/skills` → `~/.anima/skills` → bundled → `skills.load.extraDirs`. `noxhub` installs into `./skills` by default, which Anima treats as `<workspace>/skills`.
 
 ### How can I use different models for different tasks
 
@@ -1060,17 +1060,17 @@ Docs: [Cron jobs](/automation/cron-jobs), [Cron vs Heartbeat](/automation/cron-v
 
 ### How do I install skills on Linux
 
-Use **AnimaHub** (CLI) or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
-Browse skills at [https://animahub.com](https://animahub.com).
+Use **NoxHub** (CLI) or drop skills into your workspace. The macOS Skills UI isn't available on Linux.
+Browse skills at [https://noxhub.com](https://noxhub.com).
 
-Install the AnimaHub CLI (pick one package manager):
+Install the NoxHub CLI (pick one package manager):
 
 ```bash
-npm i -g animahub
+npm i -g noxhub
 ```
 
 ```bash
-pnpm add -g animahub
+pnpm add -g noxhub
 ```
 
 ### Can Anima run tasks on a schedule or continuously in the background
@@ -1140,11 +1140,11 @@ targeting those APIs.
 Install skills:
 
 ```bash
-animahub install <skill-slug>
-animahub update --all
+noxhub install <skill-slug>
+noxhub update --all
 ```
 
-AnimaHub installs into `./skills` under your current directory (or falls back to your configured Anima workspace); Anima treats that as `<workspace>/skills` on the next session. For shared skills across agents, place them in `~/.anima/skills/<name>/SKILL.md`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills) and [AnimaHub](/tools/animahub).
+NoxHub installs into `./skills` under your current directory (or falls back to your configured Anima workspace); Anima treats that as `<workspace>/skills` on the next session. For shared skills across agents, place them in `~/.anima/skills/<name>/SKILL.md`. Some skills expect binaries installed via Homebrew; on Linux that means Linuxbrew (see the Homebrew Linux FAQ entry above). See [Skills](/tools/skills) and [NoxHub](/tools/noxhub).
 
 ### How do I install the Chrome extension for browser takeover
 
@@ -1267,9 +1267,9 @@ Related: [Agent workspace](/concepts/agent-workspace), [Memory](/concepts/memory
 
 Everything lives under `$ANIMA_STATE_DIR` (default: `~/.anima`):
 
-| Path                                                            | Purpose                                                      |
-| --------------------------------------------------------------- | ------------------------------------------------------------ |
-| `$ANIMA_STATE_DIR/anima.json`                             | Main config (JSON5)                                          |
+| Path                                                         | Purpose                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `$ANIMA_STATE_DIR/anima.json`                                | Main config (JSON5)                                          |
 | `$ANIMA_STATE_DIR/credentials/oauth.json`                    | Legacy OAuth import (copied into auth profiles on first use) |
 | `$ANIMA_STATE_DIR/agents/<agentId>/agent/auth-profiles.json` | Auth profiles (OAuth + API keys)                             |
 | `$ANIMA_STATE_DIR/agents/<agentId>/agent/auth.json`          | Runtime auth cache (managed automatically)                   |
@@ -2856,4 +2856,4 @@ You can add options like `debounce:2s cap:25 drop:summarize` for followup modes.
 
 ---
 
-Still stuck? Ask in [Discord](https://discord.com/invite/clawd) or open a [GitHub discussion](https://github.com/anima/anima/discussions).
+Still stuck? Ask in [Discord](https://discord.gg/noxsoft) or open a [GitLab discussion](https://gitlab.com/sylys-group/anima/-/issues).

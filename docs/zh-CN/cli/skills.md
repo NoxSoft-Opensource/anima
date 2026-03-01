@@ -21,7 +21,7 @@ x-i18n:
 
 - Skills 系统：[Skills](/tools/skills)
 - Skills 配置：[Skills 配置](/tools/skills-config)
-- AnimaHub 安装：[AnimaHub](/tools/animahub)
+- NoxHub 安装：[NoxHub](/tools/noxhub)
 
 ## 命令
 

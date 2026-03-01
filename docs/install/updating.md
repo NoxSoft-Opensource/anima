@@ -17,7 +17,7 @@ detects existing installs, upgrades in place, and runs `anima doctor` when
 needed.
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 Notes:
@@ -26,7 +26,7 @@ Notes:
 - For **source installs**, use:
 
   ```bash
-  curl -fsSL https://anima.ai/install.sh | bash -s -- --install-method git --no-onboard
+  curl -fsSL https://noxsoft.net/install.sh | bash -s -- --install-method git --no-onboard
   ```
 
   The installer will `git pull --rebase` **only** if the repo is clean.
@@ -135,7 +135,7 @@ anima health
 
 Notes:
 
-- `pnpm build` matters when you run the packaged `anima` binary ([`anima.mjs`](https://github.com/anima/anima/blob/main/anima.mjs)) or use Node to run `dist/`.
+- `pnpm build` matters when you run the packaged `anima` binary ([`anima.mjs`](https://gitlab.com/sylys-group/anima/-/blob/main/anima.mjs)) or use Node to run `dist/`.
 - If you run from a repo checkout without a global install, use `pnpm anima ...` for CLI commands.
 - If you run directly from TypeScript (`pnpm anima ...`), a rebuild is usually unnecessary, but **config migrations still apply** → run doctor.
 - Switching between global and git installs is easy: install the other flavor, then run `anima doctor` so the gateway service entrypoint is rewritten to the current install.
@@ -228,4 +228,4 @@ git pull
 
 - Run `anima doctor` again and read the output carefully (it often tells you the fix).
 - Check: [Troubleshooting](/gateway/troubleshooting)
-- Ask in Discord: [https://discord.gg/clawd](https://discord.gg/clawd)
+- Ask in Discord: [https://discord.gg/noxsoft](https://discord.gg/noxsoft)

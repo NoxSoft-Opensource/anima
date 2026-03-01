@@ -119,13 +119,13 @@ sudo sysctl -p
 ### 选项 A：标准安装（推荐）
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 ### 选项 B：可修改安装（用于调试）
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 npm install
 npm run build

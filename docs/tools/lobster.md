@@ -153,7 +153,7 @@ Notes:
 
 ## Install Lobster
 
-Install the Lobster CLI on the **same host** that runs the Anima Gateway (see the [Lobster repo](https://github.com/anima/lobster)), and ensure `lobster` is on `PATH`.
+Install the Lobster CLI on the **same host** that runs the Anima Gateway (see the [Lobster repo](https://gitlab.com/sylys-group/lobster)), and ensure `lobster` is on `PATH`.
 If you want to use a custom binary location, pass an **absolute** `lobsterPath` in the tool call.
 
 ## Enable the tool

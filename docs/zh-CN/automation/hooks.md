@@ -133,7 +133,7 @@ Hook 包可以附带依赖；它们将安装在 `~/.anima/hooks/<id>` 下。
 ---
 name: my-hook
 description: "Short description of what this hook does"
-homepage: https://docs.anima.ai/automation/hooks#my-hook
+homepage: https://docs.noxsoft.net/anima/automation/hooks#my-hook
 metadata:
   { "anima": { "emoji": "🔗", "events": ["command:new"], "requires": { "bins": ["node"] } } }
 ---
@@ -877,6 +877,6 @@ node -e "import('./path/to/handler.ts').then(console.log)"
 ## 另请参阅
 
 - [CLI 参考：hooks](/cli/hooks)
-- [捆绑 Hooks README](https://github.com/anima/anima/tree/main/src/hooks/bundled)
+- [捆绑 Hooks README](https://gitlab.com/sylys-group/anima/-/tree/main/src/hooks/bundled)
 - [Webhook Hooks](/automation/webhook)
 - [配置](/gateway/configuration#hooks)

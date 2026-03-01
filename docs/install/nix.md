@@ -9,7 +9,7 @@ title: "Nix"
 
 # Nix Installation
 
-The recommended way to run Anima with Nix is via **[nix-anima](https://github.com/anima/nix-anima)** — a batteries-included Home Manager module.
+The recommended way to run Anima with Nix is via **[nix-anima](https://gitlab.com/sylys-group/nix-anima)** — a batteries-included Home Manager module.
 
 ## Quick Start
 
@@ -30,7 +30,7 @@ What I need you to do:
 Reference the nix-anima README for module options.
 ```
 
-> **📦 Full guide: [github.com/anima/nix-anima](https://github.com/anima/nix-anima)**
+> **📦 Full guide: [gitlab.com/sylys-group/nix-anima](https://gitlab.com/sylys-group/nix-anima)**
 >
 > The nix-anima repo is the source of truth for Nix installation. This page is just a quick overview.
 
@@ -87,12 +87,12 @@ The macOS packaging flow expects a stable Info.plist template at:
 apps/macos/Sources/Anima/Resources/Info.plist
 ```
 
-[`scripts/package-mac-app.sh`](https://github.com/anima/anima/blob/main/scripts/package-mac-app.sh) copies this template into the app bundle and patches dynamic fields
+[`scripts/package-mac-app.sh`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/package-mac-app.sh) copies this template into the app bundle and patches dynamic fields
 (bundle ID, version/build, Git SHA, Sparkle keys). This keeps the plist deterministic for SwiftPM
 packaging and Nix builds (which do not rely on a full Xcode toolchain).
 
 ## Related
 
-- [nix-anima](https://github.com/anima/nix-anima) — full setup guide
+- [nix-anima](https://gitlab.com/sylys-group/nix-anima) — full setup guide
 - [Wizard](/start/wizard) — non-Nix CLI setup
 - [Docker](/install/docker) — containerized setup

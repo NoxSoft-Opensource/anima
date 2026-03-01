@@ -160,7 +160,7 @@ steps:
 
 ## 安装 Lobster
 
-在运行 Anima Gateway 网关的**同一主机**上安装 Lobster CLI（参见 [Lobster 仓库](https://github.com/anima/lobster)），并确保 `lobster` 在 `PATH` 中。
+在运行 Anima Gateway 网关的**同一主机**上安装 Lobster CLI（参见 [Lobster 仓库](https://gitlab.com/sylys-group/lobster)），并确保 `lobster` 在 `PATH` 中。
 如果你想使用自定义二进制位置，在工具调用中传递**绝对**路径 `lobsterPath`。
 
 ## 启用工具

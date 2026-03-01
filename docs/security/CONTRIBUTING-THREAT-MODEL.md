@@ -6,18 +6,18 @@ Thanks for helping make Anima more secure. This threat model is a living documen
 
 ### Add a Threat
 
-Spotted an attack vector or risk we haven't covered? Open an issue on [anima/trust](https://github.com/anima/trust/issues) and describe it in your own words. You don't need to know any frameworks or fill in every field - just describe the scenario.
+Spotted an attack vector or risk we haven't covered? Open an issue on [anima/trust](https://gitlab.com/sylys-group/trust/-/issues) and describe it in your own words. You don't need to know any frameworks or fill in every field - just describe the scenario.
 
 **Helpful to include (but not required):**
 
 - The attack scenario and how it could be exploited
-- Which parts of Anima are affected (CLI, gateway, channels, AnimaHub, MCP servers, etc.)
+- Which parts of Anima are affected (CLI, gateway, channels, NoxHub, MCP servers, etc.)
 - How severe you think it is (low / medium / high / critical)
 - Any links to related research, CVEs, or real-world examples
 
 We'll handle the ATLAS mapping, threat IDs, and risk assessment during review. If you want to include those details, great - but it's not expected.
 
-> **This is for adding to the threat model, not reporting live vulnerabilities.** If you've found an exploitable vulnerability, see our [Trust page](https://trust.anima.ai) for responsible disclosure instructions.
+> **This is for adding to the threat model, not reporting live vulnerabilities.** If you've found an exploitable vulnerability, see our [Trust page](https://trust.noxsoft.net) for responsible disclosure instructions.
 
 ### Suggest a Mitigation
 
@@ -81,8 +81,8 @@ If you're unsure about the risk level, just describe the impact and we'll assess
 
 ## Contact
 
-- **Security vulnerabilities:** See our [Trust page](https://trust.anima.ai) for reporting instructions
-- **Threat model questions:** Open an issue on [anima/trust](https://github.com/anima/trust/issues)
+- **Security vulnerabilities:** See our [Trust page](https://trust.noxsoft.net) for reporting instructions
+- **Threat model questions:** Open an issue on [anima/trust](https://gitlab.com/sylys-group/trust/-/issues)
 - **General chat:** Discord #security channel
 
 ## Recognition

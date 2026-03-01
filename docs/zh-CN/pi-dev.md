@@ -73,5 +73,5 @@ scripts/pi/run-tests.sh --live
 
 ## 参考资料
 
-- https://docs.anima.ai/testing
-- https://docs.anima.ai/start/getting-started
+- https://docs.noxsoft.net/anima/testing
+- https://docs.noxsoft.net/anima/start/getting-started

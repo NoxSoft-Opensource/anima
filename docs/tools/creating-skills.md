@@ -51,4 +51,4 @@ Ask your agent to "refresh skills" or restart the gateway. Anima will discover t
 
 ## Shared Skills
 
-You can also browse and contribute skills to [AnimaHub](https://animahub.com).
+You can also browse and contribute skills to [NoxHub](https://noxhub.com).

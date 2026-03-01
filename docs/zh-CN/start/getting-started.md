@@ -57,7 +57,7 @@ Windows：使用 **WSL2**（推荐 Ubuntu）。强烈推荐 WSL2；原生 Window
 ## 1) 安装 CLI（推荐）
 
 ```bash
-curl -fsSL https://anima.ai/install.sh | bash
+curl -fsSL https://noxsoft.net/install.sh | bash
 ```
 
 安装程序选项（安装方法、非交互式、从 GitHub）：[安装](/install)。
@@ -65,7 +65,7 @@ curl -fsSL https://anima.ai/install.sh | bash
 Windows (PowerShell)：
 
 ```powershell
-iwr -useb https://anima.ai/install.ps1 | iex
+iwr -useb https://noxsoft.net/install.ps1 | iex
 ```
 
 替代方案（全局安装）：
@@ -169,7 +169,7 @@ anima pairing approve whatsapp <code>
 如果你正在开发 Anima 本身，从源代码运行：
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm ui:build # 首次运行时自动安装 UI 依赖

@@ -17,7 +17,7 @@ title: "Tests"
 
 ## Model latency bench (local keys)
 
-Script: [`scripts/bench-model.ts`](https://github.com/anima/anima/blob/main/scripts/bench-model.ts)
+Script: [`scripts/bench-model.ts`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/bench-model.ts)
 
 Usage:
 

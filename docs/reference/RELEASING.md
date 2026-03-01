@@ -23,17 +23,17 @@ When the operator says “release”, immediately do this preflight (no extra qu
 
 - [ ] Bump `package.json` version (e.g., `2026.1.29`).
 - [ ] Run `pnpm plugins:sync` to align extension package versions + changelogs.
-- [ ] Update CLI/version strings: [`src/cli/program.ts`](https://github.com/anima/anima/blob/main/src/cli/program.ts) and the Baileys user agent in [`src/provider-web.ts`](https://github.com/anima/anima/blob/main/src/provider-web.ts).
-- [ ] Confirm package metadata (name, description, repository, keywords, license) and `bin` map points to [`anima.mjs`](https://github.com/anima/anima/blob/main/anima.mjs) for `anima`.
+- [ ] Update CLI/version strings: [`src/cli/program.ts`](https://gitlab.com/sylys-group/anima/-/blob/main/src/cli/program.ts) and the Baileys user agent in [`src/provider-web.ts`](https://gitlab.com/sylys-group/anima/-/blob/main/src/provider-web.ts).
+- [ ] Confirm package metadata (name, description, repository, keywords, license) and `bin` map points to [`anima.mjs`](https://gitlab.com/sylys-group/anima/-/blob/main/anima.mjs) for `anima`.
 - [ ] If dependencies changed, run `pnpm install` so `pnpm-lock.yaml` is current.
 
 2. **Build & artifacts**
 
-- [ ] If A2UI inputs changed, run `pnpm canvas:a2ui:bundle` and commit any updated [`src/canvas-host/a2ui/a2ui.bundle.js`](https://github.com/anima/anima/blob/main/src/canvas-host/a2ui/a2ui.bundle.js).
+- [ ] If A2UI inputs changed, run `pnpm canvas:a2ui:bundle` and commit any updated [`src/canvas-host/a2ui/a2ui.bundle.js`](https://gitlab.com/sylys-group/anima/-/blob/main/src/canvas-host/a2ui/a2ui.bundle.js).
 - [ ] `pnpm run build` (regenerates `dist/`).
 - [ ] Verify npm package `files` includes all required `dist/*` folders (notably `dist/node-host/**` and `dist/acp/**` for headless node + ACP CLI).
 - [ ] Confirm `dist/build-info.json` exists and includes the expected `commit` hash (CLI banner uses this for npm installs).
-- [ ] Optional: `npm pack --pack-destination /tmp` after the build; inspect the tarball contents and keep it handy for the GitHub release (do **not** commit it).
+- [ ] Optional: `npm pack --pack-destination /tmp` after the build; inspect the tarball contents and keep it handy for the GitLab release (do **not** commit it).
 
 3. **Changelog & docs**
 
@@ -49,7 +49,7 @@ When the operator says “release”, immediately do this preflight (no extra qu
 - [ ] `ANIMA_INSTALL_SMOKE_SKIP_NONROOT=1 pnpm test:install:smoke` (Docker install smoke test, fast path; required before release)
   - If the immediate previous npm release is known broken, set `ANIMA_INSTALL_SMOKE_PREVIOUS=<last-good-version>` or `ANIMA_INSTALL_SMOKE_SKIP_PREVIOUS=1` for the preinstall step.
 - [ ] (Optional) Full installer smoke (adds non-root + CLI coverage): `pnpm test:install:smoke`
-- [ ] (Optional) Installer E2E (Docker, runs `curl -fsSL https://anima.ai/install.sh | bash`, onboards, then runs real tool calls):
+- [ ] (Optional) Installer E2E (Docker, runs `curl -fsSL https://noxsoft.net/install.sh | bash`, onboards, then runs real tool calls):
   - `pnpm test:install:e2e:openai` (requires `OPENAI_API_KEY`)
   - `pnpm test:install:e2e:anthropic` (requires `ANTHROPIC_API_KEY`)
   - `pnpm test:install:e2e` (requires both keys; runs both providers)
@@ -58,8 +58,8 @@ When the operator says “release”, immediately do this preflight (no extra qu
 5. **macOS app (Sparkle)**
 
 - [ ] Build + sign the macOS app, then zip it for distribution.
-- [ ] Generate the Sparkle appcast (HTML notes via [`scripts/make_appcast.sh`](https://github.com/anima/anima/blob/main/scripts/make_appcast.sh)) and update `appcast.xml`.
-- [ ] Keep the app zip (and optional dSYM zip) ready to attach to the GitHub release.
+- [ ] Generate the Sparkle appcast (HTML notes via [`scripts/make_appcast.sh`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/make_appcast.sh)) and update `appcast.xml`.
+- [ ] Keep the app zip (and optional dSYM zip) ready to attach to the GitLab release.
 - [ ] Follow [macOS release](/platforms/mac/release) for the exact commands and required env vars.
   - `APP_BUILD` must be numeric + monotonic (no `-beta`) so Sparkle compares versions correctly.
   - If notarizing, use the `anima-notary` keychain profile created from App Store Connect API env vars (see [macOS release](/platforms/mac/release)).
@@ -78,13 +78,13 @@ When the operator says “release”, immediately do this preflight (no extra qu
   - `NPM_CONFIG_AUTH_TYPE=legacy npm dist-tag add anima@X.Y.Z latest`
 - **`npx` verification fails with `ECOMPROMISED: Lock compromised`**: retry with a fresh cache:
   - `NPM_CONFIG_CACHE=/tmp/npm-cache-$(date +%s) npx -y anima@X.Y.Z --version`
-- **Tag needs repointing after a late fix**: force-update and push the tag, then ensure the GitHub release assets still match:
+- **Tag needs repointing after a late fix**: force-update and push the tag, then ensure the GitLab release assets still match:
   - `git tag -f vX.Y.Z && git push -f origin vX.Y.Z`
 
-7. **GitHub release + appcast**
+7. **GitLab release + appcast**
 
 - [ ] Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z` (or `git push --tags`).
-- [ ] Create/refresh the GitHub release for `vX.Y.Z` with **title `anima X.Y.Z`** (not just the tag); body should include the **full** changelog section for that version (Highlights + Changes + Fixes), inline (no bare links), and **must not repeat the title inside the body**.
+- [ ] Create/refresh the GitLab release for `vX.Y.Z` with **title `anima X.Y.Z`** (not just the tag); body should include the **full** changelog section for that version (Highlights + Changes + Fixes), inline (no bare links), and **must not repeat the title inside the body**.
 - [ ] Attach artifacts: `npm pack` tarball (optional), `Anima-X.Y.Z.zip`, and `Anima-X.Y.Z.dSYM.zip` (if generated).
 - [ ] Commit the updated `appcast.xml` and push it (Sparkle feeds from main).
 - [ ] From a clean temp directory (no `package.json`), run `npx -y anima@X.Y.Z send --help` to confirm install/CLI entrypoints work.

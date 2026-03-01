@@ -90,7 +90,7 @@ Details:
   Source: anima-bundled
   Path: /path/to/anima/hooks/bundled/session-memory/HOOK.md
   Handler: /path/to/anima/hooks/bundled/session-memory/handler.ts
-  Homepage: https://docs.anima.ai/automation/hooks#session-memory
+  Homepage: https://docs.noxsoft.net/anima/automation/hooks#session-memory
   Events: command:new
 
 Requirements:

@@ -37,12 +37,12 @@ x-i18n:
     <Tabs>
       <Tab title="macOS/Linux">
         ```bash
-        curl -fsSL https://anima.ai/install.sh | bash
+        curl -fsSL https://noxsoft.net/install.sh | bash
         ```
       </Tab>
       <Tab title="Windows (PowerShell)">
         ```powershell
-        iwr -useb https://anima.ai/install.ps1 | iex
+        iwr -useb https://noxsoft.net/install.ps1 | iex
         ```
       </Tab>
     </Tabs>

@@ -116,7 +116,7 @@ If you used a profile, delete the matching task name and `~\.anima-<profile>\gat
 
 ### Normal install (install.sh / npm / pnpm / bun)
 
-If you used `https://anima.ai/install.sh` or `install.ps1`, the CLI was installed with `npm install -g anima@latest`.
+If you used `https://noxsoft.net/install.sh` or `install.ps1`, the CLI was installed with `npm install -g anima@latest`.
 Remove it with `npm rm -g anima` (or `pnpm remove -g` / `bun remove -g` if you installed that way).
 
 ### Source checkout (git clone)

@@ -23,7 +23,7 @@ x-i18n:
 
 ## 模型延迟基准测试（本地密钥）
 
-脚本：[`scripts/bench-model.ts`](https://github.com/anima/anima/blob/main/scripts/bench-model.ts)
+脚本：[`scripts/bench-model.ts`](https://gitlab.com/sylys-group/anima/-/blob/main/scripts/bench-model.ts)
 
 用法：
 

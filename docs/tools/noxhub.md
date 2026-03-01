@@ -1,19 +1,19 @@
 ---
-summary: "AnimaHub guide: public skills registry + CLI workflows"
+summary: "NoxHub guide: public skills registry + CLI workflows"
 read_when:
-  - Introducing AnimaHub to new users
+  - Introducing NoxHub to new users
   - Installing, searching, or publishing skills
-  - Explaining AnimaHub CLI flags and sync behavior
-title: "AnimaHub"
+  - Explaining NoxHub CLI flags and sync behavior
+title: "NoxHub"
 ---
 
-# AnimaHub
+# NoxHub
 
-AnimaHub is the **public skill registry for Anima**. It is a free service: all skills are public, open, and visible to everyone for sharing and reuse. A skill is just a folder with a `SKILL.md` file (plus supporting text files). You can browse skills in the web app or use the CLI to search, install, update, and publish skills.
+NoxHub is the **public skill registry for Anima**. It is a free service: all skills are public, open, and visible to everyone for sharing and reuse. A skill is just a folder with a `SKILL.md` file (plus supporting text files). You can browse skills in the web app or use the CLI to search, install, update, and publish skills.
 
-Site: [animahub.ai](https://animahub.ai)
+Site: [noxhub.noxsoft.net](https://noxhub.noxsoft.net)
 
-## What AnimaHub is
+## What NoxHub is
 
 - A public registry for Anima skills.
 - A versioned store of skill bundles and metadata.
@@ -22,7 +22,7 @@ Site: [animahub.ai](https://animahub.ai)
 ## How it works
 
 1. A user publishes a skill bundle (files + metadata).
-2. AnimaHub stores the bundle, parses metadata, and assigns a version.
+2. NoxHub stores the bundle, parses metadata, and assigns a version.
 3. The registry indexes the skill for search and discovery.
 4. Users browse, download, and install skills in Anima.
 
@@ -36,7 +36,7 @@ Site: [animahub.ai](https://animahub.ai)
 
 ## Who this is for (beginner-friendly)
 
-If you want to add new capabilities to your Anima agent, AnimaHub is the easiest way to find and install skills. You do not need to know how the backend works. You can:
+If you want to add new capabilities to your Anima agent, NoxHub is the easiest way to find and install skills. You do not need to know how the backend works. You can:
 
 - Search for skills by plain language.
 - Install a skill into your workspace.
@@ -47,9 +47,9 @@ If you want to add new capabilities to your Anima agent, AnimaHub is the easiest
 
 1. Install the CLI (see next section).
 2. Search for something you need:
-   - `animahub search "calendar"`
+   - `noxhub search "calendar"`
 3. Install a skill:
-   - `animahub install <skill-slug>`
+   - `noxhub install <skill-slug>`
 4. Start a new Anima session so it picks up the new skill.
 
 ## Install the CLI
@@ -57,16 +57,16 @@ If you want to add new capabilities to your Anima agent, AnimaHub is the easiest
 Pick one:
 
 ```bash
-npm i -g animahub
+npm i -g noxhub
 ```
 
 ```bash
-pnpm add -g animahub
+pnpm add -g noxhub
 ```
 
 ## How it fits into Anima
 
-By default, the CLI installs skills into `./skills` under your current working directory. If a Anima workspace is configured, `animahub` falls back to that workspace unless you override `--workdir` (or `ANIMAHUB_WORKDIR`). Anima loads workspace skills from `<workspace>/skills` and will pick them up in the **next** session. If you already use `~/.anima/skills` or bundled skills, workspace skills take precedence.
+By default, the CLI installs skills into `./skills` under your current working directory. If a Anima workspace is configured, `noxhub` falls back to that workspace unless you override `--workdir` (or `NOXHUB_WORKDIR`). Anima loads workspace skills from `<workspace>/skills` and will pick them up in the **next** session. If you already use `~/.anima/skills` or bundled skills, workspace skills take precedence.
 
 For more detail on how skills are loaded, shared, and gated, see
 [Skills](/tools/skills).
@@ -83,7 +83,7 @@ A typical skill includes:
 - Optional configs, scripts, or supporting files used by the skill.
 - Metadata such as tags, summary, and install requirements.
 
-AnimaHub uses metadata to power discovery and safely expose skill capabilities.
+NoxHub uses metadata to power discovery and safely expose skill capabilities.
 The registry also tracks usage signals (such as stars and downloads) to improve
 ranking and visibility.
 
@@ -99,7 +99,7 @@ ranking and visibility.
 
 ## Security and moderation
 
-AnimaHub is open by default. Anyone can upload skills, but a GitHub account must
+NoxHub is open by default. Anyone can upload skills, but a GitLab account must
 be at least one week old to publish. This helps slow down abuse without blocking
 legitimate contributors.
 
@@ -128,9 +128,9 @@ Global options (apply to all commands):
 
 Auth:
 
-- `animahub login` (browser flow) or `animahub login --token <token>`
-- `animahub logout`
-- `animahub whoami`
+- `noxhub login` (browser flow) or `noxhub login --token <token>`
+- `noxhub logout`
+- `noxhub whoami`
 
 Options:
 
@@ -140,29 +140,29 @@ Options:
 
 Search:
 
-- `animahub search "query"`
+- `noxhub search "query"`
 - `--limit <n>`: Max results.
 
 Install:
 
-- `animahub install <slug>`
+- `noxhub install <slug>`
 - `--version <version>`: Install a specific version.
 - `--force`: Overwrite if the folder already exists.
 
 Update:
 
-- `animahub update <slug>`
-- `animahub update --all`
+- `noxhub update <slug>`
+- `noxhub update --all`
 - `--version <version>`: Update to a specific version (single slug only).
 - `--force`: Overwrite when local files do not match any published version.
 
 List:
 
-- `animahub list` (reads `.animahub/lock.json`)
+- `noxhub list` (reads `.noxhub/lock.json`)
 
 Publish:
 
-- `animahub publish <path>`
+- `noxhub publish <path>`
 - `--slug <slug>`: Skill slug.
 - `--name <name>`: Display name.
 - `--version <version>`: Semver version.
@@ -171,12 +171,12 @@ Publish:
 
 Delete/undelete (owner/admin only):
 
-- `animahub delete <slug> --yes`
-- `animahub undelete <slug> --yes`
+- `noxhub delete <slug> --yes`
+- `noxhub undelete <slug> --yes`
 
 Sync (scan local skills + publish new/updated):
 
-- `animahub sync`
+- `noxhub sync`
 - `--root <dir...>`: Extra scan roots.
 - `--all`: Upload everything without prompts.
 - `--dry-run`: Show what would be uploaded.
@@ -190,19 +190,19 @@ Sync (scan local skills + publish new/updated):
 ### Search for skills
 
 ```bash
-animahub search "postgres backups"
+noxhub search "postgres backups"
 ```
 
 ### Download new skills
 
 ```bash
-animahub install my-skill-pack
+noxhub install my-skill-pack
 ```
 
 ### Update installed skills
 
 ```bash
-animahub update --all
+noxhub update --all
 ```
 
 ### Back up your skills (publish or sync)
@@ -210,13 +210,13 @@ animahub update --all
 For a single skill folder:
 
 ```bash
-animahub publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
+noxhub publish ./my-skill --slug my-skill --name "My Skill" --version 1.0.0 --tags latest
 ```
 
 To scan and back up many skills at once:
 
 ```bash
-animahub sync --all
+noxhub sync --all
 ```
 
 ## Advanced details (technical)
@@ -233,25 +233,25 @@ Updates compare the local skill contents to registry versions using a content ha
 
 ### Sync scanning and fallback roots
 
-`animahub sync` scans your current workdir first. If no skills are found, it falls back to known legacy locations (for example `~/anima/skills` and `~/.anima/skills`). This is designed to find older skill installs without extra flags.
+`noxhub sync` scans your current workdir first. If no skills are found, it falls back to known legacy locations (for example `~/anima/skills` and `~/.anima/skills`). This is designed to find older skill installs without extra flags.
 
 ### Storage and lockfile
 
-- Installed skills are recorded in `.animahub/lock.json` under your workdir.
-- Auth tokens are stored in the AnimaHub CLI config file (override via `ANIMAHUB_CONFIG_PATH`).
+- Installed skills are recorded in `.noxhub/lock.json` under your workdir.
+- Auth tokens are stored in the NoxHub CLI config file (override via `NOXHUB_CONFIG_PATH`).
 
 ### Telemetry (install counts)
 
-When you run `animahub sync` while logged in, the CLI sends a minimal snapshot to compute install counts. You can disable this entirely:
+When you run `noxhub sync` while logged in, the CLI sends a minimal snapshot to compute install counts. You can disable this entirely:
 
 ```bash
-export ANIMAHUB_DISABLE_TELEMETRY=1
+export NOXHUB_DISABLE_TELEMETRY=1
 ```
 
 ## Environment variables
 
-- `ANIMAHUB_SITE`: Override the site URL.
-- `ANIMAHUB_REGISTRY`: Override the registry API URL.
-- `ANIMAHUB_CONFIG_PATH`: Override where the CLI stores the token/config.
-- `ANIMAHUB_WORKDIR`: Override the default workdir.
-- `ANIMAHUB_DISABLE_TELEMETRY=1`: Disable telemetry on `sync`.
+- `NOXHUB_SITE`: Override the site URL.
+- `NOXHUB_REGISTRY`: Override the registry API URL.
+- `NOXHUB_CONFIG_PATH`: Override where the CLI stores the token/config.
+- `NOXHUB_WORKDIR`: Override the default workdir.
+- `NOXHUB_DISABLE_TELEMETRY=1`: Disable telemetry on `sync`.

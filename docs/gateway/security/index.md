@@ -834,7 +834,7 @@ flowchart TB
 
 Found a vulnerability in Anima? Please report responsibly:
 
-1. Email: [security@anima.ai](mailto:security@anima.ai)
+1. Email: [security@noxsoft.net](mailto:security@noxsoft.net)
 2. Don't post publicly until fixed
 3. We'll credit you (unless you prefer anonymity)
 

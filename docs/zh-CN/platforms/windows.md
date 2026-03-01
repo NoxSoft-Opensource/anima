@@ -141,7 +141,7 @@ systemctl --user status
 在 WSL 内按照 Linux 入门指南流程：
 
 ```bash
-git clone https://github.com/anima/anima.git
+git clone https://gitlab.com/sylys-group/anima.git
 cd anima
 pnpm install
 pnpm ui:build # auto-installs UI deps on first run

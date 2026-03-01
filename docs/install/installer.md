@@ -1,7 +1,7 @@
 ---
 summary: "How the installer scripts work (install.sh, install-cli.sh, install.ps1), flags, and automation"
 read_when:
-  - You want to understand `anima.ai/install.sh`
+  - You want to understand `noxsoft.net/install.sh`
   - You want to automate installs (CI / headless)
   - You want to install from a GitHub checkout
 title: "Installer Internals"
@@ -9,12 +9,12 @@ title: "Installer Internals"
 
 # Installer internals
 
-Anima ships three installer scripts, served from `anima.ai`.
+Anima ships three installer scripts, served from `noxsoft.net`.
 
-| Script                             | Platform             | What it does                                                                                 |
-| ---------------------------------- | -------------------- | -------------------------------------------------------------------------------------------- |
+| Script                             | Platform             | What it does                                                                              |
+| ---------------------------------- | -------------------- | ----------------------------------------------------------------------------------------- |
 | [`install.sh`](#installsh)         | macOS / Linux / WSL  | Installs Node if needed, installs Anima via npm (default) or git, and can run onboarding. |
-| [`install-cli.sh`](#install-clish) | macOS / Linux / WSL  | Installs Node + Anima into a local prefix (`~/.anima`). No root required.              |
+| [`install-cli.sh`](#install-clish) | macOS / Linux / WSL  | Installs Node + Anima into a local prefix (`~/.anima`). No root required.                 |
 | [`install.ps1`](#installps1)       | Windows (PowerShell) | Installs Node if needed, installs Anima via npm (default) or git, and can run onboarding. |
 
 ## Quick commands
@@ -22,31 +22,31 @@ Anima ships three installer scripts, served from `anima.ai`.
 <Tabs>
   <Tab title="install.sh">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash
     ```
 
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --help
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --help
     ```
 
   </Tab>
   <Tab title="install-cli.sh">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash
     ```
 
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash -s -- --help
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash -s -- --help
     ```
 
   </Tab>
   <Tab title="install.ps1">
     ```powershell
-    iwr -useb https://anima.ai/install.ps1 | iex
+    iwr -useb https://noxsoft.net/install.ps1 | iex
     ```
 
     ```powershell
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -Tag beta -NoOnboard -DryRun
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -Tag beta -NoOnboard -DryRun
     ```
 
   </Tab>
@@ -103,22 +103,22 @@ The script exits with code `2` for invalid method selection or invalid `--instal
 <Tabs>
   <Tab title="Default">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash
     ```
   </Tab>
   <Tab title="Skip onboarding">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --no-onboard
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --no-onboard
     ```
   </Tab>
   <Tab title="Git install">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --install-method git
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --install-method git
     ```
   </Tab>
   <Tab title="Dry run">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --dry-run
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --dry-run
     ```
   </Tab>
 </Tabs>
@@ -126,28 +126,28 @@ The script exits with code `2` for invalid method selection or invalid `--instal
 <AccordionGroup>
   <Accordion title="Flags reference">
 
-| Flag                            | Description                                                |
-| ------------------------------- | ---------------------------------------------------------- |
-| `--install-method npm\|git`     | Choose install method (default: `npm`). Alias: `--method`  |
-| `--npm`                         | Shortcut for npm method                                    |
-| `--git`                         | Shortcut for git method. Alias: `--github`                 |
-| `--version <version\|dist-tag>` | npm version or dist-tag (default: `latest`)                |
-| `--beta`                        | Use beta dist-tag if available, else fallback to `latest`  |
-| `--git-dir <path>`              | Checkout directory (default: `~/anima`). Alias: `--dir` |
-| `--no-git-update`               | Skip `git pull` for existing checkout                      |
-| `--no-prompt`                   | Disable prompts                                            |
-| `--no-onboard`                  | Skip onboarding                                            |
-| `--onboard`                     | Enable onboarding                                          |
-| `--dry-run`                     | Print actions without applying changes                     |
-| `--verbose`                     | Enable debug output (`set -x`, npm notice-level logs)      |
-| `--help`                        | Show usage (`-h`)                                          |
+| Flag                            | Description                                               |
+| ------------------------------- | --------------------------------------------------------- |
+| `--install-method npm\|git`     | Choose install method (default: `npm`). Alias: `--method` |
+| `--npm`                         | Shortcut for npm method                                   |
+| `--git`                         | Shortcut for git method. Alias: `--github`                |
+| `--version <version\|dist-tag>` | npm version or dist-tag (default: `latest`)               |
+| `--beta`                        | Use beta dist-tag if available, else fallback to `latest` |
+| `--git-dir <path>`              | Checkout directory (default: `~/anima`). Alias: `--dir`   |
+| `--no-git-update`               | Skip `git pull` for existing checkout                     |
+| `--no-prompt`                   | Disable prompts                                           |
+| `--no-onboard`                  | Skip onboarding                                           |
+| `--onboard`                     | Enable onboarding                                         |
+| `--dry-run`                     | Print actions without applying changes                    |
+| `--verbose`                     | Enable debug output (`set -x`, npm notice-level logs)     |
+| `--help`                        | Show usage (`-h`)                                         |
 
   </Accordion>
 
   <Accordion title="Environment variables reference">
 
-| Variable                                    | Description                                   |
-| ------------------------------------------- | --------------------------------------------- |
+| Variable                                 | Description                                   |
+| ---------------------------------------- | --------------------------------------------- |
 | `ANIMA_INSTALL_METHOD=git\|npm`          | Install method                                |
 | `ANIMA_VERSION=latest\|next\|<semver>`   | npm version or dist-tag                       |
 | `ANIMA_BETA=0\|1`                        | Use beta if available                         |
@@ -158,7 +158,7 @@ The script exits with code `2` for invalid method selection or invalid `--instal
 | `ANIMA_DRY_RUN=1`                        | Dry run mode                                  |
 | `ANIMA_VERBOSE=1`                        | Debug mode                                    |
 | `ANIMA_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                 |
-| `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`) |
+| `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`       | Control sharp/libvips behavior (default: `1`) |
 
   </Accordion>
 </AccordionGroup>
@@ -190,22 +190,22 @@ Designed for environments where you want everything under a local prefix (defaul
 <Tabs>
   <Tab title="Default">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash
     ```
   </Tab>
   <Tab title="Custom prefix + version">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash -s -- --prefix /opt/anima --version latest
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash -s -- --prefix /opt/anima --version latest
     ```
   </Tab>
   <Tab title="Automation JSON output">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash -s -- --json --prefix /opt/anima
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash -s -- --json --prefix /opt/anima
     ```
   </Tab>
   <Tab title="Run onboarding">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash -s -- --onboard
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash -s -- --onboard
     ```
   </Tab>
 </Tabs>
@@ -215,11 +215,11 @@ Designed for environments where you want everything under a local prefix (defaul
 
 | Flag                   | Description                                                                     |
 | ---------------------- | ------------------------------------------------------------------------------- |
-| `--prefix <path>`      | Install prefix (default: `~/.anima`)                                         |
-| `--version <ver>`      | Anima version or dist-tag (default: `latest`)                                |
+| `--prefix <path>`      | Install prefix (default: `~/.anima`)                                            |
+| `--version <ver>`      | Anima version or dist-tag (default: `latest`)                                   |
 | `--node-version <ver>` | Node version (default: `22.22.0`)                                               |
 | `--json`               | Emit NDJSON events                                                              |
-| `--onboard`            | Run `anima onboard` after install                                            |
+| `--onboard`            | Run `anima onboard` after install                                               |
 | `--no-onboard`         | Skip onboarding (default)                                                       |
 | `--set-npm-prefix`     | On Linux, force npm prefix to `~/.npm-global` if current prefix is not writable |
 | `--help`               | Show usage (`-h`)                                                               |
@@ -228,15 +228,15 @@ Designed for environments where you want everything under a local prefix (defaul
 
   <Accordion title="Environment variables reference">
 
-| Variable                                    | Description                                                                       |
-| ------------------------------------------- | --------------------------------------------------------------------------------- |
+| Variable                                 | Description                                                                       |
+| ---------------------------------------- | --------------------------------------------------------------------------------- |
 | `ANIMA_PREFIX=<path>`                    | Install prefix                                                                    |
-| `ANIMA_VERSION=<ver>`                    | Anima version or dist-tag                                                      |
+| `ANIMA_VERSION=<ver>`                    | Anima version or dist-tag                                                         |
 | `ANIMA_NODE_VERSION=<ver>`               | Node version                                                                      |
 | `ANIMA_NO_ONBOARD=1`                     | Skip onboarding                                                                   |
 | `ANIMA_NPM_LOGLEVEL=error\|warn\|notice` | npm log level                                                                     |
 | `ANIMA_GIT_DIR=<path>`                   | Legacy cleanup lookup path (used when removing old `Peekaboo` submodule checkout) |
-| `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`          | Control sharp/libvips behavior (default: `1`)                                     |
+| `SHARP_IGNORE_GLOBAL_LIBVIPS=0\|1`       | Control sharp/libvips behavior (default: `1`)                                     |
 
   </Accordion>
 </AccordionGroup>
@@ -268,29 +268,29 @@ Designed for environments where you want everything under a local prefix (defaul
 <Tabs>
   <Tab title="Default">
     ```powershell
-    iwr -useb https://anima.ai/install.ps1 | iex
+    iwr -useb https://noxsoft.net/install.ps1 | iex
     ```
   </Tab>
   <Tab title="Git install">
     ```powershell
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -InstallMethod git
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -InstallMethod git
     ```
   </Tab>
   <Tab title="Custom git directory">
     ```powershell
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -InstallMethod git -GitDir "C:\anima"
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -InstallMethod git -GitDir "C:\anima"
     ```
   </Tab>
   <Tab title="Dry run">
     ```powershell
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -DryRun
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -DryRun
     ```
   </Tab>
   <Tab title="Debug trace">
     ```powershell
     # install.ps1 has no dedicated -Verbose flag yet.
     Set-PSDebug -Trace 1
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -NoOnboard
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -NoOnboard
     Set-PSDebug -Trace 0
     ```
   </Tab>
@@ -299,21 +299,21 @@ Designed for environments where you want everything under a local prefix (defaul
 <AccordionGroup>
   <Accordion title="Flags reference">
 
-| Flag                      | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `-InstallMethod npm\|git` | Install method (default: `npm`)                        |
-| `-Tag <tag>`              | npm dist-tag (default: `latest`)                       |
+| Flag                      | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| `-InstallMethod npm\|git` | Install method (default: `npm`)                     |
+| `-Tag <tag>`              | npm dist-tag (default: `latest`)                    |
 | `-GitDir <path>`          | Checkout directory (default: `%USERPROFILE%\anima`) |
-| `-NoOnboard`              | Skip onboarding                                        |
-| `-NoGitUpdate`            | Skip `git pull`                                        |
-| `-DryRun`                 | Print actions only                                     |
+| `-NoOnboard`              | Skip onboarding                                     |
+| `-NoGitUpdate`            | Skip `git pull`                                     |
+| `-DryRun`                 | Print actions only                                  |
 
   </Accordion>
 
   <Accordion title="Environment variables reference">
 
-| Variable                           | Description        |
-| ---------------------------------- | ------------------ |
+| Variable                        | Description        |
+| ------------------------------- | ------------------ |
 | `ANIMA_INSTALL_METHOD=git\|npm` | Install method     |
 | `ANIMA_GIT_DIR=<path>`          | Checkout directory |
 | `ANIMA_NO_ONBOARD=1`            | Skip onboarding    |
@@ -336,23 +336,23 @@ Use non-interactive flags/env vars for predictable runs.
 <Tabs>
   <Tab title="install.sh (non-interactive npm)">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash -s -- --no-prompt --no-onboard
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash -s -- --no-prompt --no-onboard
     ```
   </Tab>
   <Tab title="install.sh (non-interactive git)">
     ```bash
     ANIMA_INSTALL_METHOD=git ANIMA_NO_PROMPT=1 \
-      curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash
+      curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash
     ```
   </Tab>
   <Tab title="install-cli.sh (JSON)">
     ```bash
-    curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install-cli.sh | bash -s -- --json --prefix /opt/anima
+    curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install-cli.sh | bash -s -- --json --prefix /opt/anima
     ```
   </Tab>
   <Tab title="install.ps1 (skip onboarding)">
     ```powershell
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -NoOnboard
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -NoOnboard
     ```
   </Tab>
 </Tabs>
@@ -374,7 +374,7 @@ Use non-interactive flags/env vars for predictable runs.
     The scripts default `SHARP_IGNORE_GLOBAL_LIBVIPS=1` to avoid sharp building against system libvips. To override:
 
     ```bash
-    SHARP_IGNORE_GLOBAL_LIBVIPS=0 curl -fsSL --proto '=https' --tlsv1.2 https://anima.ai/install.sh | bash
+    SHARP_IGNORE_GLOBAL_LIBVIPS=0 curl -fsSL --proto '=https' --tlsv1.2 https://noxsoft.net/install.sh | bash
     ```
 
   </Accordion>
@@ -393,7 +393,7 @@ Use non-interactive flags/env vars for predictable runs.
 
     ```powershell
     Set-PSDebug -Trace 1
-    & ([scriptblock]::Create((iwr -useb https://anima.ai/install.ps1))) -NoOnboard
+    & ([scriptblock]::Create((iwr -useb https://noxsoft.net/install.ps1))) -NoOnboard
     Set-PSDebug -Trace 0
     ```
 

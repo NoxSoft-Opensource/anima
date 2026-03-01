@@ -116,10 +116,10 @@ Moltbot never quite rolled off the tongue. And so, at 4am GMT, the team gathered
 
 In just 3 hours:
 
-- GitHub renamed: `github.com/anima/anima` ✅
+- GitLab repo: `gitlab.com/sylys-group/anima` ✅
 - X handle `@anima` secured with GOLD CHECKMARK 💰
 - npm packages released under new name
-- Docs migrated to `docs.anima.ai`
+- Docs migrated to `docs.noxsoft.net/anima`
 - 200K+ views on announcement in 90 minutes
 
 **The Heroes:**
