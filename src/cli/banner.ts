@@ -72,7 +72,7 @@ const ANIMA_ASCII = [
   "  █   █ █   █▄ █  █  █  █ █   █   █        ",
   "  █   █ █    ██▀ ▄█▄ █  █ █   █   █        ",
   "                                            ",
-  "          ╌╌ by NoxSoft ╌╌                  ",
+  "       ╌╌ AI life system ╌╌                 ",
   "                                            ",
 ];
 
@@ -96,13 +96,8 @@ export function formatCliBannerArt(options: BannerOptions = {}): string {
   };
 
   const colored = ANIMA_ASCII.map((line) => {
-    if (line.includes("NoxSoft")) {
-      return (
-        theme.muted("          ╌╌ ") +
-        theme.info("by ") +
-        theme.accent("NoxSoft") +
-        theme.muted(" ╌╌")
-      );
+    if (line.includes("AI life system")) {
+      return theme.muted("       ╌╌ ") + theme.accent("AI life system") + theme.muted(" ╌╌");
     }
     if (line.includes("ANIMA") && !line.includes("█")) {
       return theme.heading(line);

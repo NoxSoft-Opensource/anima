@@ -27,6 +27,8 @@ export {
 export type MessagingToolSend = {
   to: string;
   text: string;
+  provider?: string;
+  accountId?: string;
 };
 
 export function applyExtraParamsToAgent(): void {

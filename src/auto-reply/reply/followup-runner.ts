@@ -171,7 +171,7 @@ export function createFollowupRunner(params: {
               timeoutMs: queued.run.timeoutMs,
               runId,
               blockReplyBreak: queued.run.blockReplyBreak,
-              onAgentEvent: (evt) => {
+              onAgentEvent: (evt: { stream: string; data: Record<string, unknown> }) => {
                 if (evt.stream !== "compaction") {
                   return;
                 }

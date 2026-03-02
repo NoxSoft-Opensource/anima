@@ -1,6 +1,6 @@
 # Contributing to ANIMA
 
-ANIMA is NoxSoft's AI orchestration daemon.
+ANIMA is NoxSoft's AI life system.
 
 ## Quick Links
 

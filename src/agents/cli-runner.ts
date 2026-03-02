@@ -289,6 +289,7 @@ export async function runCliAgent(params: {
     const payloads = text ? [{ text }] : undefined;
 
     return {
+      status: "completed" as const,
       payloads,
       meta: {
         durationMs: Date.now() - started,

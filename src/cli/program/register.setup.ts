@@ -22,26 +22,14 @@ export function registerSetupCommand(program: Command) {
     )
     .option("--wizard", "Run the interactive onboarding wizard", false)
     .option("--non-interactive", "Run the wizard without prompts", false)
-    .option("--mode <mode>", "Wizard mode: local|remote")
-    .option("--remote-url <url>", "Remote Gateway WebSocket URL")
-    .option("--remote-token <token>", "Remote Gateway token (optional)")
     .action(async (opts, command) => {
       await runCommandWithRuntime(defaultRuntime, async () => {
-        const hasWizardFlags = hasExplicitOptions(command, [
-          "wizard",
-          "nonInteractive",
-          "mode",
-          "remoteUrl",
-          "remoteToken",
-        ]);
+        const hasWizardFlags = hasExplicitOptions(command, ["wizard", "nonInteractive"]);
         if (opts.wizard || hasWizardFlags) {
           await onboardCommand(
             {
               workspace: opts.workspace as string | undefined,
               nonInteractive: Boolean(opts.nonInteractive),
-              mode: opts.mode as "local" | "remote" | undefined,
-              remoteUrl: opts.remoteUrl as string | undefined,
-              remoteToken: opts.remoteToken as string | undefined,
             },
             defaultRuntime,
           );

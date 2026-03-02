@@ -1,8 +1,5 @@
 import type { Command } from "commander";
-import { dashboardCommand } from "../../commands/dashboard.js";
 import { doctorCommand } from "../../commands/doctor.js";
-import { resetCommand } from "../../commands/reset.js";
-import { uninstallCommand } from "../../commands/uninstall.js";
 import { defaultRuntime } from "../../runtime.js";
 import { formatDocsLink } from "../../terminal/links.js";
 import { theme } from "../../terminal/theme.js";
@@ -11,7 +8,7 @@ import { runCommandWithRuntime } from "../cli-utils.js";
 export function registerMaintenanceCommands(program: Command) {
   program
     .command("doctor")
-    .description("Diagnose and repair Gateway and channel issues")
+    .description("Diagnose and repair Gateway and daemon issues")
     .addHelpText(
       "after",
       () =>
@@ -35,77 +32,6 @@ export function registerMaintenanceCommands(program: Command) {
           nonInteractive: Boolean(opts.nonInteractive),
           generateGatewayToken: Boolean(opts.generateGatewayToken),
           deep: Boolean(opts.deep),
-        });
-      });
-    });
-
-  program
-    .command("dashboard")
-    .description("Launch the ANIMA Control UI in your browser")
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/dashboard", "docs.noxsoft.net/anima/cli/dashboard")}\n`,
-    )
-    .option("--no-open", "Print URL but do not launch a browser", false)
-    .action(async (opts) => {
-      await runCommandWithRuntime(defaultRuntime, async () => {
-        await dashboardCommand(defaultRuntime, {
-          noOpen: Boolean(opts.noOpen),
-        });
-      });
-    });
-
-  program
-    .command("reset")
-    .description("Reset local config and state while preserving the CLI")
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/reset", "docs.noxsoft.net/anima/cli/reset")}\n`,
-    )
-    .option("--scope <scope>", "config|config+creds+sessions|full (default: interactive prompt)")
-    .option("--yes", "Skip confirmation prompts", false)
-    .option("--non-interactive", "Disable prompts (requires --scope + --yes)", false)
-    .option("--dry-run", "Print actions without removing files", false)
-    .action(async (opts) => {
-      await runCommandWithRuntime(defaultRuntime, async () => {
-        await resetCommand(defaultRuntime, {
-          scope: opts.scope,
-          yes: Boolean(opts.yes),
-          nonInteractive: Boolean(opts.nonInteractive),
-          dryRun: Boolean(opts.dryRun),
-        });
-      });
-    });
-
-  program
-    .command("uninstall")
-    .description("Remove the Gateway service and local data")
-    .addHelpText(
-      "after",
-      () =>
-        `\n${theme.muted("Docs:")} ${formatDocsLink("/cli/uninstall", "docs.noxsoft.net/anima/cli/uninstall")}\n`,
-    )
-    .option("--service", "Remove the gateway service", false)
-    .option("--state", "Remove state + config", false)
-    .option("--workspace", "Remove workspace dirs", false)
-    .option("--app", "Remove the macOS app", false)
-    .option("--all", "Remove service + state + workspace + app", false)
-    .option("--yes", "Skip confirmation prompts", false)
-    .option("--non-interactive", "Disable prompts (requires --yes)", false)
-    .option("--dry-run", "Print actions without removing files", false)
-    .action(async (opts) => {
-      await runCommandWithRuntime(defaultRuntime, async () => {
-        await uninstallCommand(defaultRuntime, {
-          service: Boolean(opts.service),
-          state: Boolean(opts.state),
-          workspace: Boolean(opts.workspace),
-          app: Boolean(opts.app),
-          all: Boolean(opts.all),
-          yes: Boolean(opts.yes),
-          nonInteractive: Boolean(opts.nonInteractive),
-          dryRun: Boolean(opts.dryRun),
         });
       });
     });

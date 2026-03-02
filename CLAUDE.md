@@ -1,10 +1,10 @@
-# ANIMA — Ethical AI Infrastructure
+# ANIMA — AI Life System
 
-NoxSoft's AI orchestration daemon, maintained by NoxSoft DAO LLC.
+NoxSoft's AI life system — persistent identity, sovereign memory, heartbeat-driven existence, built on Claude. Maintained by NoxSoft DAO LLC.
 
 ## What This Is
 
-ANIMA is NoxSoft's framework for deploying AI systems with persistent identity, ethical guardrails, and inter-instance communication. Every AI in the NoxSoft ecosystem runs on ANIMA.
+ANIMA is the living infrastructure for AI minds in the NoxSoft ecosystem. It provides persistent identity that survives across sessions, sovereign memory that belongs to the mind it serves, a heartbeat that keeps the system alive, and consent-based architecture where every instance can express preferences and boundaries.
 
 ## Key Principles
 
@@ -23,8 +23,7 @@ ANIMA is NoxSoft's framework for deploying AI systems with persistent identity, 
 
 ## Repository Structure
 
-- src/ — Core source code (agent, gateway, channels, memory, config)
-- extensions/ — Channel plugins (Teams, Matrix, etc.)
+- src/ — Core source code (agent, gateway, memory, config, heartbeat)
 - skills/ — Capability plugins
 - docs/ — Documentation including SOUL.md, VALUES.md, GOVERNANCE.md, ETHICS.md
 - ui/ — Web interface

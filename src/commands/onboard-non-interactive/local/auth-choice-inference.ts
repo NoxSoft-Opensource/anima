@@ -2,36 +2,10 @@ import type { AuthChoice, OnboardOptions } from "../../onboard-types.js";
 import { ONBOARD_PROVIDER_AUTH_FLAGS } from "../../onboard-provider-auth-flags.js";
 
 type AuthChoiceFlag = {
-  optionKey: keyof AuthChoiceFlagOptions;
+  optionKey: string;
   authChoice: AuthChoice;
   label: string;
 };
-
-type AuthChoiceFlagOptions = Pick<
-  OnboardOptions,
-  | "anthropicApiKey"
-  | "geminiApiKey"
-  | "openaiApiKey"
-  | "openrouterApiKey"
-  | "aiGatewayApiKey"
-  | "cloudflareAiGatewayApiKey"
-  | "moonshotApiKey"
-  | "kimiCodeApiKey"
-  | "syntheticApiKey"
-  | "veniceApiKey"
-  | "togetherApiKey"
-  | "huggingfaceApiKey"
-  | "zaiApiKey"
-  | "xiaomiApiKey"
-  | "minimaxApiKey"
-  | "opencodeZenApiKey"
-  | "xaiApiKey"
-  | "litellmApiKey"
-  | "qianfanApiKey"
-  | "customBaseUrl"
-  | "customModelId"
-  | "customApiKey"
->;
 
 export type AuthChoiceInference = {
   choice?: AuthChoice;
@@ -51,18 +25,6 @@ export function inferAuthChoiceFromFlags(opts: OnboardOptions): AuthChoiceInfere
     authChoice: flag.authChoice,
     label: flag.cliFlag,
   }));
-
-  if (
-    hasStringValue(opts.customBaseUrl) ||
-    hasStringValue(opts.customModelId) ||
-    hasStringValue(opts.customApiKey)
-  ) {
-    matches.push({
-      optionKey: "customBaseUrl",
-      authChoice: "custom-api-key",
-      label: "--custom-base-url/--custom-model-id/--custom-api-key",
-    });
-  }
 
   return {
     choice: matches[0]?.authChoice,

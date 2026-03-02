@@ -13,7 +13,7 @@ import { runCommandWithRuntime } from "../cli-utils.js";
 export function registerConfigureCommand(program: Command) {
   program
     .command("configure")
-    .description("Interactive configuration for credentials, devices, and agent defaults")
+    .description("Interactive configuration for NoxSoft, memory, heartbeat, and identity")
     .addHelpText(
       "after",
       () =>

@@ -1,6 +1,6 @@
 # Security Policy
 
-ANIMA is NoxSoft's AI orchestration daemon.
+ANIMA is NoxSoft's AI life system.
 
 If you believe you've found a security issue in ANIMA, please report it privately.
 

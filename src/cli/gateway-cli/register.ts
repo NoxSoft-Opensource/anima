@@ -75,7 +75,7 @@ export function registerGatewayCli(program: Command) {
   const gateway = addGatewayRunCommand(
     program
       .command("gateway")
-      .description("ANIMA Gateway orchestration and control")
+      .description("ANIMA Gateway management and control")
       .addHelpText(
         "after",
         () =>

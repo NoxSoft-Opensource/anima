@@ -12,8 +12,6 @@ import {
   resolveConfiguredModelRef,
 } from "../agents/model-selection.js";
 import { formatTokenK } from "./models/shared.js";
-import { OPENAI_CODEX_DEFAULT_MODEL } from "./openai-codex-model-default.js";
-import { promptAndConfigureVllm } from "./vllm-setup.js";
 
 const KEEP_VALUE = "__keep__";
 const MANUAL_VALUE = "__manual__";
@@ -263,13 +261,6 @@ export async function promptDefaultModel(
   if (includeManual) {
     options.push({ value: MANUAL_VALUE, label: "Enter model manually" });
   }
-  if (includeVllm && agentDir) {
-    options.push({
-      value: VLLM_VALUE,
-      label: "vLLM (custom)",
-      hint: "Enter vLLM URL + API key + model",
-    });
-  }
 
   const seen = new Set<string>();
 
@@ -314,22 +305,6 @@ export async function promptDefaultModel(
       initialValue: configuredRaw || resolvedKey || undefined,
     });
   }
-  if (selection === VLLM_VALUE) {
-    if (!agentDir) {
-      await params.prompter.note(
-        "vLLM setup requires an agent directory context.",
-        "vLLM not available",
-      );
-      return {};
-    }
-    const { config: nextConfig, modelRef } = await promptAndConfigureVllm({
-      cfg,
-      prompter: params.prompter,
-      agentDir,
-    });
-
-    return { model: modelRef, config: nextConfig };
-  }
   return { model: String(selection) };
 }
 
@@ -367,7 +342,7 @@ export async function promptModelAllowlist(params: {
         params.message ??
         "Allowlist models (comma-separated provider/model; blank to keep current)",
       initialValue: existingKeys.join(", "),
-      placeholder: `${OPENAI_CODEX_DEFAULT_MODEL}, anthropic/claude-opus-4-6`,
+      placeholder: `anthropic/claude-opus-4-6, anthropic/claude-sonnet-4-5`,
     });
     const parsed = String(raw ?? "")
       .split(",")

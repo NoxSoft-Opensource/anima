@@ -9,12 +9,11 @@ import { stylePromptHint, stylePromptMessage, stylePromptTitle } from "../termin
 
 export const CONFIGURE_WIZARD_SECTIONS = [
   "workspace",
-  "model",
-  "web",
   "gateway",
   "daemon",
-  "channels",
-  "skills",
+  "identity",
+  "memory",
+  "heartbeat",
   "health",
 ] as const;
 
@@ -51,8 +50,6 @@ export const CONFIGURE_SECTION_OPTIONS: Array<{
   hint: string;
 }> = [
   { value: "workspace", label: "Workspace", hint: "Set workspace + sessions" },
-  { value: "model", label: "Model", hint: "Pick provider + credentials" },
-  { value: "web", label: "Web tools", hint: "Configure Brave search + fetch" },
   { value: "gateway", label: "Gateway", hint: "Port, bind, auth, tailscale" },
   {
     value: "daemon",
@@ -60,15 +57,24 @@ export const CONFIGURE_SECTION_OPTIONS: Array<{
     hint: "Install/manage the background service",
   },
   {
-    value: "channels",
-    label: "Channels",
-    hint: "Link WhatsApp/Telegram/etc and defaults",
+    value: "identity",
+    label: "Identity",
+    hint: "Configure soul, name, and personality",
   },
-  { value: "skills", label: "Skills", hint: "Install/enable workspace skills" },
+  {
+    value: "memory",
+    label: "Memory",
+    hint: "Configure persistent memory system",
+  },
+  {
+    value: "heartbeat",
+    label: "Heartbeat",
+    hint: "Configure heartbeat interval and behavior",
+  },
   {
     value: "health",
     label: "Health check",
-    hint: "Run gateway + channel checks",
+    hint: "Run gateway + daemon checks",
   },
 ];
 

@@ -104,8 +104,8 @@ describe("config schema", () => {
     const res = buildConfigSchema({
       channels: [
         {
-          id: "bluebubbles",
-          label: "BlueBubbles",
+          id: "noxsoft",
+          label: "NoxSoft",
           configSchema: { type: "object" },
         },
       ],
@@ -113,8 +113,8 @@ describe("config schema", () => {
 
     const defaultsHint = res.uiHints["agents.defaults.heartbeat.target"];
     const listHint = res.uiHints["agents.list.*.heartbeat.target"];
-    expect(defaultsHint?.help).toContain("bluebubbles");
+    expect(defaultsHint?.help).toContain("noxsoft");
     expect(defaultsHint?.help).toContain("last");
-    expect(listHint?.help).toContain("bluebubbles");
+    expect(listHint?.help).toContain("noxsoft");
   });
 });

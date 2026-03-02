@@ -1,7 +1,28 @@
 import fs from "node:fs";
 import path from "node:path";
 import type { AnimaConfig } from "../config/config.js";
-import type { DmPolicy, GroupPolicy, WhatsAppAccountConfig } from "../config/types.js";
+import type { DmPolicy, GroupPolicy } from "../config/types.js";
+
+/** Stub type — WhatsApp channel was removed; kept for backward compat. */
+type WhatsAppAccountConfig = Record<string, unknown> & {
+  enabled?: boolean;
+  name?: string;
+  sendReadReceipts?: boolean;
+  messagePrefix?: string;
+  authDir?: string;
+  selfChatMode?: boolean;
+  allowFrom?: string[];
+  groupAllowFrom?: string[];
+  groupPolicy?: GroupPolicy;
+  dmPolicy?: DmPolicy;
+  textChunkLimit?: number;
+  chunkMode?: "length" | "newline";
+  mediaMaxMb?: number;
+  blockStreaming?: boolean;
+  ackReaction?: unknown;
+  groups?: unknown;
+  debounceMs?: number;
+};
 import { resolveOAuthDir } from "../config/paths.js";
 import { DEFAULT_ACCOUNT_ID, normalizeAccountId } from "../routing/session-key.js";
 import { resolveUserPath } from "../utils.js";

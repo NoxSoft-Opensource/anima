@@ -2,9 +2,8 @@ export type AuthProfileConfig = {
   provider: string;
   /**
    * Credential type expected in auth-profiles.json for this profile id.
-   * - api_key: static provider API key
-   * - oauth: refreshable OAuth credentials (access+refresh+expires)
-   * - token: static bearer-style token (optionally expiring; no refresh)
+   * - api_key: static provider API key (Anthropic)
+   * - token: NoxSoft agent token
    */
   mode: "api_key" | "oauth" | "token";
   email?: string;

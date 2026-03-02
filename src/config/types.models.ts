@@ -1,11 +1,4 @@
-export type ModelApi =
-  | "openai-completions"
-  | "openai-responses"
-  | "anthropic-messages"
-  | "google-generative-ai"
-  | "github-copilot"
-  | "bedrock-converse-stream"
-  | "ollama";
+export type ModelApi = "anthropic-messages";
 
 export type ModelCompatConfig = {
   supportsStore?: boolean;
@@ -51,17 +44,7 @@ export type ModelProviderConfig = {
   models: ModelDefinitionConfig[];
 };
 
-export type BedrockDiscoveryConfig = {
-  enabled?: boolean;
-  region?: string;
-  providerFilter?: string[];
-  refreshInterval?: number;
-  defaultContextWindow?: number;
-  defaultMaxTokens?: number;
-};
-
 export type ModelsConfig = {
   mode?: "merge" | "replace";
   providers?: Record<string, ModelProviderConfig>;
-  bedrockDiscovery?: BedrockDiscoveryConfig;
 };

@@ -11,7 +11,7 @@ import {
   warnIfModelConfigLooksOff,
 } from "../commands/auth-choice.js";
 import { applyPrimaryModel, promptDefaultModel } from "../commands/model-picker.js";
-import { promptCustomApiConfig } from "../commands/onboard-custom.js";
+// promptCustomApiConfig removed — NoxSoft auth only
 import {
   applyWizardMetadata,
   DEFAULT_WORKSPACE,
@@ -61,7 +61,7 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   printWizardHeader(runtime);
-  await prompter.intro("Welcome to ANIMA — NoxSoft's AI orchestration daemon.");
+  await prompter.intro("Welcome to ANIMA — NoxSoft's AI life system.");
   await requireRiskAcknowledgement({ opts, prompter });
 
   // --- Step 1: Load existing config (merge, never prompt) ---
@@ -120,30 +120,19 @@ export async function runOnboardingWizard(
       includeSkip: true,
     }));
 
-  if (authChoice === "custom-api-key") {
-    const customResult = await promptCustomApiConfig({
-      prompter,
-      runtime,
-      config: nextConfig,
-    });
-    nextConfig = customResult.config;
-  } else {
+  {
     const authResult = await applyAuthChoice({
       authChoice,
       config: nextConfig,
       prompter,
       runtime,
       setDefaultModel: true,
-      opts: {
-        tokenProvider: opts.tokenProvider,
-        token: opts.authChoice === "apiKey" && opts.token ? opts.token : undefined,
-      },
     });
     nextConfig = authResult.config;
   }
 
   // --- Step 3: Model selection ---
-  if (authChoiceFromPrompt && authChoice !== "custom-api-key") {
+  if (authChoiceFromPrompt) {
     const modelSelection = await promptDefaultModel({
       config: nextConfig,
       prompter,

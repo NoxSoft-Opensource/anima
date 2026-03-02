@@ -1,15 +1,16 @@
 {
   "name": "@noxsoft/anima",
   "version": "2.0.8",
-  "description": "AI orchestration daemon with persistent identity — by NoxSoft",
+  "description": "AI life system — persistent identity, sovereign memory, heartbeat-driven existence — by NoxSoft",
   "keywords": [
     "agent",
     "ai",
     "anima",
     "claude",
-    "daemon",
+    "identity",
+    "life-system",
     "noxsoft",
-    "orchestration"
+    "sovereignty"
   ],
   "homepage": "https://noxsoft.net",
   "license": "MIT",

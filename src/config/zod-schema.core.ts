@@ -3,15 +3,7 @@ import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import { createAllowDenyChannelRulesSchema } from "./zod-schema.allowdeny.js";
 import { sensitive } from "./zod-schema.sensitive.js";
 
-export const ModelApiSchema = z.union([
-  z.literal("openai-completions"),
-  z.literal("openai-responses"),
-  z.literal("anthropic-messages"),
-  z.literal("google-generative-ai"),
-  z.literal("github-copilot"),
-  z.literal("bedrock-converse-stream"),
-  z.literal("ollama"),
-]);
+export const ModelApiSchema = z.literal("anthropic-messages");
 
 export const ModelCompatSchema = z
   .object({
@@ -69,23 +61,10 @@ export const ModelProviderSchema = z
   })
   .strict();
 
-export const BedrockDiscoverySchema = z
-  .object({
-    enabled: z.boolean().optional(),
-    region: z.string().optional(),
-    providerFilter: z.array(z.string()).optional(),
-    refreshInterval: z.number().int().nonnegative().optional(),
-    defaultContextWindow: z.number().int().positive().optional(),
-    defaultMaxTokens: z.number().int().positive().optional(),
-  })
-  .strict()
-  .optional();
-
 export const ModelsConfigSchema = z
   .object({
     mode: z.union([z.literal("merge"), z.literal("replace")]).optional(),
     providers: z.record(z.string(), ModelProviderSchema).optional(),
-    bedrockDiscovery: BedrockDiscoverySchema,
   })
   .strict()
   .optional();
@@ -302,8 +281,6 @@ export const requireOpenAllowFrom = (params: {
   });
 };
 
-export const MSTeamsReplyStyleSchema = z.enum(["thread", "top-level"]);
-
 export const RetryConfigSchema = z
   .object({
     attempts: z.number().int().min(1).optional(),
@@ -316,16 +293,8 @@ export const RetryConfigSchema = z
 
 export const QueueModeBySurfaceSchema = z
   .object({
-    whatsapp: QueueModeSchema.optional(),
-    telegram: QueueModeSchema.optional(),
-    discord: QueueModeSchema.optional(),
-    irc: QueueModeSchema.optional(),
-    slack: QueueModeSchema.optional(),
-    mattermost: QueueModeSchema.optional(),
-    signal: QueueModeSchema.optional(),
-    imessage: QueueModeSchema.optional(),
-    msteams: QueueModeSchema.optional(),
     webchat: QueueModeSchema.optional(),
+    noxsoft: QueueModeSchema.optional(),
   })
   .strict()
   .optional();

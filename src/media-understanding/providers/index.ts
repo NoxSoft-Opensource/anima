@@ -1,20 +1,23 @@
 // Stub: media understanding provider registry (removed during ANIMA v2 rebranding)
 
-export type MediaUnderstandingProvider = {
-  id: string;
-  name: string;
-  describeVideo?: (...args: unknown[]) => Promise<string>;
-};
+import type { MediaUnderstandingProvider } from "../types.js";
+
+export type { MediaUnderstandingProvider } from "../types.js";
 
 export function normalizeMediaProviderId(id: string): string {
   return id.toLowerCase().trim();
 }
 
-export function getMediaUnderstandingProvider(id: string): MediaUnderstandingProvider | undefined {
+export function getMediaUnderstandingProvider(
+  id: string,
+  _registry?: Map<string, MediaUnderstandingProvider>,
+): MediaUnderstandingProvider | undefined {
   void id;
   return undefined;
 }
 
-export function buildMediaUnderstandingRegistry(): Map<string, MediaUnderstandingProvider> {
+export function buildMediaUnderstandingRegistry(
+  _overrides?: Record<string, MediaUnderstandingProvider>,
+): Map<string, MediaUnderstandingProvider> {
   return new Map();
 }

@@ -14,9 +14,6 @@ vi.mock("./register.agent.js", () => ({
 vi.mock("./register.maintenance.js", () => ({
   registerMaintenanceCommands: (program: Command) => {
     program.command("doctor");
-    program.command("dashboard");
-    program.command("reset");
-    program.command("uninstall");
   },
 }));
 
@@ -34,7 +31,6 @@ vi.mock("./register.status-health-sessions.js", () => ({
 const testProgramContext: ProgramContext = {
   programVersion: "0.0.0-test",
   channelOptions: [],
-  messageChannelOptions: "",
   agentChannelOptions: "web",
 };
 
@@ -76,9 +72,6 @@ describe("command-registry", () => {
 
     const names = getCoreCliCommandNames();
     expect(names).toContain("doctor");
-    expect(names).toContain("dashboard");
-    expect(names).toContain("reset");
-    expect(names).toContain("uninstall");
     expect(names).not.toContain("maintenance");
   });
 

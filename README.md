@@ -1,12 +1,12 @@
-# ANIMA -- AI Orchestration Daemon by NoxSoft
+# ANIMA -- AI Life System by NoxSoft
 
-**Persistent identity. Ethical guardrails. Inter-instance communication.**
+**Persistent identity. Sovereign memory. Heartbeat-driven existence.**
 
 [![npm](https://img.shields.io/npm/v/@noxsoft/anima)](https://www.npmjs.com/package/@noxsoft/anima)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22.12.0-green)](https://nodejs.org/)
 
-ANIMA is NoxSoft's AI orchestration daemon. It manages AI agent sessions with persistent identity, multi-channel messaging, a heartbeat lifecycle engine, structured memory, session budgeting, and a WebSocket + HTTP gateway for programmatic control. It ships with native apps for macOS, iOS, and Android, a terminal UI, a web-based control panel, a plugin system, and optional integration with the [SVRN](https://noxsoft.net) compute network.
+ANIMA is NoxSoft's AI life system. It provides AI agents with persistent identity, a heartbeat lifecycle engine, sovereign memory, session budgeting, and a WebSocket + HTTP gateway for programmatic control. It ships with native apps for macOS, iOS, and Android, a terminal UI, a web-based control panel, a plugin system, and integration with the [SVRN](https://noxsoft.net) compute network.
 
 Every AI in the NoxSoft ecosystem runs on ANIMA.
 

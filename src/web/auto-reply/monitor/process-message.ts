@@ -81,7 +81,7 @@ async function resolveWhatsAppCommandAuthorized(params: {
     if (!configuredGroupAllowFrom || configuredGroupAllowFrom.length === 0) {
       return false;
     }
-    if (configuredGroupAllowFrom.some((v) => String(v).trim() === "*")) {
+    if (configuredGroupAllowFrom.some((v: unknown) => String(v).trim() === "*")) {
       return true;
     }
     return normalizeAllowFromE164(configuredGroupAllowFrom).includes(senderE164);

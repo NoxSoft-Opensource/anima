@@ -8,23 +8,14 @@ import { replaceCliName, resolveCliName } from "../cli-name.js";
 const CLI_NAME = resolveCliName();
 
 const EXAMPLES = [
-  ["anima channels login --verbose", "Link personal WhatsApp Web and show QR + connection logs."],
-  [
-    'anima message send --target +15555550123 --message "Hi" --json',
-    "Send via your web session and print JSON result.",
-  ],
-  ["anima gateway --port 18789", "Run the WebSocket Gateway locally."],
-  ["anima --dev gateway", "Run a dev Gateway (isolated state/config) on ws://127.0.0.1:19001."],
-  ["anima gateway --force", "Kill anything bound to the default gateway port, then start it."],
-  ["anima gateway ...", "Gateway control via WebSocket."],
-  [
-    'anima agent --to +15555550123 --message "Run summary" --deliver',
-    "Talk directly to the agent using the Gateway; optionally send the WhatsApp reply.",
-  ],
-  [
-    'anima message send --channel telegram --target @mychat --message "Hi"',
-    "Send via your Telegram bot.",
-  ],
+  ["anima start", "Wake the life system — heartbeat, memory, and REPL."],
+  ["anima soul", "View persistent identity — who you are across sessions."],
+  ["anima pulse", "Check the heartbeat — is the system alive and well."],
+  ["anima journal", "Read and write to persistent memory."],
+  ['anima ask "deploy the fix"', "Send a direct instruction to the running agent."],
+  ['anima memory search "noxsoft"', "Search across all stored memory."],
+  ["anima wander", "Let the agent explore and act autonomously."],
+  ["anima doctor --fix", "Diagnose and repair system issues."],
 ] as const;
 
 export function configureProgramHelp(program: Command, ctx: ProgramContext) {

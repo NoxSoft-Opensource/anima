@@ -7,42 +7,83 @@
  * Full replacement comes in Phase 2 (Task 7: Claude Code CLI Spawner).
  */
 
+import type { SessionSystemPromptReport } from "../config/sessions/types.js";
+import type { NormalizedUsage } from "./usage.js";
+
 export type EmbeddedPiAgentMeta = Record<string, unknown>;
-export type EmbeddedPiCompactResult = { ok: boolean };
+
+export type EmbeddedPiCompactResult = {
+  ok: boolean;
+  compacted?: boolean;
+  reason?: string;
+  result?: {
+    tokensBefore?: number;
+    tokensAfter?: number;
+  };
+};
+
 export type EmbeddedPiRunMeta = Record<string, unknown>;
+
 export type EmbeddedPiRunResult = {
   status: "completed" | "failed" | "timeout";
   output?: string;
+  payloads?: Array<{
+    text?: string;
+    mediaUrl?: string;
+    mediaUrls?: string[];
+  }>;
+  meta: {
+    durationMs?: number;
+    error?: { message: string; kind?: string };
+    systemPromptReport?: SessionSystemPromptReport;
+    agentMeta?: {
+      sessionId?: string;
+      provider?: string;
+      model?: string;
+      usage?: NormalizedUsage;
+      promptTokens?: number;
+      lastCallUsage?: NormalizedUsage;
+    };
+  };
+  messagingToolSentTexts?: string[];
+  messagingToolSentTargets?: Array<{
+    to: string;
+    text: string;
+    provider?: string;
+    accountId?: string;
+  }>;
 };
 
-export async function runEmbeddedPiAgent(): Promise<EmbeddedPiRunResult> {
+export async function runEmbeddedPiAgent(..._args: unknown[]): Promise<EmbeddedPiRunResult> {
   throw new Error("pi-embedded removed — use Claude Code CLI spawner (Phase 2, Task 7)");
 }
 
-export async function compactEmbeddedPiSession(): Promise<EmbeddedPiCompactResult> {
+export async function compactEmbeddedPiSession(
+  ..._args: unknown[]
+): Promise<EmbeddedPiCompactResult> {
   throw new Error("pi-embedded removed — use Claude Code CLI spawner (Phase 2, Task 7)");
 }
 
-export function abortEmbeddedPiRun(): void {
-  // no-op stub
-}
-
-export function isEmbeddedPiRunActive(): boolean {
+export function abortEmbeddedPiRun(..._args: unknown[]): boolean {
   return false;
 }
 
-export function isEmbeddedPiRunStreaming(): boolean {
+export function isEmbeddedPiRunActive(..._args: unknown[]): boolean {
   return false;
 }
 
-export function queueEmbeddedPiMessage(): void {
-  // no-op stub
+export function isEmbeddedPiRunStreaming(..._args: unknown[]): boolean {
+  return false;
 }
 
-export function resolveEmbeddedSessionLane(): string {
+export function queueEmbeddedPiMessage(..._args: unknown[]): boolean {
+  return false;
+}
+
+export function resolveEmbeddedSessionLane(..._args: unknown[]): string {
   return "default";
 }
 
-export async function waitForEmbeddedPiRunEnd(): Promise<void> {
-  // no-op stub
+export async function waitForEmbeddedPiRunEnd(..._args: unknown[]): Promise<boolean> {
+  return true;
 }

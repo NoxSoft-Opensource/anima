@@ -320,7 +320,7 @@ export async function runAgentTurnWithFallback(params: {
             blockReplyBreak: params.resolvedBlockStreamingBreak,
             blockReplyChunking: params.blockReplyChunking,
             onPartialReply: allowPartialStream
-              ? async (payload) => {
+              ? async (payload: { text?: string; mediaUrls?: string[] }) => {
                   const textForTyping = await handlePartialForTyping(payload);
                   if (!params.opts?.onPartialReply || textForTyping === undefined) {
                     return;
@@ -336,7 +336,7 @@ export async function runAgentTurnWithFallback(params: {
             },
             onReasoningStream:
               params.typingSignals.shouldStartOnReasoning || params.opts?.onReasoningStream
-                ? async (payload) => {
+                ? async (payload: { text?: string; mediaUrls?: string[] }) => {
                     await params.typingSignals.signalReasoningDelta();
                     await params.opts?.onReasoningStream?.({
                       text: payload.text,
@@ -344,7 +344,7 @@ export async function runAgentTurnWithFallback(params: {
                     });
                   }
                 : undefined,
-            onAgentEvent: async (evt) => {
+            onAgentEvent: async (evt: { stream: string; data: Record<string, unknown> }) => {
               // Trigger typing when tools start executing.
               // Must await to ensure typing indicator starts before tool summaries are emitted.
               if (evt.stream === "tool") {
@@ -386,7 +386,7 @@ export async function runAgentTurnWithFallback(params: {
             shouldEmitToolResult: params.shouldEmitToolResult,
             shouldEmitToolOutput: params.shouldEmitToolOutput,
             onToolResult: onToolResult
-              ? (payload) => {
+              ? (payload: { text?: string; mediaUrls?: string[]; mediaUrl?: string }) => {
                   // `subscribeEmbeddedPiSession` may invoke tool callbacks without awaiting them.
                   // If a tool callback starts typing after the run finalized, we can end up with
                   // a typing loop that never sees a matching markRunComplete(). Track and drain.

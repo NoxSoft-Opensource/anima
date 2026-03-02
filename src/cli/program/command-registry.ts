@@ -51,7 +51,7 @@ const coreEntries: CoreCliEntry[] = [
     commands: [
       {
         name: "configure",
-        description: "Interactive configuration for credentials, devices, and agent defaults",
+        description: "Interactive configuration for NoxSoft, memory, heartbeat, and identity",
       },
     ],
     register: async ({ program }) => {
@@ -67,25 +67,10 @@ const coreEntries: CoreCliEntry[] = [
     },
   },
   {
-    commands: [
-      { name: "doctor", description: "Diagnose and repair Gateway and channel issues" },
-      { name: "dashboard", description: "Launch the ANIMA Control UI in your browser" },
-      { name: "reset", description: "Reset local config and state while preserving the CLI" },
-      {
-        name: "uninstall",
-        description: "Remove the Gateway service and local data",
-      },
-    ],
+    commands: [{ name: "doctor", description: "Diagnose and repair Gateway and daemon issues" }],
     register: async ({ program }) => {
       const mod = await import("./register.maintenance.js");
       mod.registerMaintenanceCommands(program);
-    },
-  },
-  {
-    commands: [{ name: "message", description: "Send messages and perform channel actions" }],
-    register: async ({ program, ctx }) => {
-      const mod = await import("./register.message.js");
-      mod.registerMessageCommands(program, ctx);
     },
   },
   {
@@ -107,20 +92,13 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "status", description: "Channel health and session activity overview" },
+      { name: "status", description: "Gateway health and session activity overview" },
       { name: "health", description: "Probe the running Gateway for live health" },
       { name: "sessions", description: "List and inspect conversation sessions" },
     ],
     register: async ({ program }) => {
       const mod = await import("./register.status-health-sessions.js");
       mod.registerStatusHealthSessionsCommands(program);
-    },
-  },
-  {
-    commands: [{ name: "browser", description: "Control ANIMA's dedicated browser instance" }],
-    register: async ({ program }) => {
-      const mod = await import("../browser-cli.js");
-      mod.registerBrowserCli(program);
     },
   },
   {

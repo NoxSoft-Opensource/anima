@@ -11,6 +11,8 @@ import type {
   MemorySearchResult,
   MemorySource,
   MemorySyncProgressUpdate,
+  SearchOptions,
+  TieredSearchResult,
 } from "./types.js";
 import { resolveAgentDir, resolveAgentWorkspaceDir } from "../agents/agent-scope.js";
 import { resolveMemorySearchConfig } from "../agents/memory-search.js";
@@ -515,6 +517,25 @@ export class MemoryIndexManager implements MemorySearchManager {
       const message = err instanceof Error ? err.message : String(err);
       return { ok: false, error: message };
     }
+  }
+
+  /**
+   * Search across all memory tiers using the cross-tier search system.
+   * This wraps the existing search with tier labels and adds soul/semantic/session tiers.
+   */
+  async searchTiered(query: string, options?: SearchOptions): Promise<TieredSearchResult[]> {
+    const { searchAllTiers } = await import("./cross-tier-search.js");
+    const { ImmediateMemory } = await import("./tiers/immediate.js");
+    const { SessionMemory } = await import("./tiers/session.js");
+    const { SemanticMemoryTier } = await import("./tiers/semantic.js");
+    const { SoulMemory } = await import("./tiers/soul.js");
+
+    const immediate = new ImmediateMemory();
+    const session = new SessionMemory(this.db);
+    const semantic = new SemanticMemoryTier(this.db);
+    const soul = new SoulMemory();
+
+    return searchAllTiers(query, { immediate, session, semantic, soul }, options);
   }
 
   async close(): Promise<void> {

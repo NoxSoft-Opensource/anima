@@ -1,6 +1,5 @@
 import type { AuthProfileStore } from "../agents/auth-profiles.js";
 import type { AuthChoice, AuthChoiceGroupId } from "./onboard-types.js";
-import { AUTH_CHOICE_LEGACY_ALIASES_FOR_CLI } from "./auth-choice-legacy.js";
 
 export type { AuthChoiceGroupId };
 
@@ -23,27 +22,26 @@ const AUTH_CHOICE_GROUP_DEFS: {
   choices: AuthChoice[];
 }[] = [
   {
-    value: "anthropic",
-    label: "Anthropic (Claude Code)",
-    hint: "Uses Claude Code CLI — recommended",
-    choices: ["token", "apiKey"],
+    value: "noxsoft",
+    label: "NoxSoft Agent",
+    hint: "Register as a NoxSoft agent — recommended",
+    choices: ["noxsoft"],
   },
   {
-    value: "custom",
-    label: "Custom Provider",
-    hint: "Any OpenAI or Anthropic compatible endpoint",
-    choices: ["custom-api-key"],
+    value: "anthropic",
+    label: "Anthropic API Key",
+    hint: "Direct Anthropic API key for Claude",
+    choices: ["apiKey"],
   },
 ];
 
 const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
   {
-    value: "token",
-    label: "Claude Code setup-token (recommended)",
-    hint: "Run 'claude setup-token' to get a token",
+    value: "noxsoft",
+    label: "NoxSoft Agent Registration (recommended)",
+    hint: "Auto-register as a NoxSoft agent",
   },
   { value: "apiKey", label: "Anthropic API key" },
-  { value: "custom-api-key", label: "Custom Provider" },
 ];
 
 export function formatAuthChoiceChoicesForCli(params?: {
@@ -51,14 +49,10 @@ export function formatAuthChoiceChoicesForCli(params?: {
   includeLegacyAliases?: boolean;
 }): string {
   const includeSkip = params?.includeSkip ?? true;
-  const includeLegacyAliases = params?.includeLegacyAliases ?? false;
-  const values = BASE_AUTH_CHOICE_OPTIONS.map((opt) => opt.value);
+  const values: string[] = BASE_AUTH_CHOICE_OPTIONS.map((opt) => opt.value);
 
   if (includeSkip) {
     values.push("skip");
-  }
-  if (includeLegacyAliases) {
-    values.push(...AUTH_CHOICE_LEGACY_ALIASES_FOR_CLI);
   }
 
   return values.join("|");

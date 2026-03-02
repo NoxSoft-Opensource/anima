@@ -1,5 +1,7 @@
 export type MemorySource = "memory" | "sessions";
 
+export type MemoryTier = "immediate" | "session" | "semantic" | "soul";
+
 export type MemorySearchResult = {
   path: string;
   startLine: number;
@@ -9,6 +11,48 @@ export type MemorySearchResult = {
   source: MemorySource;
   citation?: string;
 };
+
+export interface TieredMemoryEntry {
+  id: string;
+  tier: MemoryTier;
+  content: string;
+  topics: string[];
+  createdAt: Date;
+  lastAccessedAt: Date;
+  accessCount: number;
+  relevanceScore: number;
+  metadata?: Record<string, unknown>;
+}
+
+export interface TopicCluster {
+  topic: string;
+  entryCount: number;
+  avgRelevance: number;
+  lastUpdated: Date;
+}
+
+export interface ConsolidationResult {
+  sessionsConsolidated: number;
+  entriesCreated: number;
+  duplicatesMerged: number;
+  contradictionsFlagged: number;
+  soulSuggestionsGenerated: number;
+  duration: number;
+}
+
+export interface SearchOptions {
+  tiers?: MemoryTier[];
+  topics?: string[];
+  limit?: number;
+  minRelevance?: number;
+  timeRange?: { from: Date; to: Date };
+}
+
+export interface TieredSearchResult {
+  entry: TieredMemoryEntry;
+  tier: MemoryTier;
+  score: number;
+}
 
 export type MemoryEmbeddingProbeResult = {
   ok: boolean;

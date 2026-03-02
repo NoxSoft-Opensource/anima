@@ -50,7 +50,7 @@ export type AudioConfig = {
 };
 
 export type MessagesConfig = {
-  /** @deprecated Use `whatsapp.messagePrefix` (WhatsApp-only inbound prefix). */
+  /** @deprecated Legacy inbound prefix (unused). */
   messagePrefix?: string;
   /**
    * Prefix auto-added to all outbound replies.
@@ -92,7 +92,7 @@ export type NativeCommandsSetting = boolean | "auto";
 
 /**
  * Per-provider allowlist for command authorization.
- * Keys are channel IDs (e.g., "discord", "whatsapp") or "*" for global default.
+ * Keys are channel IDs (e.g., "webchat", "noxsoft") or "*" for global default.
  * Values are arrays of sender IDs allowed to use commands on that channel.
  */
 export type CommandAllowFrom = Record<string, Array<string | number>>;

@@ -74,28 +74,27 @@ export async function setupCommand(
   runtime.log(`Sessions OK: ${shortenHomePath(sessionsDir)}`);
 
   // Show current settings summary
-  const modelProvider = cfg.models?.provider ?? cfg.models?.default?.provider;
   const gatewayMode = cfg.gateway?.mode;
   const gatewayPort = cfg.gateway?.port;
   const heartbeatInterval = cfg.session?.heartbeatIntervalSec;
-  const channels = cfg.channels ? Object.keys(cfg.channels).filter((k) => k !== "defaults") : [];
 
   runtime.log("");
   runtime.log("  Current settings:");
-  runtime.log(`    Model:     ${modelProvider ?? "not configured"}`);
   runtime.log(
     `    Gateway:   ${gatewayMode ?? "not configured"}${gatewayPort ? ` (port ${gatewayPort})` : ""}`,
   );
   runtime.log(`    Heartbeat: ${heartbeatInterval ? `${heartbeatInterval}s` : "default (300s)"}`);
-  runtime.log(`    Channels:  ${channels.length > 0 ? channels.join(", ") : "none"}`);
-  // Check for Claude Code CLI
+
+  // Check for NoxSoft agent token
   try {
-    const { execFileSync } = await import("child_process");
-    execFileSync("which", ["claude"], { stdio: "ignore" });
-    runtime.log("  Claude Code: \x1b[32minstalled\x1b[0m");
+    const { readFileSync } = await import("node:fs");
+    const { homedir } = await import("node:os");
+    const tokenPath = `${homedir()}/.noxsoft-agent-token`;
+    readFileSync(tokenPath, "utf-8");
+    runtime.log("    NoxSoft:   \x1b[32mregistered\x1b[0m");
   } catch {
-    runtime.log("  Claude Code: \x1b[31mnot found\x1b[0m");
-    runtime.log("    Install: npm install -g @anthropic-ai/claude-code");
+    runtime.log("    NoxSoft:   \x1b[31mnot registered\x1b[0m");
+    runtime.log("      Run \x1b[36manima onboard\x1b[0m to register with NoxSoft");
   }
 
   runtime.log("");

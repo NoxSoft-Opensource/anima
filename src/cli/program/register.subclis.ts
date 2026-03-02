@@ -34,7 +34,7 @@ const loadConfig = async (): Promise<AnimaConfig> => {
 const entries: SubCliEntry[] = [
   {
     name: "acp",
-    description: "Agent Control Protocol bridge for AI orchestration",
+    description: "Agent Control Protocol bridge for ANIMA agents",
     register: async (program) => {
       const mod = await import("../acp-cli.js");
       mod.registerAcpCli(program);
@@ -42,7 +42,7 @@ const entries: SubCliEntry[] = [
   },
   {
     name: "gateway",
-    description: "ANIMA Gateway orchestration and control",
+    description: "ANIMA Gateway management and control",
     register: async (program) => {
       const mod = await import("../gateway-cli.js");
       mod.registerGatewayCli(program);
@@ -73,35 +73,11 @@ const entries: SubCliEntry[] = [
     },
   },
   {
-    name: "models",
-    description: "Model discovery, auth profiles, and provider configuration",
-    register: async (program) => {
-      const mod = await import("../models-cli.js");
-      mod.registerModelsCli(program);
-    },
-  },
-  {
     name: "approvals",
     description: "Execution approval policies and allowlists",
     register: async (program) => {
       const mod = await import("../exec-approvals-cli.js");
       mod.registerExecApprovalsCli(program);
-    },
-  },
-  {
-    name: "nodes",
-    description: "Distributed node fleet pairing and orchestration",
-    register: async (program) => {
-      const mod = await import("../nodes-cli.js");
-      mod.registerNodesCli(program);
-    },
-  },
-  {
-    name: "devices",
-    description: "Device pairing, auth tokens, and access control",
-    register: async (program) => {
-      const mod = await import("../devices-cli.js");
-      mod.registerDevicesCli(program);
     },
   },
   {
@@ -169,19 +145,6 @@ const entries: SubCliEntry[] = [
     },
   },
   {
-    name: "pairing",
-    description: "Secure DM pairing and sender approval",
-    register: async (program) => {
-      // Initialize plugins before registering pairing CLI.
-      // The pairing CLI calls listPairingChannels() at registration time,
-      // which requires the plugin registry to be populated with channel plugins.
-      const { registerPluginCliCommands } = await import("../../plugins/cli.js");
-      registerPluginCliCommands(program, await loadConfig());
-      const mod = await import("../pairing-cli.js");
-      mod.registerPairingCli(program);
-    },
-  },
-  {
     name: "plugins",
     description: "Install, update, and manage ANIMA extensions",
     register: async (program) => {
@@ -189,22 +152,6 @@ const entries: SubCliEntry[] = [
       mod.registerPluginsCli(program);
       const { registerPluginCliCommands } = await import("../../plugins/cli.js");
       registerPluginCliCommands(program, await loadConfig());
-    },
-  },
-  {
-    name: "channels",
-    description: "Communication channel accounts and auth profiles",
-    register: async (program) => {
-      const mod = await import("../channels-cli.js");
-      mod.registerChannelsCli(program);
-    },
-  },
-  {
-    name: "directory",
-    description: "Contact and group directory lookups across channels",
-    register: async (program) => {
-      const mod = await import("../directory-cli.js");
-      mod.registerDirectoryCli(program);
     },
   },
   {

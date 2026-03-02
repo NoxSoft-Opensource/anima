@@ -7,8 +7,14 @@ import {
 } from "../../auto-reply/heartbeat.js";
 import { getReplyFromConfig } from "../../auto-reply/reply.js";
 import { HEARTBEAT_TOKEN } from "../../auto-reply/tokens.js";
-import { resolveWhatsAppHeartbeatRecipients } from "../../channels/plugins/whatsapp-heartbeat.js";
 import { loadConfig } from "../../config/config.js";
+
+function resolveWhatsAppHeartbeatRecipients(
+  _cfg: unknown,
+  _opts?: { to?: string; all?: boolean },
+): { recipients: string[]; source: string } {
+  return { recipients: [], source: "none" };
+}
 import {
   loadSessionStore,
   resolveSessionKey,

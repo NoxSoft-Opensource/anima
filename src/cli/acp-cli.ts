@@ -6,9 +6,7 @@ import { formatDocsLink } from "../terminal/links.js";
 import { theme } from "../terminal/theme.js";
 
 export function registerAcpCli(program: Command) {
-  const acp = program
-    .command("acp")
-    .description("Agent Control Protocol bridge for AI orchestration");
+  const acp = program.command("acp").description("Agent Control Protocol bridge for ANIMA agents");
 
   acp
     .option("--url <url>", "Gateway WebSocket URL (defaults to gateway.remote.url when configured)")
