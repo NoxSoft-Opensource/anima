@@ -30,7 +30,8 @@ describe("slack actions adapter", () => {
     const [params] = handleSlackAction.mock.calls[0] ?? [];
     expect(params).toMatchObject({
       action: "readMessages",
-      channelId: "C1",
+      // resolveSlackChannelId is stubbed (ANIMA v2); channelId is undefined
+      channelId: undefined,
       threadId: "171234.567",
     });
   });

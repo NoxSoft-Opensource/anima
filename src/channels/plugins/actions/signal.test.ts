@@ -44,7 +44,13 @@ describe("signalMessageActions", () => {
 
   it("blocks reactions when action gate is disabled", async () => {
     const cfg = {
-      channels: { signal: { account: "+15550001111", actions: { reactions: false } } },
+      channels: {
+        signal: {
+          account: "+15550001111",
+          reactionLevel: "minimal",
+          actions: { reactions: false },
+        },
+      },
     } as AnimaConfig;
 
     await expect(
@@ -64,7 +70,11 @@ describe("signalMessageActions", () => {
         signal: {
           actions: { reactions: false },
           accounts: {
-            work: { account: "+15550001111", actions: { reactions: true } },
+            work: {
+              account: "+15550001111",
+              reactionLevel: "minimal",
+              actions: { reactions: true },
+            },
           },
         },
       },
@@ -85,7 +95,7 @@ describe("signalMessageActions", () => {
   it("normalizes uuid recipients", async () => {
     sendReactionSignal.mockClear();
     const cfg = {
-      channels: { signal: { account: "+15550001111" } },
+      channels: { signal: { account: "+15550001111", reactionLevel: "minimal" } },
     } as AnimaConfig;
 
     await signalMessageActions.handleAction({
@@ -109,7 +119,7 @@ describe("signalMessageActions", () => {
 
   it("requires targetAuthor for group reactions", async () => {
     const cfg = {
-      channels: { signal: { account: "+15550001111" } },
+      channels: { signal: { account: "+15550001111", reactionLevel: "minimal" } },
     } as AnimaConfig;
 
     await expect(
@@ -125,7 +135,7 @@ describe("signalMessageActions", () => {
   it("passes groupId and targetAuthor for group reactions", async () => {
     sendReactionSignal.mockClear();
     const cfg = {
-      channels: { signal: { account: "+15550001111" } },
+      channels: { signal: { account: "+15550001111", reactionLevel: "minimal" } },
     } as AnimaConfig;
 
     await signalMessageActions.handleAction({

@@ -105,7 +105,8 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("whatsapp:+999");
+    // WhatsApp dock normalizes From by stripping the "whatsapp:" prefix
+    expect(auth.senderId).toBe("+999");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 

@@ -48,7 +48,7 @@ describe("message-channel", () => {
   it("normalizes gateway message channels and rejects unknown values", () => {
     expect(resolveGatewayMessageChannel("web")).toBe("web");
     expect(resolveGatewayMessageChannel("webchat")).toBe("webchat");
-    expect(resolveGatewayMessageChannel("discord")).toBeUndefined();
+    expect(resolveGatewayMessageChannel("discord")).toBe("discord");
     expect(resolveGatewayMessageChannel("nope")).toBeUndefined();
   });
 
