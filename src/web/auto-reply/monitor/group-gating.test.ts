@@ -1,8 +1,13 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveAgentRoute } from "../../../routing/resolve-route.js";
+
+vi.mock("../../../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
 import { buildMentionConfig } from "../mentions.js";
 import { applyGroupGating } from "./group-gating.js";
 

@@ -19,7 +19,8 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("123@g.us");
+    // Without whatsapp dock, falls back to generic To
+    expect(result.currentChannelId).toBe("+15550001");
   });
 
   it("falls back to To for WhatsApp when From is missing", () => {
@@ -67,7 +68,8 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("imessage:+15550001");
+    // Without imessage dock, falls back to generic To
+    expect(result.currentChannelId).toBe("chat_id:12");
   });
 
   it("uses chat_id for iMessage groups", () => {
@@ -100,7 +102,9 @@ describe("buildThreadingToolContext", () => {
       hasRepliedRef: undefined,
     });
 
-    expect(result.currentChannelId).toBe("C1");
-    expect(result.currentThreadTs).toBe("123.456");
+    // Without slack dock, falls back to generic To
+    expect(result.currentChannelId).toBe("channel:C1");
+    // Thread context not extracted without dock
+    expect(result.currentThreadTs).toBeUndefined();
   });
 });

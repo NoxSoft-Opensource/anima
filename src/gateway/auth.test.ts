@@ -34,13 +34,13 @@ describe("gateway auth", () => {
     });
   });
 
-  it("does not resolve legacy gateway env vars", () => {
+  it("does not resolve legacy CLAWDBOT gateway env vars", () => {
     expect(
       resolveGatewayAuth({
         authConfig: {},
         env: {
-          ANIMA_GATEWAY_TOKEN: "legacy-token",
-          ANIMA_GATEWAY_PASSWORD: "legacy-password",
+          CLAWDBOT_GATEWAY_TOKEN: "legacy-token",
+          CLAWDBOT_GATEWAY_PASSWORD: "legacy-password",
         } as NodeJS.ProcessEnv,
       }),
     ).toMatchObject({

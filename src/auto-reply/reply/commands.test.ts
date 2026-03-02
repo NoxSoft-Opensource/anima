@@ -3,6 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import type { AnimaConfig } from "../../config/config.js";
+
+vi.mock("../../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
 import type { MsgContext } from "../templating.js";
 import {
   addSubagentRunForTests,

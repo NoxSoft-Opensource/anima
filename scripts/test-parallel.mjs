@@ -81,16 +81,7 @@ const runs = [
           args: ["vitest", "run", "--config", "vitest.unit.config.ts"],
         },
       ]),
-  {
-    name: "extensions",
-    args: [
-      "vitest",
-      "run",
-      "--config",
-      "vitest.extensions.config.ts",
-      ...(useVmForks ? ["--pool=vmForks"] : []),
-    ],
-  },
+  // extensions runner removed — extensions/ directory was stripped in the channel-removal commit.
   {
     name: "gateway",
     args: [
@@ -111,8 +102,7 @@ const shardCount = isWindowsCi
     : 2
   : 1;
 const windowsCiArgs = isWindowsCi ? ["--dangerouslyIgnoreUnhandledErrors"] : [];
-const silentArgs =
-  process.env.ANIMA_TEST_SHOW_PASSED_LOGS === "1" ? [] : ["--silent=passed-only"];
+const silentArgs = process.env.ANIMA_TEST_SHOW_PASSED_LOGS === "1" ? [] : ["--silent=passed-only"];
 const rawPassthroughArgs = process.argv.slice(2);
 const passthroughArgs =
   rawPassthroughArgs[0] === "--" ? rawPassthroughArgs.slice(1) : rawPassthroughArgs;

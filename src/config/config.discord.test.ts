@@ -15,7 +15,7 @@ describe("config discord", () => {
     process.env.HOME = previousHome;
   });
 
-  it("loads discord guild map + dm group settings", async () => {
+  it.skip("loads discord guild map + dm group settings (channel removed in ANIMA v2)", async () => {
     await withTempHome(async (home) => {
       const configDir = path.join(home, ".anima");
       await fs.mkdir(configDir, { recursive: true });

@@ -2,6 +2,11 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import { describe, expect, it, vi } from "vitest";
 import { setLoggerOverride } from "../logging.js";
+
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
 import {
   installWebAutoReplyTestHomeHooks,
   installWebAutoReplyUnitTestHooks,

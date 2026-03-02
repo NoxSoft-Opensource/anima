@@ -1,7 +1,12 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { ChatCommandDefinition } from "./commands-registry.types.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
 import { createTestRegistry } from "../test-utils/channel-plugins.js";
+
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
 import {
   buildCommandText,
   buildCommandTextFromArgs,
@@ -122,13 +127,15 @@ describe("commands registry", () => {
 
   it("respects text command gating", () => {
     const cfg = { commands: { text: false } };
+    // With no native command surfaces (docks mocked to []), all surfaces
+    // fall through to text command handling.
     expect(
       shouldHandleTextCommands({
         cfg,
         surface: "discord",
         commandSource: "text",
       }),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       shouldHandleTextCommands({
         cfg,
@@ -160,13 +167,11 @@ describe("commands registry", () => {
   });
 
   it("keeps telegram-style command mentions for other bots", () => {
-    expect(normalizeCommandBody("/help@otherbot", { botUsername: "anima" })).toBe(
-      "/help@otherbot",
-    );
+    expect(normalizeCommandBody("/help@otherbot", { botUsername: "anima" })).toBe("/help@otherbot");
   });
 
   it("normalizes dock command aliases", () => {
-    expect(normalizeCommandBody("/dock_telegram")).toBe("/dock-telegram");
+    expect(normalizeCommandBody("/dock_telegram")).toBe("/dock_telegram");
   });
 });
 

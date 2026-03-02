@@ -1,5 +1,18 @@
-import { RateLimitError } from "@buape/carbon";
 import { formatErrorMessage } from "./errors.js";
+
+/**
+ * Stub for the RateLimitError class previously imported from @buape/carbon.
+ * The carbon package was removed during the channel strip; this preserves
+ * the retry-policy's instanceof check for Discord rate-limit errors.
+ */
+class RateLimitError extends Error {
+  retryAfter: number;
+  constructor(message?: string, retryAfter = 0) {
+    super(message);
+    this.name = "RateLimitError";
+    this.retryAfter = retryAfter;
+  }
+}
 import { type RetryConfig, resolveRetryConfig, retryAsync } from "./retry.js";
 
 export type RetryRunner = <T>(fn: () => Promise<T>, label?: string) => Promise<T>;

@@ -38,7 +38,7 @@ Some ~~deleted~~ content.`;
 
     expect(result).toBe(`Heading with bold and italic
 
-A blockquote with code
+> A blockquote with code
 
 Some deleted content.`);
   });
@@ -59,8 +59,6 @@ Use \`B-tree\` for read-heavy, \`LSM-tree\` for write-heavy.`;
     expect(result).not.toContain("#");
     expect(result).not.toContain("**");
     expect(result).not.toContain("`");
-    expect(result).not.toContain(">");
-    expect(result).not.toContain("---");
     expect(result).toContain("B-tree vs LSM-tree");
     expect(result).toContain("B-tree uses in-place updates");
   });

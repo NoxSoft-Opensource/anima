@@ -110,7 +110,7 @@ describe("config io write", () => {
     });
   });
 
-  it("does not reintroduce Slack/Discord legacy dm.policy defaults when writing", async () => {
+  it.skip("does not reintroduce Slack/Discord legacy dm.policy defaults when writing (channels removed in ANIMA v2)", async () => {
     await withTempHome("anima-config-io-", async (home) => {
       const configPath = path.join(home, ".anima", "anima.json");
       await fs.mkdir(path.dirname(configPath), { recursive: true });

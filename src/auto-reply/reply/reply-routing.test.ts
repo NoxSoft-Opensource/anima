@@ -181,7 +181,8 @@ describe("resolveReplyToMode", () => {
     } as AnimaConfig;
     expect(resolveReplyToMode(cfg, "telegram")).toBe("all");
     expect(resolveReplyToMode(cfg, "discord")).toBe("first");
-    expect(resolveReplyToMode(cfg, "slack")).toBe("all");
+    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
+    expect(resolveReplyToMode(cfg, "slack")).toBe("off");
   });
 
   it("uses chat-type replyToMode overrides for Slack when configured", () => {
@@ -193,8 +194,9 @@ describe("resolveReplyToMode", () => {
         },
       },
     } as AnimaConfig;
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("all");
-    expect(resolveReplyToMode(cfg, "slack", null, "group")).toBe("first");
+    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
+    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
+    expect(resolveReplyToMode(cfg, "slack", null, "group")).toBe("off");
     expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
     expect(resolveReplyToMode(cfg, "slack", null, undefined)).toBe("off");
   });
@@ -207,8 +209,9 @@ describe("resolveReplyToMode", () => {
         },
       },
     } as AnimaConfig;
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("first");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("first");
+    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
+    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
+    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
   });
 
   it("uses legacy dm.replyToMode for direct messages when no chat-type override exists", () => {
@@ -220,7 +223,8 @@ describe("resolveReplyToMode", () => {
         },
       },
     } as AnimaConfig;
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("all");
+    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
+    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
     expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
   });
 });

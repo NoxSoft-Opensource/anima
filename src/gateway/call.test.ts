@@ -265,8 +265,8 @@ describe("callGateway error details", () => {
       err = caught as Error;
     }
 
-    expect(err?.message).toContain("gateway closed (1006");
-    expect(err?.message).toContain("Gateway target: ws://127.0.0.1:18789");
+    expect(err?.message).toContain("ANIMA Gateway closed (1006");
+    expect(err?.message).toContain("ANIMA Gateway target: ws://127.0.0.1:18789");
     expect(err?.message).toContain("Source: local loopback");
     expect(err?.message).toContain("Bind: loopback");
   });
@@ -288,8 +288,8 @@ describe("callGateway error details", () => {
     await vi.advanceTimersByTimeAsync(5);
     await promise;
 
-    expect(err?.message).toContain("gateway timeout after 5ms");
-    expect(err?.message).toContain("Gateway target: ws://127.0.0.1:18789");
+    expect(err?.message).toContain("ANIMA Gateway timeout after 5ms");
+    expect(err?.message).toContain("ANIMA Gateway target: ws://127.0.0.1:18789");
     expect(err?.message).toContain("Source: local loopback");
     expect(err?.message).toContain("Bind: loopback");
   });
@@ -314,7 +314,7 @@ describe("callGateway error details", () => {
     lastClientOptions?.onClose?.(1006, "");
     await promise;
 
-    expect(err?.message).toContain("gateway closed (1006");
+    expect(err?.message).toContain("ANIMA Gateway closed (1006");
   });
 
   it("fails fast when remote mode is missing remote url", async () => {
@@ -326,7 +326,7 @@ describe("callGateway error details", () => {
         method: "health",
         timeoutMs: 10,
       }),
-    ).rejects.toThrow("gateway remote mode misconfigured");
+    ).rejects.toThrow("ANIMA Gateway remote mode misconfigured");
   });
 });
 

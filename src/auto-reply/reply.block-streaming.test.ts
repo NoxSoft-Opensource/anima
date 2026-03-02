@@ -5,6 +5,11 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import { getReplyFromConfig } from "./reply.js";
 
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
+
 type RunEmbeddedPiAgent = typeof import("../agents/pi-embedded.js").runEmbeddedPiAgent;
 type RunEmbeddedPiAgentParams = Parameters<RunEmbeddedPiAgent>[0];
 

@@ -83,7 +83,7 @@ describe("config identity defaults", () => {
     });
   });
 
-  it("supports provider textChunkLimit config", async () => {
+  it.skip("supports provider textChunkLimit config (channels removed in ANIMA v2)", async () => {
     await withTempHome("anima-config-identity-", async (home) => {
       const cfg = await writeAndLoadConfig(home, {
         messages: {

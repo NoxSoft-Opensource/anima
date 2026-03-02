@@ -315,7 +315,7 @@ describe("mention helpers", () => {
   });
 
   it("normalizes zero-width characters", () => {
-    expect(normalizeMentionText("open\u200bclaw")).toBe("anima");
+    expect(normalizeMentionText("ani\u200bma")).toBe("anima");
   });
 
   it("matches patterns case-insensitively", () => {
@@ -348,7 +348,7 @@ describe("mention helpers", () => {
 });
 
 describe("resolveGroupRequireMention", () => {
-  it("respects Discord guild/channel requireMention settings", () => {
+  it.skip("respects Discord guild/channel requireMention settings (channel removed in ANIMA v2)", () => {
     const cfg: AnimaConfig = {
       channels: {
         discord: {
@@ -378,7 +378,7 @@ describe("resolveGroupRequireMention", () => {
     expect(resolveGroupRequireMention({ cfg, ctx, groupResolution })).toBe(false);
   });
 
-  it("respects Slack channel requireMention settings", () => {
+  it.skip("respects Slack channel requireMention settings (channel removed in ANIMA v2)", () => {
     const cfg: AnimaConfig = {
       channels: {
         slack: {

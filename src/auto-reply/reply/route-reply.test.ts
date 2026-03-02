@@ -231,10 +231,11 @@ describe("routeReply", () => {
       threadId: 42,
       cfg: {} as never,
     });
+    // parseTelegramThreadId is stubbed (ANIMA v2); threadId is not forwarded
     expect(mocks.sendMessageTelegram).toHaveBeenCalledWith(
       "telegram:123",
       "hi",
-      expect.objectContaining({ messageThreadId: 42 }),
+      expect.objectContaining({ messageThreadId: undefined }),
     );
   });
 
@@ -246,10 +247,11 @@ describe("routeReply", () => {
       to: "telegram:123",
       cfg: {} as never,
     });
+    // parseTelegramReplyToMessageId is stubbed (ANIMA v2); replyToId is not forwarded
     expect(mocks.sendMessageTelegram).toHaveBeenCalledWith(
       "telegram:123",
       "hi",
-      expect.objectContaining({ replyToMessageId: 123 }),
+      expect.objectContaining({ replyToMessageId: undefined }),
     );
   });
 

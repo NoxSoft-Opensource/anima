@@ -1,5 +1,95 @@
 import { afterAll, afterEach, beforeEach, vi } from "vitest";
 
+// Mock removed packages (WhatsApp/QR dependencies removed during ANIMA v2 rebrand)
+vi.mock("@whiskeysockets/baileys", () => ({
+  DisconnectReason: { loggedOut: 401, connectionClosed: 428 },
+  fetchLatestBaileysVersion: vi.fn().mockResolvedValue({ version: [2, 2413, 1] }),
+  isJidGroup: vi.fn((jid: string) => jid?.endsWith("@g.us")),
+  isJidUser: vi.fn((jid: string) => jid?.endsWith("@s.whatsapp.net")),
+  makeWASocket: vi.fn(),
+  useMultiFileAuthState: vi.fn().mockResolvedValue({
+    state: {},
+    saveCreds: vi.fn(),
+  }),
+  downloadMediaMessage: vi.fn(),
+  getContentType: vi.fn((msg: Record<string, unknown> | undefined) => {
+    if (!msg) {
+      return undefined;
+    }
+    const keys = [
+      "conversation",
+      "extendedTextMessage",
+      "imageMessage",
+      "videoMessage",
+      "audioMessage",
+      "documentMessage",
+      "stickerMessage",
+      "contactMessage",
+      "contactsArrayMessage",
+      "locationMessage",
+      "liveLocationMessage",
+      "viewOnceMessage",
+      "viewOnceMessageV2",
+      "viewOnceMessageV2Extension",
+      "ephemeralMessage",
+      "protocolMessage",
+      "buttonsResponseMessage",
+      "listResponseMessage",
+    ];
+    return keys.find((k) => msg[k] != null);
+  }),
+  proto: { Message: {} },
+  WAMessageStubType: {},
+  extractMessageContent: vi.fn((msg: Record<string, unknown> | undefined) => msg),
+  normalizeMessageContent: vi.fn((msg: Record<string, unknown> | undefined) => {
+    if (!msg) {
+      return msg;
+    }
+    // Unwrap viewOnce/ephemeral wrappers like real baileys does
+    const wrapperKeys = [
+      "viewOnceMessage",
+      "viewOnceMessageV2",
+      "viewOnceMessageV2Extension",
+      "ephemeralMessage",
+    ];
+    for (const key of wrapperKeys) {
+      const wrapper = msg[key] as Record<string, unknown> | undefined;
+      if (wrapper?.message) {
+        return wrapper.message as Record<string, unknown>;
+      }
+    }
+    return msg;
+  }),
+  jidNormalizedUser: vi.fn((jid: string) => jid),
+  delay: vi.fn(),
+}));
+
+vi.mock("qrcode-terminal", () => ({
+  default: { generate: vi.fn() },
+  generate: vi.fn(),
+}));
+
+vi.mock("qrcode-terminal/vendor/QRCode/index.js", () => {
+  function QRCode() {
+    // oxlint-disable-next-line typescript/no-this-alias
+    const self = this as Record<string, unknown>;
+    self.modules = [];
+    self.moduleCount = 0;
+  }
+  QRCode.prototype.addData = vi.fn();
+  QRCode.prototype.make = vi.fn(function (this: Record<string, unknown>) {
+    this.moduleCount = 21;
+    this.modules = Array.from({ length: 21 }, () => Array.from({ length: 21 }, () => false));
+  });
+  QRCode.prototype.isDark = vi.fn(() => false);
+  QRCode.prototype.getModuleCount = vi.fn(() => 21);
+  return { default: QRCode };
+});
+
+vi.mock("qrcode-terminal/vendor/QRCode/QRErrorCorrectLevel.js", () => ({
+  default: { L: 1, M: 0, Q: 3, H: 2 },
+}));
+
 // Ensure Vitest environment is properly set
 process.env.VITEST = "true";
 // Config validation walks plugin manifests; keep an aggressive cache in tests to avoid

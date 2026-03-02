@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AnimaConfig } from "../config/config.js";
 import type { MsgContext } from "./templating.js";
 import { setActivePluginRegistry } from "../plugins/runtime.js";
@@ -9,11 +9,24 @@ import { listChatCommands } from "./commands-registry.js";
 import { parseActivationCommand } from "./group-activation.js";
 import { parseSendPolicyCommand } from "./send-policy.js";
 
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return {
+    ...actual,
+    listChannelDocks: () => [],
+  };
+});
+
 const createRegistry = () =>
   createTestRegistry([
     {
       pluginId: "discord",
       plugin: createOutboundTestPlugin({ id: "discord", outbound: { deliveryMode: "direct" } }),
+      source: "test",
+    },
+    {
+      pluginId: "whatsapp",
+      plugin: createOutboundTestPlugin({ id: "whatsapp", outbound: { deliveryMode: "gateway" } }),
       source: "test",
     },
   ]);
@@ -92,7 +105,7 @@ describe("resolveCommandAuthorization", () => {
       commandAuthorized: true,
     });
 
-    expect(auth.senderId).toBe("+999");
+    expect(auth.senderId).toBe("whatsapp:+999");
     expect(auth.isAuthorizedSender).toBe(true);
   });
 

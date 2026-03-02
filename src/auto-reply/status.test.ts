@@ -19,6 +19,14 @@ vi.mock("../plugins/commands.js", () => ({
   listPluginCommands,
 }));
 
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return {
+    ...actual,
+    listChannelDocks: () => [],
+  };
+});
+
 afterEach(() => {
   vi.restoreAllMocks();
 });

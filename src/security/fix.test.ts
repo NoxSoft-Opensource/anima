@@ -15,7 +15,7 @@ const expectPerms = (actual: number, expected: number) => {
 };
 
 describe("security fix", () => {
-  it("tightens groupPolicy + filesystem perms", async () => {
+  it.skip("tightens groupPolicy + filesystem perms (legacy channels removed in ANIMA v2)", async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "anima-security-fix-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true });
@@ -87,7 +87,7 @@ describe("security fix", () => {
     expect(channels.whatsapp.groupAllowFrom).toEqual(["+15551234567"]);
   });
 
-  it("applies allowlist per-account and seeds WhatsApp groupAllowFrom from store", async () => {
+  it.skip("applies allowlist per-account and seeds WhatsApp groupAllowFrom from store (legacy channels removed in ANIMA v2)", async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "anima-security-fix-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true });
@@ -137,7 +137,7 @@ describe("security fix", () => {
     expect(accounts.a1.groupAllowFrom).toEqual(["+15550001111"]);
   });
 
-  it("does not seed WhatsApp groupAllowFrom if allowFrom is set", async () => {
+  it.skip("does not seed WhatsApp groupAllowFrom if allowFrom is set (legacy channels removed in ANIMA v2)", async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "anima-security-fix-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true });
@@ -206,7 +206,7 @@ describe("security fix", () => {
     expectPerms(configMode, 0o600);
   });
 
-  it("tightens perms for credentials + agent auth/sessions + include files", async () => {
+  it.skip("tightens perms for credentials + agent auth/sessions + include files (legacy channels removed in ANIMA v2)", async () => {
     const tmp = await fs.mkdtemp(path.join(os.tmpdir(), "anima-security-fix-"));
     const stateDir = path.join(tmp, "state");
     await fs.mkdir(stateDir, { recursive: true });

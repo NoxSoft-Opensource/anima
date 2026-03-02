@@ -49,7 +49,7 @@ describe("resolveGatewayRuntimeConfig", () => {
           cfg,
           port: 18789,
         }),
-      ).rejects.toThrow("gateway auth mode=trusted-proxy makes no sense with bind=loopback");
+      ).rejects.toThrow("ANIMA Gateway: auth mode=trusted-proxy makes no sense with bind=loopback");
     });
 
     it("should reject trusted-proxy without trustedProxies configured", async () => {
@@ -72,7 +72,7 @@ describe("resolveGatewayRuntimeConfig", () => {
           port: 18789,
         }),
       ).rejects.toThrow(
-        "gateway auth mode=trusted-proxy requires gateway.trustedProxies to be configured",
+        "ANIMA Gateway: auth mode=trusted-proxy requires gateway.trustedProxies to be configured",
       );
     });
   });
@@ -93,7 +93,7 @@ describe("resolveGatewayRuntimeConfig", () => {
           cfg,
           port: 18789,
         }),
-      ).rejects.toThrow("gateway auth mode is token, but no token was configured");
+      ).rejects.toThrow("ANIMA Gateway auth mode is token, but no token was configured");
     });
 
     it("should allow lan binding with token", async () => {

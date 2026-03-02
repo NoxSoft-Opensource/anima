@@ -4,6 +4,11 @@ import { callGateway } from "../../gateway/call.js";
 import { handleCommands } from "./commands.js";
 import { buildCommandTestParams } from "./commands.test-harness.js";
 
+vi.mock("../../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
+
 vi.mock("../../gateway/call.js", () => ({
   callGateway: vi.fn(),
 }));

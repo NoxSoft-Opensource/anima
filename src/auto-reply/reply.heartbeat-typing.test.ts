@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTempHomeHarness, makeReplyConfig } from "./reply.test-harness.js";
 
+vi.mock("../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
+
 const runEmbeddedPiAgentMock = vi.fn();
 
 vi.mock("../agents/model-fallback.js", () => ({

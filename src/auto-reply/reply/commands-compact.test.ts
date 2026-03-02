@@ -4,6 +4,11 @@ import { compactEmbeddedPiSession } from "../../agents/pi-embedded.js";
 import { handleCompactCommand } from "./commands-compact.js";
 import { buildCommandTestParams } from "./commands.test-harness.js";
 
+vi.mock("../../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
+
 vi.mock("../../agents/pi-embedded.js", () => ({
   abortEmbeddedPiRun: vi.fn(),
   compactEmbeddedPiSession: vi.fn(),

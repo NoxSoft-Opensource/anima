@@ -90,6 +90,14 @@ const formatLower = (allowFrom: Array<string | number>) =>
 // - add a new entry to `DOCKS`
 // - keep it cheap; push heavy logic into `src/channels/plugins/<id>.ts` or channel modules
 const DOCKS: Record<ChatChannelId, ChannelDock> = {
+  web: {
+    id: "web",
+    capabilities: {
+      chatTypes: ["direct"],
+      media: true,
+    },
+    outbound: { textChunkLimit: 4000 },
+  },
   telegram: {
     id: "telegram",
     capabilities: {
@@ -514,7 +522,7 @@ export function listChannelDocks(): ChannelDock[] {
     }
     return String(a.id).localeCompare(String(b.id));
   });
-  return combined.map((entry) => entry.dock);
+  return combined.map((entry) => entry.dock).filter((dock): dock is ChannelDock => dock != null);
 }
 
 export function getChannelDock(id: ChannelId): ChannelDock | undefined {

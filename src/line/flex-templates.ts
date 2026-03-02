@@ -16,3 +16,18 @@ export function createActionCard(..._args: any[]): any {
 export function createReceiptCard(..._args: any[]): any {
   return {};
 }
+export function createMediaPlayerCard(..._args: any[]): any {
+  return {};
+}
+export function createEventCard(..._args: any[]): any {
+  return {};
+}
+export function createAgendaCard(..._args: any[]): any {
+  return {};
+}
+export function createDeviceControlCard(..._args: any[]): any {
+  return {};
+}
+export function createAppleTvRemoteCard(..._args: any[]): any {
+  return {};
+}

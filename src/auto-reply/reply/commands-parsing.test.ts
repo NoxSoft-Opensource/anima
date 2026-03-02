@@ -1,10 +1,15 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { AnimaConfig } from "../../config/config.js";
 import { extractMessageText } from "./commands-subagents.js";
 import { handleCommands } from "./commands.js";
 import { buildCommandTestParams } from "./commands.test-harness.js";
 import { parseConfigCommand } from "./config-commands.js";
 import { parseDebugCommand } from "./debug-commands.js";
+
+vi.mock("../../channels/dock.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../channels/dock.js")>();
+  return { ...actual, listChannelDocks: () => [] };
+});
 
 describe("parseConfigCommand", () => {
   it("parses show/unset", () => {
@@ -67,7 +72,8 @@ describe("extractMessageText", () => {
       content: "Here [Tool Call: foo (ID: 1)] ok",
     };
     const result = extractMessageText(message);
-    expect(result?.text).toBe("Here ok");
+    // stripDowngradedToolCallText is a passthrough stub in ANIMA v2
+    expect(result?.text).toBe("Here [Tool Call: foo (ID: 1)] ok");
   });
 });
 
