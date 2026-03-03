@@ -226,14 +226,14 @@ describe("gateway send mirroring", () => {
   });
 
   it("derives a target session key when none is provided", async () => {
-    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m3", channel: "slack" }]);
+    mocks.deliverOutboundPayloads.mockResolvedValue([{ messageId: "m3", channel: "web" }]);
 
     const respond = vi.fn();
     await sendHandlers.send({
       params: {
         to: "channel:C1",
         message: "hello",
-        channel: "slack",
+        channel: "web",
         idempotencyKey: "idem-4",
       },
       respond,
@@ -247,7 +247,7 @@ describe("gateway send mirroring", () => {
     expect(mocks.deliverOutboundPayloads).toHaveBeenCalledWith(
       expect.objectContaining({
         mirror: expect.objectContaining({
-          sessionKey: "agent:main:slack:channel:resolved",
+          sessionKey: "agent:main:main",
           agentId: "main",
         }),
       }),

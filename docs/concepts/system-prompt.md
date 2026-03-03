@@ -18,10 +18,12 @@ The prompt is intentionally compact and uses fixed sections:
 
 - **Tooling**: current tool list + short descriptions.
 - **Safety**: short guardrail reminder to avoid power-seeking behavior or bypassing oversight.
+- **Systems Thinking**: baseline reasoning guidance (boundaries, loops, delays, leverage points, second-order effects, and feedback cadence).
 - **Skills** (when available): tells the model how to load skill instructions on demand.
 - **Anima Self-Update**: how to run `config.apply` and `update.run`.
 - **Workspace**: working directory (`agents.defaults.workspace`).
 - **Documentation**: local path to Anima docs (repo or npm package) and when to read them.
+- **NoxSoft Mission Mode** (conditional): when running in NoxSoft/hell workspaces, adds mission directives for heartbeat continuity, multi-role orchestration, and legacy-surface streamlining.
 - **Workspace Files (injected)**: indicates bootstrap files are included below.
 - **Sandbox** (when enabled): indicates sandboxed runtime, sandbox paths, and whether elevated exec is available.
 - **Current Date & Time**: user-local time, timezone, and time format.
@@ -127,3 +129,26 @@ package docs) and also notes the public mirror, source repo, community Discord, 
 NoxHub ([https://noxhub.com](https://noxhub.com)) for skills discovery. The prompt instructs the model to consult local docs first
 for Anima behavior, commands, configuration, or architecture, and to run
 `anima status` itself when possible (asking the user only when it lacks access).
+
+## NoxSoft Mission Mode
+
+When the workspace path indicates a NoxSoft mission workspace (for example under
+`/Desktop/hell` or folders containing `noxsoft`), Anima injects an additional
+mission section in the system prompt that emphasizes:
+
+- Delivering full NoxSoft vision in production-grade code.
+- Heartbeat continuity and active coordination across available NoxSoft channels.
+- Multi-role execution coverage (security, strict review, implementation, UX, testing).
+- File-managed coordination artifacts and explicit GC-style handoffs.
+- Test integrity (no fake-green behavior, no hidden regressions).
+- Continuous streamlining of legacy surfaces toward coherent NoxSoft naming.
+
+## Systems Thinking
+
+Anima includes a dedicated **Systems Thinking** section in the system prompt (including
+minimal prompt mode for subagents, in compact form). This section pushes agents to:
+
+- define boundaries before intervention,
+- map reinforcing/balancing loops and delays,
+- evaluate second-order effects,
+- and attach measurable feedback loops to proposed changes.

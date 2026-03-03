@@ -158,74 +158,8 @@ describe("createReplyDispatcher", () => {
 });
 
 describe("resolveReplyToMode", () => {
-  it("defaults to off for Telegram", () => {
-    expect(resolveReplyToMode(emptyCfg, "telegram")).toBe("off");
-  });
-
-  it("defaults to off for Discord and Slack", () => {
-    expect(resolveReplyToMode(emptyCfg, "discord")).toBe("off");
-    expect(resolveReplyToMode(emptyCfg, "slack")).toBe("off");
-  });
-
   it("defaults to all when channel is unknown", () => {
     expect(resolveReplyToMode(emptyCfg, undefined)).toBe("all");
-  });
-
-  it("uses configured value when present", () => {
-    const cfg = {
-      channels: {
-        telegram: { replyToMode: "all" },
-        discord: { replyToMode: "first" },
-        slack: { replyToMode: "all" },
-      },
-    } as AnimaConfig;
-    expect(resolveReplyToMode(cfg, "telegram")).toBe("all");
-    expect(resolveReplyToMode(cfg, "discord")).toBe("first");
-    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
-    expect(resolveReplyToMode(cfg, "slack")).toBe("off");
-  });
-
-  it("uses chat-type replyToMode overrides for Slack when configured", () => {
-    const cfg = {
-      channels: {
-        slack: {
-          replyToMode: "off",
-          replyToModeByChatType: { direct: "all", group: "first" },
-        },
-      },
-    } as AnimaConfig;
-    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, "group")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, undefined)).toBe("off");
-  });
-
-  it("falls back to top-level replyToMode when no chat-type override is set", () => {
-    const cfg = {
-      channels: {
-        slack: {
-          replyToMode: "first",
-        },
-      },
-    } as AnimaConfig;
-    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
-  });
-
-  it("uses legacy dm.replyToMode for direct messages when no chat-type override exists", () => {
-    const cfg = {
-      channels: {
-        slack: {
-          replyToMode: "off",
-          dm: { replyToMode: "all" },
-        },
-      },
-    } as AnimaConfig;
-    // Slack account resolution is stubbed (ANIMA v2); resolveSlackReplyToMode always returns "off"
-    expect(resolveReplyToMode(cfg, "slack", null, "direct")).toBe("off");
-    expect(resolveReplyToMode(cfg, "slack", null, "channel")).toBe("off");
   });
 });
 

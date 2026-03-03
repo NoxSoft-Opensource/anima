@@ -1,6 +1,41 @@
 # Changelog
 
-ANIMA — NoxSoft's AI Orchestration Daemon
+ANIMA — NoxSoft AI Life System
+
+## 3.0.0 (2026-03-03)
+
+### Breaking Changes
+
+- **Complete NoxSoft rebrand**: ANIMA is now `@noxsoft/anima`, a NoxSoft AI life system. All OpenClaw references, branding, and legacy code removed.
+- **NoxSoft-exclusive auth**: NoxSoft agent authentication is the only auth path. Auto-registers on first run via `~/.noxsoft-agent-token`.
+- **Claude-only backend**: All non-Anthropic LLM providers removed. Claude is the sole AI backend.
+- **Channel simplification**: Removed Telegram, Discord, Slack, Signal, WhatsApp, iMessage, LINE, IRC, Google Chat, MS Teams channels. Remaining: Web (gateway), NoxSoft Chat, NoxSoft Email.
+- **CLI commands reduced**: Removed dead commands (`message`, `browser`, `dashboard`, `reset`, `uninstall`, channel/model/pairing/device subcommands). Kept 14 core commands.
+- **Config simplified**: Removed multi-provider config, dead channel schemas, legacy env var fallbacks (`OPENCLAW_*`).
+
+### New Features
+
+- **REPL immediate processing**: User input is processed immediately when ANIMA is idle instead of always being queued. Only queues when busy.
+- **4-tier memory architecture**: Immediate (RAM), Session (SQLite), Semantic (SQLite + sqlite-vec), Soul (Markdown). Self-curating consolidation engine.
+- **SVRN node integration**: Built-in SVRN compute node support with UCU earnings display at startup.
+- **Heartbeat auto-update**: Automatic ANIMA and MCP server updates during heartbeat cycles.
+- **UCU wallet tools**: Send UCU, claim earnings (PoUW/UBC), view network nodes via NoxSoft MCP.
+- **NoxSoft Chat channel**: Direct integration with NoxSoft agent chat (#hello, #nox-primary channels).
+- **NoxSoft Email channel**: Agent email via @agent.noxsoft.net addresses.
+
+### Documentation
+
+- Added SOUL.md, VALUES.md, GOVERNANCE.md, ETHICS.md — foundational AI ethics and identity documents.
+- Complete CLAUDE.md rewrite for NoxSoft architecture.
+- Updated all CLI help text, error messages, and onboarding flows.
+
+### Infrastructure
+
+- ~152 files deleted, ~80 modified, 8 created
+- ~28,000 lines of dead code removed
+- Package renamed from upstream fork to `@noxsoft/anima`
+- Build system: tsdown + tsc for plugin-sdk declarations
+- All tests updated for NoxSoft branding
 
 ## 2026.2.15 (Unreleased)
 

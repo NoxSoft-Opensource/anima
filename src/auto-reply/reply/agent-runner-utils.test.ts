@@ -6,38 +6,6 @@ import { buildThreadingToolContext } from "./agent-runner-utils.js";
 describe("buildThreadingToolContext", () => {
   const cfg = {} as AnimaConfig;
 
-  it("uses conversation id for WhatsApp", () => {
-    const sessionCtx = {
-      Provider: "whatsapp",
-      From: "123@g.us",
-      To: "+15550001",
-    } as TemplateContext;
-
-    const result = buildThreadingToolContext({
-      sessionCtx,
-      config: cfg,
-      hasRepliedRef: undefined,
-    });
-
-    // WhatsApp dock threading uses From (group JID) as the channel id
-    expect(result.currentChannelId).toBe("123@g.us");
-  });
-
-  it("falls back to To for WhatsApp when From is missing", () => {
-    const sessionCtx = {
-      Provider: "whatsapp",
-      To: "+15550001",
-    } as TemplateContext;
-
-    const result = buildThreadingToolContext({
-      sessionCtx,
-      config: cfg,
-      hasRepliedRef: undefined,
-    });
-
-    expect(result.currentChannelId).toBe("+15550001");
-  });
-
   it("uses the recipient id for other channels", () => {
     const sessionCtx = {
       Provider: "telegram",
@@ -52,24 +20,6 @@ describe("buildThreadingToolContext", () => {
     });
 
     expect(result.currentChannelId).toBe("chat:99");
-  });
-
-  it("uses the sender handle for iMessage direct chats", () => {
-    const sessionCtx = {
-      Provider: "imessage",
-      ChatType: "direct",
-      From: "imessage:+15550001",
-      To: "chat_id:12",
-    } as TemplateContext;
-
-    const result = buildThreadingToolContext({
-      sessionCtx,
-      config: cfg,
-      hasRepliedRef: undefined,
-    });
-
-    // iMessage dock threading uses From for direct chats
-    expect(result.currentChannelId).toBe("imessage:+15550001");
   });
 
   it("uses chat_id for iMessage groups", () => {

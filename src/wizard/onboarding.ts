@@ -3,6 +3,7 @@ import type { AnimaConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { QuickstartGatewayDefaults, WizardFlow } from "./onboarding.types.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
+import { ensureAuthenticated } from "../auth/noxsoft-auth.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { promptAuthChoiceGrouped } from "../commands/auth-choice-prompt.js";
 import {
@@ -67,6 +68,7 @@ export async function runOnboardingWizard(
   // --- Step 1: Load existing config (merge, never prompt) ---
   const snapshot = await readConfigFileSnapshot();
   const baseConfig: AnimaConfig = snapshot.valid ? snapshot.config : {};
+  const isFreshInstance = !snapshot.exists;
 
   if (snapshot.exists && !snapshot.valid) {
     await prompter.note(summarizeExistingConfig(baseConfig), "Invalid configuration detected");
@@ -107,7 +109,28 @@ export async function runOnboardingWizard(
     },
   };
 
-  // --- Step 2: Auth provider selection ---
+  // --- Step 2: Required NoxSoft auth ---
+  try {
+    const auth = await ensureAuthenticated({
+      name: opts.noxsoftAgentName,
+      displayName: opts.noxsoftDisplayName,
+      description: "ANIMA onboarding wizard",
+    });
+    await prompter.note(
+      `${auth.registered ? "Registered" : "Authenticated"} as ${auth.agent.display_name} (@${auth.agent.name}).`,
+      "NoxSoft authentication",
+    );
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unknown NoxSoft authentication error.";
+    await prompter.note(message, "NoxSoft authentication failed");
+    runtime.exit(1);
+    return;
+  }
+
+  // --- Step 3: Model/auth provider selection ---
   const authStore = ensureAuthProfileStore(undefined, {
     allowKeychainPrompt: false,
   });
@@ -117,7 +140,7 @@ export async function runOnboardingWizard(
     (await promptAuthChoiceGrouped({
       prompter,
       store: authStore,
-      includeSkip: true,
+      includeSkip: false,
     }));
 
   {
@@ -131,7 +154,7 @@ export async function runOnboardingWizard(
     nextConfig = authResult.config;
   }
 
-  // --- Step 3: Model selection ---
+  // --- Step 4: Model selection ---
   if (authChoiceFromPrompt) {
     const modelSelection = await promptDefaultModel({
       config: nextConfig,
@@ -151,7 +174,7 @@ export async function runOnboardingWizard(
 
   await warnIfModelConfigLooksOff(nextConfig, prompter);
 
-  // --- Step 4: Auto-configure gateway with quickstart defaults ---
+  // --- Step 5: Auto-configure gateway with quickstart defaults ---
   const localPort = resolveGatewayPort(baseConfig);
 
   const quickstartGateway: QuickstartGatewayDefaults = (() => {
@@ -217,11 +240,12 @@ export async function runOnboardingWizard(
   nextConfig = gateway.nextConfig;
   const settings = gateway.settings;
 
-  // --- Step 5: Write config, setup workspace, hooks, finalize ---
+  // --- Step 6: Write config, setup workspace, hooks, finalize ---
   await writeConfigFile(nextConfig);
   logConfigUpdated(runtime);
   await ensureWorkspaceAndSessions(workspaceDir, runtime, {
     skipBootstrap: Boolean(nextConfig.agents?.defaults?.skipBootstrap),
+    seedBootstrapOnFirstRun: isFreshInstance,
   });
 
   // Setup hooks (session memory on /new)
@@ -237,6 +261,7 @@ export async function runOnboardingWizard(
     nextConfig,
     workspaceDir,
     settings,
+    allowHatching: isFreshInstance,
     prompter,
     runtime,
   });

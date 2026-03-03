@@ -106,6 +106,34 @@ describe("cli program (smoke)", () => {
     expect(onboardCommand).not.toHaveBeenCalled();
   });
 
+  it("passes setup preset and heartbeat overrides", async () => {
+    const program = buildProgram();
+    await program.parseAsync(
+      [
+        "setup",
+        "--preset",
+        "noxsoft-autonomy",
+        "--heartbeat-every",
+        "5m",
+        "--heartbeat-target",
+        "last",
+        "--heartbeat-prompt",
+        "Check chat.noxsoft.net and status.noxsoft.net before coding.",
+      ],
+      { from: "user" },
+    );
+    expect(setupCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        preset: "noxsoft-autonomy",
+        heartbeatEvery: "5m",
+        heartbeatTarget: "last",
+        heartbeatPrompt: "Check chat.noxsoft.net and status.noxsoft.net before coding.",
+      }),
+      runtime,
+    );
+    expect(onboardCommand).not.toHaveBeenCalled();
+  });
+
   it("runs setup wizard when wizard flags are present", async () => {
     const program = buildProgram();
     await program.parseAsync(["setup", "--remote-url", "ws://example"], {

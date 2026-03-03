@@ -1,22 +1,22 @@
 /* ANIMA Web UI — NoxSoft Design System */
 
 :root {
-  --color-bg: #0A0A0A;
-  --color-text: #F0EEE8;
-  --color-accent: #FF6600;
-  --color-accent-dim: #CC5200;
+  --color-bg: #0a0a0a;
+  --color-text: #f0eee8;
+  --color-accent: #ff6600;
+  --color-accent-dim: #cc5200;
   --color-accent-glow: rgba(255, 102, 0, 0.15);
-  --color-muted: #8A8A8A;
+  --color-muted: #8a8a8a;
   --color-surface: #111111;
-  --color-surface-hover: #1A1A1A;
-  --color-border: #2A2A2A;
-  --color-success: #00C853;
-  --color-error: #FF3B30;
-  --color-warning: #FFB300;
+  --color-surface-hover: #1a1a1a;
+  --color-border: #2a2a2a;
+  --color-success: #00c853;
+  --color-error: #ff3b30;
+  --color-warning: #ffb300;
 
-  --font-heading: 'Syne', system-ui, sans-serif;
-  --font-body: 'Space Grotesk', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-heading: "Syne", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -29,7 +29,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   background: var(--color-bg);
@@ -189,9 +191,15 @@ html, body, #root {
   display: inline-block;
 }
 
-.status-dot.healthy { background: var(--color-success); }
-.status-dot.unhealthy { background: var(--color-error); }
-.status-dot.unknown { background: var(--color-warning); }
+.status-dot.healthy {
+  background: var(--color-success);
+}
+.status-dot.unhealthy {
+  background: var(--color-error);
+}
+.status-dot.unknown {
+  background: var(--color-warning);
+}
 
 /* Badge */
 .badge {
@@ -205,10 +213,22 @@ html, body, #root {
   letter-spacing: 0.5px;
 }
 
-.badge.completed { background: rgba(0, 200, 83, 0.15); color: var(--color-success); }
-.badge.running { background: var(--color-accent-glow); color: var(--color-accent); }
-.badge.queued { background: rgba(255, 179, 0, 0.15); color: var(--color-warning); }
-.badge.failed { background: rgba(255, 59, 48, 0.15); color: var(--color-error); }
+.badge.completed {
+  background: rgba(0, 200, 83, 0.15);
+  color: var(--color-success);
+}
+.badge.running {
+  background: var(--color-accent-glow);
+  color: var(--color-accent);
+}
+.badge.queued {
+  background: rgba(255, 179, 0, 0.15);
+  color: var(--color-warning);
+}
+.badge.failed {
+  background: rgba(255, 59, 48, 0.15);
+  color: var(--color-error);
+}
 
 /* Progress bar */
 .progress-bar {
@@ -389,4 +409,143 @@ html, body, #root {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted);
+}
+
+/* Home dashboard chat layout */
+.home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.live-chat-card {
+  min-height: 760px;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-chip {
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.status-chip.online {
+  background: rgba(0, 200, 83, 0.18);
+  color: var(--color-success);
+}
+
+.status-chip.offline {
+  background: rgba(255, 179, 0, 0.18);
+  color: var(--color-warning);
+}
+
+.live-chat-feed {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--color-bg);
+  min-height: 420px;
+}
+
+.live-chat-row {
+  display: flex;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.live-chat-row.user {
+  justify-content: flex-end;
+}
+
+.live-chat-row.assistant {
+  justify-content: flex-start;
+}
+
+.live-chat-bubble {
+  max-width: 84%;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.live-chat-bubble.user {
+  background: var(--color-accent-glow);
+  border: 1px solid rgba(255, 102, 0, 0.3);
+}
+
+.live-chat-bubble.assistant {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.live-chat-role {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.live-chat-input-row {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.live-chat-input {
+  width: 100%;
+  resize: vertical;
+  min-height: 76px;
+  max-height: 180px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+}
+
+.live-chat-input:focus {
+  border-color: var(--color-accent);
+}
+
+.live-chat-send {
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-text);
+  font-weight: 700;
+  font-family: var(--font-body);
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.live-chat-send:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1120px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .live-chat-card {
+    min-height: 620px;
+  }
 }

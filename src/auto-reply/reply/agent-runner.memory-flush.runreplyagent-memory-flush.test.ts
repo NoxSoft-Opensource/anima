@@ -122,53 +122,6 @@ afterAll(async () => {
 });
 
 describe("runReplyAgent memory flush", () => {
-  it("skips memory flush for CLI providers", async () => {
-    const runEmbeddedPiAgentMock = getRunEmbeddedPiAgentMock();
-    const runCliAgentMock = getRunCliAgentMock();
-    runEmbeddedPiAgentMock.mockReset();
-    runCliAgentMock.mockReset();
-
-    await withTempStore(async (storePath) => {
-      const sessionKey = "main";
-      const sessionEntry = {
-        sessionId: "session",
-        updatedAt: Date.now(),
-        totalTokens: 80_000,
-        compactionCount: 1,
-      };
-
-      await seedSessionStore({ storePath, sessionKey, entry: sessionEntry });
-
-      runEmbeddedPiAgentMock.mockImplementation(async () => ({
-        payloads: [{ text: "ok" }],
-        meta: { agentMeta: { usage: { input: 1, output: 1 } } },
-      }));
-      runCliAgentMock.mockResolvedValue({
-        payloads: [{ text: "ok" }],
-        meta: { agentMeta: { usage: { input: 1, output: 1 } } },
-      });
-
-      const baseRun = createBaseRun({
-        storePath,
-        sessionEntry,
-        runOverrides: { provider: "codex-cli" },
-      });
-
-      await runReplyAgentWithBase({
-        baseRun,
-        storePath,
-        sessionKey,
-        sessionEntry,
-        commandBody: "hello",
-      });
-
-      expect(runCliAgentMock).toHaveBeenCalledTimes(1);
-      const call = runCliAgentMock.mock.calls[0]?.[0] as { prompt?: string } | undefined;
-      expect(call?.prompt).toBe("hello");
-      expect(runEmbeddedPiAgentMock).not.toHaveBeenCalled();
-    });
-  });
-
   it("uses configured prompts for memory flush runs", async () => {
     const runEmbeddedPiAgentMock = getRunEmbeddedPiAgentMock();
     runEmbeddedPiAgentMock.mockReset();

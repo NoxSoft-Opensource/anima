@@ -1,6 +1,7 @@
 import type { AnimaConfig } from "../../config/config.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { OnboardOptions } from "../onboard-types.js";
+import { ensureAuthenticated } from "../../auth/noxsoft-auth.js";
 import { formatCliCommand } from "../../cli/command-format.js";
 import { writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
@@ -17,6 +18,27 @@ export async function runNonInteractiveOnboardingRemote(params: {
   const remoteUrl = opts.remoteUrl?.trim();
   if (!remoteUrl) {
     runtime.error("Missing --remote-url for remote mode.");
+    runtime.exit(1);
+    return;
+  }
+
+  try {
+    const auth = await ensureAuthenticated({
+      name: opts.noxsoftAgentName,
+      displayName: opts.noxsoftDisplayName,
+      description: "ANIMA non-interactive remote onboarding",
+    });
+    if (!opts.json) {
+      runtime.log(
+        `NoxSoft ${auth.registered ? "registered" : "authenticated"}: ${auth.agent.display_name} (@${auth.agent.name})`,
+      );
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unknown NoxSoft authentication error.";
+    runtime.error(`NoxSoft authentication is required.\n${message}`);
     runtime.exit(1);
     return;
   }

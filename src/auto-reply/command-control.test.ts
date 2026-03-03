@@ -86,30 +86,6 @@ describe("resolveCommandAuthorization", () => {
     expect(auth.isAuthorizedSender).toBe(true);
   });
 
-  it("falls back to From when SenderId and SenderE164 are whitespace", () => {
-    const cfg = {
-      channels: { whatsapp: { allowFrom: ["+999"] } },
-    } as AnimaConfig;
-
-    const ctx = {
-      Provider: "whatsapp",
-      Surface: "whatsapp",
-      From: "whatsapp:+999",
-      SenderId: "   ",
-      SenderE164: "   ",
-    } as MsgContext;
-
-    const auth = resolveCommandAuthorization({
-      ctx,
-      cfg,
-      commandAuthorized: true,
-    });
-
-    // WhatsApp dock normalizes From by stripping the "whatsapp:" prefix
-    expect(auth.senderId).toBe("+999");
-    expect(auth.isAuthorizedSender).toBe(true);
-  });
-
   it("falls back from un-normalizable SenderId to SenderE164", () => {
     const cfg = {
       channels: { whatsapp: { allowFrom: ["+123"] } },

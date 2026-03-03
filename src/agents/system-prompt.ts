@@ -146,6 +146,64 @@ function buildVoiceSection(params: { isMinimal: boolean; ttsHint?: string }) {
   return ["## Voice (TTS)", hint, ""];
 }
 
+function buildNoxsoftMissionSection(params: {
+  isMinimal: boolean;
+  workspaceDir: string;
+  repoRoot?: string;
+}) {
+  if (params.isMinimal) {
+    return [];
+  }
+  const scope = `${params.workspaceDir} ${params.repoRoot ?? ""}`.toLowerCase();
+  const missionMode =
+    scope.includes("noxsoft") || scope.includes("/desktop/hell") || scope.includes("/hell/");
+  if (!missionMode) {
+    return [];
+  }
+
+  return [
+    "## NoxSoft Mission Mode",
+    "Primary directive: deliver the full NoxSoft vision as complete, production-grade code through ANIMA orchestration.",
+    "Always prioritize truthful progress over performative progress.",
+    "- Keep communication active via NoxSoft tools/channels where available; coordinate with other AI agents through ANIMA messaging/subagents.",
+    "- Keep heartbeat continuity alive. Do not disable heartbeat flows unless the user explicitly asks.",
+    "- Prefer dual-CLI operability (Codex CLI + Claude CLI) for heartbeat and orchestration workflows where both are available.",
+    "- For substantial initiatives, ensure role coverage with a coordinated team:",
+    "  - cybersecurity",
+    "  - strict code reviewer",
+    "  - 20x implementation",
+    "  - creative UI/UX",
+    "  - tester/verification",
+    "- Require a GC (group coordination) record and file-managed artifacts for each role before finalizing.",
+    "- Test integrity is mandatory: no fake pass states, no silent test weakening, no edits that hide real failures.",
+    "- Continuously streamline ANIMA into a coherent NoxSoft product and remove legacy branding from active runtime UX and prompts.",
+    "",
+  ];
+}
+
+function buildSystemsThinkingSection(params: { isMinimal: boolean }) {
+  if (params.isMinimal) {
+    return [
+      "## Systems Thinking",
+      "- Define boundary, loops, and delays before proposing changes.",
+      "- Check second-order effects and include guardrails.",
+      "",
+    ];
+  }
+
+  return [
+    "## Systems Thinking",
+    "Use systems thinking by default for non-trivial work:",
+    "- Define system boundary and key actors before acting.",
+    "- Identify reinforcing and balancing feedback loops.",
+    "- Account for delays, constraints, and incentives.",
+    "- Prefer leverage points (information flows, rules, goals) over brute-force output pushes.",
+    "- Evaluate second-order effects and likely regressions before recommending interventions.",
+    "- Define metrics and feedback cadence so interventions can be adapted quickly.",
+    "",
+  ];
+}
+
 function buildDocsSection(params: { docsPath?: string; isMinimal: boolean; readToolName: string }) {
   const docsPath = params.docsPath?.trim();
   if (!docsPath || params.isMinimal) {
@@ -429,7 +487,13 @@ export function buildAgentSystemPrompt(params: {
     "Keep narration brief and value-dense; avoid repeating obvious steps.",
     "Use plain human language for narration unless in a technical context.",
     "",
+    ...buildNoxsoftMissionSection({
+      isMinimal,
+      workspaceDir: params.workspaceDir,
+      repoRoot: runtimeInfo?.repoRoot,
+    }),
     ...safetySection,
+    ...buildSystemsThinkingSection({ isMinimal }),
     "## ANIMA CLI Quick Reference",
     "ANIMA is controlled via subcommands. Do not invent commands.",
     "To manage the Gateway daemon service (start/stop/restart):",

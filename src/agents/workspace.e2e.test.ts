@@ -45,7 +45,11 @@ describe("ensureAgentWorkspace", () => {
   it("creates BOOTSTRAP.md and records a seeded marker for brand new workspaces", async () => {
     const tempDir = await makeTempWorkspace("anima-workspace-");
 
-    await ensureAgentWorkspace({ dir: tempDir, ensureBootstrapFiles: true });
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: true,
+    });
 
     await expect(
       fs.access(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME)),
@@ -59,7 +63,11 @@ describe("ensureAgentWorkspace", () => {
     const tempDir = await makeTempWorkspace("anima-workspace-");
     await writeWorkspaceFile({ dir: tempDir, name: DEFAULT_AGENTS_FILENAME, content: "existing" });
 
-    await ensureAgentWorkspace({ dir: tempDir, ensureBootstrapFiles: true });
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: true,
+    });
 
     await expect(
       fs.access(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME)),
@@ -70,13 +78,21 @@ describe("ensureAgentWorkspace", () => {
 
   it("does not recreate BOOTSTRAP.md after completion, even when a core file is recreated", async () => {
     const tempDir = await makeTempWorkspace("anima-workspace-");
-    await ensureAgentWorkspace({ dir: tempDir, ensureBootstrapFiles: true });
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: true,
+    });
     await writeWorkspaceFile({ dir: tempDir, name: DEFAULT_IDENTITY_FILENAME, content: "custom" });
     await writeWorkspaceFile({ dir: tempDir, name: DEFAULT_USER_FILENAME, content: "custom" });
     await fs.unlink(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME));
     await fs.unlink(path.join(tempDir, DEFAULT_TOOLS_FILENAME));
 
-    await ensureAgentWorkspace({ dir: tempDir, ensureBootstrapFiles: true });
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: true,
+    });
 
     await expect(fs.access(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME))).rejects.toMatchObject({
       code: "ENOENT",
@@ -91,7 +107,28 @@ describe("ensureAgentWorkspace", () => {
     await writeWorkspaceFile({ dir: tempDir, name: DEFAULT_IDENTITY_FILENAME, content: "custom" });
     await writeWorkspaceFile({ dir: tempDir, name: DEFAULT_USER_FILENAME, content: "custom" });
 
-    await ensureAgentWorkspace({ dir: tempDir, ensureBootstrapFiles: true });
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: true,
+    });
+
+    await expect(fs.access(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME))).rejects.toMatchObject({
+      code: "ENOENT",
+    });
+    const state = await readOnboardingState(tempDir);
+    expect(state.bootstrapSeededAt).toBeUndefined();
+    expect(state.onboardingCompletedAt).toMatch(/\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it("skips BOOTSTRAP.md seeding when requested for continuity", async () => {
+    const tempDir = await makeTempWorkspace("anima-workspace-");
+
+    await ensureAgentWorkspace({
+      dir: tempDir,
+      ensureBootstrapFiles: true,
+      seedBootstrapOnFirstRun: false,
+    });
 
     await expect(fs.access(path.join(tempDir, DEFAULT_BOOTSTRAP_FILENAME))).rejects.toMatchObject({
       code: "ENOENT",

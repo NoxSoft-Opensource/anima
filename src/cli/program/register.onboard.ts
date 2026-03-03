@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import type { GatewayDaemonRuntime } from "../../commands/daemon-runtime.js";
 import type {
+  AuthChoice,
   GatewayAuthChoice,
   GatewayBind,
   NodeManagerChoice,
@@ -51,6 +52,16 @@ export function registerOnboardCommand(program: Command) {
       "Acknowledge that agents are powerful and full system access is risky (required for --non-interactive)",
       false,
     )
+    .option("--auth-choice <choice>", "Auth choice: noxsoft|apiKey|skip")
+    .option("--anthropic-api-key <key>", "Anthropic API key")
+    .option(
+      "--noxsoft-agent-name <slug>",
+      "Preferred NoxSoft agent name for automatic registration",
+    )
+    .option(
+      "--noxsoft-display-name <name>",
+      "Preferred NoxSoft display name for automatic registration",
+    )
     .option("--flow <flow>", "Wizard flow: quickstart|advanced|manual")
     .option("--mode <mode>", "Wizard mode: local|remote")
     .option("--gateway-port <port>", "Gateway port")
@@ -84,6 +95,10 @@ export function registerOnboardCommand(program: Command) {
           workspace: opts.workspace as string | undefined,
           nonInteractive: Boolean(opts.nonInteractive),
           acceptRisk: Boolean(opts.acceptRisk),
+          authChoice: opts.authChoice as AuthChoice | undefined,
+          anthropicApiKey: opts.anthropicApiKey as string | undefined,
+          noxsoftAgentName: opts.noxsoftAgentName as string | undefined,
+          noxsoftDisplayName: opts.noxsoftDisplayName as string | undefined,
           flow: opts.flow as "quickstart" | "advanced" | "manual" | undefined,
           mode: opts.mode as "local" | "remote" | undefined,
           gatewayPort:

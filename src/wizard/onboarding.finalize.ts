@@ -40,6 +40,7 @@ type FinalizeOnboardingOptions = {
   nextConfig: AnimaConfig;
   workspaceDir: string;
   settings: GatewayWizardSettings;
+  allowHatching?: boolean;
   prompter: WizardPrompter;
   runtime: RuntimeEnv;
 };
@@ -270,6 +271,7 @@ export async function finalizeOnboardingWizard(
     .access(bootstrapPath)
     .then(() => true)
     .catch(() => false);
+  const shouldHatch = options.allowHatching !== false && hasBootstrap;
 
   await prompter.note(
     [
@@ -293,7 +295,7 @@ export async function finalizeOnboardingWizard(
   let launchedTui = false;
 
   if (!opts.skipUi && gatewayProbe.ok) {
-    if (hasBootstrap) {
+    if (shouldHatch) {
       await prompter.note(
         [
           "This is where your agent's persistent identity begins.",
@@ -336,7 +338,7 @@ export async function finalizeOnboardingWizard(
         password: settings.authMode === "password" ? nextConfig.gateway?.auth?.password : "",
         // Safety: onboarding TUI should not auto-deliver to lastProvider/lastTo.
         deliver: false,
-        message: hasBootstrap ? "Wake up, my friend!" : undefined,
+        message: shouldHatch ? "Wake up, my friend!" : undefined,
       });
       launchedTui = true;
     } else if (hatchChoice === "web") {

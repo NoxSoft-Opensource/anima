@@ -9,7 +9,7 @@ import Sessions from "./pages/Sessions";
 import Soul from "./pages/Soul";
 
 const navItems = [
-  { path: "/dashboard", label: "Dashboard", icon: "~" },
+  { path: "/dashboard", label: "Home", icon: "~" },
   { path: "/soul", label: "Soul", icon: "@" },
   { path: "/memory", label: "Memory", icon: "#" },
   { path: "/sessions", label: "Sessions", icon: ">" },
