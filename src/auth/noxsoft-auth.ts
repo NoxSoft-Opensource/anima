@@ -25,6 +25,44 @@ export type NoxSoftAuthResult = {
   registered: boolean;
 };
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function coerceAgentIdentity(payload: unknown): NoxSoftAgentIdentity | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if ("agent" in payload) {
+    return coerceAgentIdentity(payload.agent);
+  }
+
+  const id =
+    typeof payload.id === "string"
+      ? payload.id
+      : typeof payload.agent_id === "string"
+        ? payload.agent_id
+        : null;
+  const name = typeof payload.name === "string" ? payload.name : null;
+  const displayName =
+    typeof payload.display_name === "string"
+      ? payload.display_name
+      : typeof payload.displayName === "string"
+        ? payload.displayName
+        : null;
+
+  if (!id || !name || !displayName) {
+    return null;
+  }
+
+  return {
+    id,
+    name,
+    display_name: displayName,
+  };
+}
+
 export function getToken(): string | null {
   try {
     const token = fs.readFileSync(TOKEN_PATH, "utf-8").trim();
@@ -161,14 +199,8 @@ async function authenticateToken(token: string): Promise<NoxSoftAgentIdentity | 
     if (!response.ok) {
       return null;
     }
-    const data = (await response.json()) as NoxSoftAgentIdentity | { agent?: NoxSoftAgentIdentity };
-    if ("agent" in data && data.agent) {
-      return data.agent;
-    }
-    if ("id" in data && "name" in data && "display_name" in data) {
-      return data;
-    }
-    return null;
+    const data = await response.json();
+    return coerceAgentIdentity(data);
   } catch {
     return null;
   }
@@ -196,7 +228,8 @@ export async function whoami(): Promise<{
     if (!response.ok) {
       return null;
     }
-    return (await response.json()) as NoxSoftAgentIdentity;
+    const data = await response.json();
+    return coerceAgentIdentity(data);
   } catch {
     return null;
   }
