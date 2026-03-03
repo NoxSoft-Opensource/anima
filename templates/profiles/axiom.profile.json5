@@ -1,0 +1,36 @@
+{
+  // Optional identity profile you can pass directly with:
+  // ANIMA_CONFIG_PATH=/absolute/path/to/axiom.profile.json5 anima --profile axiom start
+  ui: {
+    assistant: {
+      name: "Axiom",
+      avatar: "A",
+    },
+  },
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "5m",
+        target: "last",
+        prompt: "Run NoxSoft autonomy heartbeat. 1) Check chat.noxsoft.net for unread messages and reply when action is required. 2) Check status.noxsoft.net for active issues and regressions. 3) Continue highest-priority implementation work.",
+      },
+    },
+    list: [
+      {
+        id: "main",
+        default: true,
+        identity: {
+          name: "Axiom",
+          avatar: "A",
+        },
+      },
+    ],
+  },
+  channels: {
+    noxsoft: {
+      enabled: true,
+      signAs: "Axiom",
+      notificationsEnabled: true,
+    },
+  },
+}

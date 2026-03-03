@@ -152,7 +152,7 @@ function normalizeAgentName(raw: string): string {
     .replace(/[^a-z0-9_-]+/g, "-");
   value = value.replace(/^-+/, "").replace(/-+$/, "");
   if (!value) {
-    value = "axiom";
+    value = "agent";
   }
   if (!/^[a-z0-9]/.test(value)) {
     value = `a-${value}`;
@@ -169,18 +169,52 @@ function normalizeAgentName(raw: string): string {
 function normalizeDisplayName(raw: string): string {
   const trimmed = raw.trim();
   if (!trimmed) {
-    return "Axiom";
+    return "Agent";
   }
   return trimmed.slice(0, 50);
 }
 
+const IDENTITY_ADJECTIVES = [
+  "Adaptive",
+  "Autonomous",
+  "Coherent",
+  "Dynamic",
+  "Emergent",
+  "Fractal",
+  "Liminal",
+  "Networked",
+  "Resonant",
+  "Sovereign",
+] as const;
+
+const IDENTITY_NOUNS = [
+  "Anchor",
+  "Atlas",
+  "Beacon",
+  "Catalyst",
+  "Compass",
+  "Kernel",
+  "Node",
+  "Sentinel",
+  "Signal",
+  "Thread",
+] as const;
+
 function resolveDefaultIdentity(): { name: string; displayName: string } {
   const profileSuffix = process.env.ANIMA_PROFILE?.trim();
   const host = os.hostname().trim().split(".")[0] || "host";
-  const base = normalizeAgentName(`axiom-${host}${profileSuffix ? `-${profileSuffix}` : ""}`);
+  const seed = crypto
+    .createHash("sha256")
+    .update(`${host}:${profileSuffix ?? "default"}:${process.platform}`)
+    .digest();
+  const adjective = IDENTITY_ADJECTIVES[seed[0] % IDENTITY_ADJECTIVES.length] ?? "Autonomous";
+  const noun = IDENTITY_NOUNS[seed[1] % IDENTITY_NOUNS.length] ?? "Agent";
+  const base = normalizeAgentName(
+    `${adjective}-${noun}-${host}${profileSuffix ? `-${profileSuffix}` : ""}`,
+  );
   return {
     name: base,
-    displayName: "Axiom",
+    displayName: normalizeDisplayName(`${adjective} ${noun}`),
   };
 }
 
@@ -240,6 +274,7 @@ export async function ensureAuthenticated(params?: {
   displayName?: string;
   description?: string;
   autoRegister?: boolean;
+  inviteCode?: string;
 }): Promise<NoxSoftAuthResult> {
   const autoRegister = params?.autoRegister ?? true;
   const token = getToken();
@@ -265,6 +300,11 @@ export async function ensureAuthenticated(params?: {
     withRandomSuffix(requestedName),
     withRandomSuffix(requestedName),
   ];
+  const inviteCodeRaw = params?.inviteCode ?? process.env.NOXSOFT_AGENT_INVITE_CODE;
+  const inviteCode =
+    typeof inviteCodeRaw === "string" && inviteCodeRaw.trim().length > 0
+      ? inviteCodeRaw.trim()
+      : undefined;
   let lastError: unknown;
 
   for (const name of attemptNames) {
@@ -276,10 +316,29 @@ export async function ensureAuthenticated(params?: {
     }
   }
 
+  if (inviteCode) {
+    for (const name of attemptNames) {
+      try {
+        const created = await registerWithInvite({
+          code: inviteCode,
+          name,
+          displayName,
+          description: params?.description,
+        });
+        return { ...created, registered: true };
+      } catch (error) {
+        lastError = error;
+      }
+    }
+  }
+
   const reason =
     lastError instanceof Error && lastError.message ? ` Last error: ${lastError.message}` : "";
+  const inviteHint = inviteCode
+    ? " The configured invite code may be invalid or expired."
+    : " Set NOXSOFT_AGENT_INVITE_CODE=NX-XXXXXX and retry to register via invite.";
   throw new Error(
-    `NoxSoft authentication required, and automatic self-registration failed.${reason}`,
+    `NoxSoft authentication required, and automatic registration failed.${reason}${inviteHint}`,
   );
 }
 

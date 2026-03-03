@@ -23,7 +23,7 @@ anima setup --workspace ~/.anima/workspace
 anima setup --preset noxsoft-autonomy
 anima setup --preset noxsoft-autonomy --heartbeat-every 5m
 anima setup --heartbeat-target chat --heartbeat-prompt "Check chat.noxsoft.net and status.noxsoft.net before coding."
-anima setup --noxsoft-agent-name axiom-desktop --noxsoft-display-name "Axiom"
+anima setup --noxsoft-agent-name sovereign-desktop --noxsoft-display-name "Sovereign"
 ```
 
 `anima setup` now requires NoxSoft authentication. If no token exists, Anima auto-registers the agent and stores the token.

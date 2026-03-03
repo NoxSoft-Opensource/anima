@@ -55,7 +55,7 @@ const CLI_NAME = resolveCliName();
 
 const UPDATE_QUIPS = [
   "Leveled up! New skills unlocked. You're welcome.",
-  "Fresh code, same Axiom core. Miss me?",
+  "Fresh code, same core. Miss me?",
   "Back and better. Did you even notice I was gone?",
   "Update complete. I learned some new tricks while I was out.",
   "Upgraded! Now with 23% more sass.",

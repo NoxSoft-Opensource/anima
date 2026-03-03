@@ -8,6 +8,7 @@ import {
   type QueueItem,
   type SVRNStatus,
 } from "../api";
+import { resolveInjectedAssistantIdentity } from "../ui/assistant-identity";
 
 const GATEWAY_WS_URL = "ws://localhost:18789/ws";
 const CHAT_SESSION_KEY = "main";
@@ -90,6 +91,37 @@ function extractText(value: unknown): string {
   }
 
   return "";
+}
+
+function mergeStreamText(current: string, incoming: string): string {
+  const next = incoming.replace(/\r/g, "");
+  if (!next) {
+    return current;
+  }
+  if (!current) {
+    return next;
+  }
+  if (next === current) {
+    return current;
+  }
+  if (next.startsWith(current)) {
+    return next;
+  }
+  if (current.startsWith(next) || current.endsWith(next)) {
+    return current;
+  }
+  if (next.includes(current)) {
+    return next;
+  }
+
+  // For chunk streams ("he" then "llo"), append only the non-overlapping suffix.
+  const maxOverlap = Math.min(current.length, next.length);
+  for (let i = maxOverlap; i > 0; i -= 1) {
+    if (current.slice(-i) === next.slice(0, i)) {
+      return `${current}${next.slice(i)}`;
+    }
+  }
+  return `${current}${next}`;
 }
 
 function normalizeHistoryMessages(raw: unknown): ChatMessage[] {
@@ -356,6 +388,11 @@ function SVRNCard({ svrn }: { svrn: SVRNStatus | null }) {
 }
 
 export default function Dashboard(): React.ReactElement {
+  const assistantName = useMemo(() => resolveInjectedAssistantIdentity().name || "Assistant", []);
+  const homeTitle = `${assistantName} Home`;
+  const talkTitle = `Talk to ${assistantName}`;
+  const messagePlaceholder = `Message ${assistantName} directly...`;
+
   const [status, setStatus] = useState<DaemonStatus | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [svrn, setSvrn] = useState<SVRNStatus | null>(null);
@@ -529,7 +566,7 @@ export default function Dashboard(): React.ReactElement {
       if (state === "delta") {
         const delta = extractText(payload.message);
         if (delta) {
-          setChatStream(delta);
+          setChatStream((prev) => mergeStreamText(prev, delta));
         }
         return;
       }
@@ -712,7 +749,7 @@ export default function Dashboard(): React.ReactElement {
   if (error) {
     return (
       <div>
-        <h1 className="page-title">Axiom Home</h1>
+        <h1 className="page-title">{homeTitle}</h1>
         <div className="card" style={{ textAlign: "center", padding: "40px" }}>
           <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.3 }}>~</div>
           <div style={{ color: "var(--color-muted)", fontSize: "15px" }}>{error}</div>
@@ -727,7 +764,7 @@ export default function Dashboard(): React.ReactElement {
   if (!status) {
     return (
       <div>
-        <h1 className="page-title">Axiom Home</h1>
+        <h1 className="page-title">{homeTitle}</h1>
         <div
           className="card"
           style={{ textAlign: "center", padding: "40px", color: "var(--color-muted)" }}
@@ -740,13 +777,13 @@ export default function Dashboard(): React.ReactElement {
 
   return (
     <div>
-      <h1 className="page-title">Axiom Home</h1>
+      <h1 className="page-title">{homeTitle}</h1>
 
       <div className="home-grid">
         <div className="card live-chat-card">
           <div className="card-header" style={{ marginBottom: "8px" }}>
             <div>
-              <div className="card-title">Talk to Axiom</div>
+              <div className="card-title">{talkTitle}</div>
               <div className="card-subtitle">ANIMA direct gateway chat</div>
             </div>
             <span className={`status-chip ${chatConnected ? "online" : "offline"}`}>
@@ -767,7 +804,9 @@ export default function Dashboard(): React.ReactElement {
                 className={`live-chat-row ${message.role === "user" ? "user" : "assistant"}`}
               >
                 <div className={`live-chat-bubble ${message.role}`}>
-                  <div className="live-chat-role">{message.role === "user" ? "You" : "Axiom"}</div>
+                  <div className="live-chat-role">
+                    {message.role === "user" ? "You" : assistantName}
+                  </div>
                   <div>{message.text}</div>
                 </div>
               </div>
@@ -776,7 +815,7 @@ export default function Dashboard(): React.ReactElement {
             {chatStream && (
               <div className="live-chat-row assistant">
                 <div className="live-chat-bubble assistant">
-                  <div className="live-chat-role">Axiom</div>
+                  <div className="live-chat-role">{assistantName}</div>
                   <div>{chatStream}</div>
                 </div>
               </div>
@@ -795,7 +834,7 @@ export default function Dashboard(): React.ReactElement {
             <textarea
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Message Axiom directly..."
+              placeholder={messagePlaceholder}
               className="live-chat-input"
               rows={3}
             />

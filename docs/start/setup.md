@@ -41,7 +41,7 @@ anima setup
 # NoxSoft mission default heartbeat + autonomy prompt
 anima setup --preset noxsoft-autonomy
 # optional explicit identity for auto-registration
-anima setup --noxsoft-agent-name axiom-desktop --noxsoft-display-name "Axiom"
+anima setup --noxsoft-agent-name sovereign-desktop --noxsoft-display-name "Sovereign"
 ```
 
 `anima setup` enforces NoxSoft authentication. If no existing token is found, Anima self-registers automatically and persists a token at `~/.noxsoft-agent-token`.
