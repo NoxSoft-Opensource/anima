@@ -224,4 +224,59 @@ describe("gateway server chat", () => {
       await Promise.all(tempDirs.map((dir) => fs.rm(dir, { recursive: true, force: true })));
     }
   });
+
+  test("emits fallback final when lifecycle end is missing after run start", async () => {
+    const tempDirs: string[] = [];
+    const { server, ws } = await startServerWithClient();
+    const spy = vi.mocked(getReplyFromConfig);
+
+    try {
+      await connectOk(ws);
+
+      const sessionDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-gw-"));
+      tempDirs.push(sessionDir);
+      testState.sessionStorePath = path.join(sessionDir, "sessions.json");
+
+      await writeSessionStore({
+        entries: {
+          main: { sessionId: "sess-main", updatedAt: Date.now() },
+        },
+      });
+
+      spy.mockReset();
+      spy.mockImplementationOnce(async (_ctx, opts) => {
+        opts?.onAgentRunStart?.("run-missing-end-1");
+        return { text: "fallback final reply" };
+      });
+
+      const finalEventP = onceMessage(
+        ws,
+        (o) =>
+          o.type === "event" &&
+          o.event === "chat" &&
+          o.payload?.runId === "idem-fallback-1" &&
+          o.payload?.state === "final",
+        10_000,
+      );
+
+      const sendRes = await rpcReq<{ status?: string }>(ws, "chat.send", {
+        sessionKey: "main",
+        message: "hello",
+        idempotencyKey: "idem-fallback-1",
+      });
+      expect(sendRes.ok).toBe(true);
+      expect(sendRes.payload?.status).toBe("started");
+
+      const finalEvent = await finalEventP;
+      expect(finalEvent.payload?.runId).toBe("idem-fallback-1");
+      expect(finalEvent.payload?.state).toBe("final");
+      expect(finalEvent.payload?.message?.content?.[0]?.text).toContain("fallback final reply");
+    } finally {
+      __setMaxChatHistoryMessagesBytesForTest();
+      testState.sessionStorePath = undefined;
+      ws.close();
+      await server.close();
+      await Promise.all(tempDirs.map((dir) => fs.rm(dir, { recursive: true, force: true })));
+    }
+  });
 });

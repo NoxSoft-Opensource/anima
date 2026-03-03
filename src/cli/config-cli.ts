@@ -277,6 +277,33 @@ export async function runConfigUnset(opts: { path: string; runtime?: RuntimeEnv 
   }
 }
 
+export async function runConfigSet(opts: {
+  path: string;
+  value: string;
+  json?: boolean;
+  runtime?: RuntimeEnv;
+}) {
+  const runtime = opts.runtime ?? defaultRuntime;
+  try {
+    const parsedPath = parsePath(opts.path);
+    if (parsedPath.length === 0) {
+      throw new Error("Path is empty.");
+    }
+    const parsedValue = parseValue(opts.value, { json: Boolean(opts.json) });
+    const snapshot = await loadValidConfig(runtime);
+    // Use snapshot.resolved (config after $include and ${ENV} resolution, but BEFORE runtime defaults)
+    // instead of snapshot.config (runtime-merged with defaults).
+    // This prevents runtime defaults from leaking into the written config file (issue #6070)
+    const next = structuredClone(snapshot.resolved) as Record<string, unknown>;
+    setAtPath(next, parsedPath, parsedValue);
+    await writeConfigFile(next);
+    runtime.log(info(`Updated ${opts.path}. Restart the gateway to apply.`));
+  } catch (err) {
+    runtime.error(danger(String(err)));
+    runtime.exit(1);
+  }
+}
+
 export function registerConfigCli(program: Command) {
   const cmd = program
     .command("config")
@@ -332,24 +359,7 @@ export function registerConfigCli(program: Command) {
     .argument("<value>", "Value (JSON5 or raw string)")
     .option("--json", "Parse value as JSON5 (required)", false)
     .action(async (path: string, value: string, opts) => {
-      try {
-        const parsedPath = parsePath(path);
-        if (parsedPath.length === 0) {
-          throw new Error("Path is empty.");
-        }
-        const parsedValue = parseValue(value, opts);
-        const snapshot = await loadValidConfig();
-        // Use snapshot.resolved (config after $include and ${ENV} resolution, but BEFORE runtime defaults)
-        // instead of snapshot.config (runtime-merged with defaults).
-        // This prevents runtime defaults from leaking into the written config file (issue #6070)
-        const next = structuredClone(snapshot.resolved) as Record<string, unknown>;
-        setAtPath(next, parsedPath, parsedValue);
-        await writeConfigFile(next);
-        defaultRuntime.log(info(`Updated ${path}. Restart the gateway to apply.`));
-      } catch (err) {
-        defaultRuntime.error(danger(String(err)));
-        defaultRuntime.exit(1);
-      }
+      await runConfigSet({ path, value, json: Boolean(opts.json) });
     });
 
   cmd

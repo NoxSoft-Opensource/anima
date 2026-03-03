@@ -48,6 +48,7 @@ type TranscriptAppendResult = {
 };
 
 type AppendMessageArg = Parameters<SessionManager["appendMessage"]>[0];
+const CHAT_FINAL_FALLBACK_DELAY_MS = 1_500;
 
 function stripDisallowedChatControlChars(message: string): string {
   let output = "";
@@ -230,6 +231,48 @@ function broadcastChatError(params: {
   params.context.broadcast("chat", payload);
   params.context.nodeSendToSession(params.sessionKey, "chat", payload);
   params.context.agentRunSeq.delete(params.runId);
+}
+
+function buildSyntheticChatFinalMessage(params: {
+  finalReplyParts: string[];
+  sessionKey: string;
+  fallbackSessionId: string;
+  fallbackSessionFile?: string;
+  agentId?: string;
+  logGateway: Pick<GatewayRequestContext["logGateway"], "warn">;
+}): Record<string, unknown> | undefined {
+  const combinedReply = params.finalReplyParts
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+  if (!combinedReply) {
+    return undefined;
+  }
+  const { storePath: latestStorePath, entry: latestEntry } = loadSessionEntry(params.sessionKey);
+  const sessionId = latestEntry?.sessionId ?? params.fallbackSessionId;
+  const appended = appendAssistantTranscriptMessage({
+    message: combinedReply,
+    sessionId,
+    storePath: latestStorePath,
+    sessionFile: latestEntry?.sessionFile ?? params.fallbackSessionFile,
+    agentId: params.agentId,
+    createIfMissing: true,
+  });
+  if (appended.ok) {
+    return appended.message;
+  }
+  params.logGateway.warn(`webchat transcript append failed: ${appended.error ?? "unknown error"}`);
+  const now = Date.now();
+  return {
+    role: "assistant",
+    content: [{ type: "text", text: combinedReply }],
+    timestamp: now,
+    // Keep this compatible with Pi stopReason enums even though this message isn't
+    // persisted to the transcript due to the append failure.
+    stopReason: "stop",
+    usage: { input: 0, output: 0, totalTokens: 0 },
+  };
 }
 
 export const chatHandlers: GatewayRequestHandlers = {
@@ -560,6 +603,7 @@ export const chatHandlers: GatewayRequestHandlers = {
       });
 
       let agentRunStarted = false;
+      let activeAgentRunId: string | undefined;
       void dispatchInboundMessage({
         ctx,
         cfg,
@@ -571,6 +615,14 @@ export const chatHandlers: GatewayRequestHandlers = {
           disableBlockStreaming: true,
           onAgentRunStart: (runId) => {
             agentRunStarted = true;
+            activeAgentRunId = runId;
+            if (!context.agentRunSeq.has(runId)) {
+              context.agentRunSeq.set(runId, 0);
+            }
+            context.addChatRun(runId, {
+              sessionKey: rawSessionKey,
+              clientRunId,
+            });
             const connId = typeof client?.connId === "string" ? client.connId : undefined;
             const wantsToolEvents = hasGatewayClientCap(
               client?.connect?.caps,
@@ -592,49 +644,43 @@ export const chatHandlers: GatewayRequestHandlers = {
         },
       })
         .then(() => {
+          const message = buildSyntheticChatFinalMessage({
+            finalReplyParts,
+            sessionKey,
+            fallbackSessionId: entry?.sessionId ?? clientRunId,
+            fallbackSessionFile: entry?.sessionFile,
+            agentId,
+            logGateway: context.logGateway,
+          });
           if (!agentRunStarted) {
-            const combinedReply = finalReplyParts
-              .map((part) => part.trim())
-              .filter(Boolean)
-              .join("\n\n")
-              .trim();
-            let message: Record<string, unknown> | undefined;
-            if (combinedReply) {
-              const { storePath: latestStorePath, entry: latestEntry } =
-                loadSessionEntry(sessionKey);
-              const sessionId = latestEntry?.sessionId ?? entry?.sessionId ?? clientRunId;
-              const appended = appendAssistantTranscriptMessage({
-                message: combinedReply,
-                sessionId,
-                storePath: latestStorePath,
-                sessionFile: latestEntry?.sessionFile,
-                agentId,
-                createIfMissing: true,
-              });
-              if (appended.ok) {
-                message = appended.message;
-              } else {
-                context.logGateway.warn(
-                  `webchat transcript append failed: ${appended.error ?? "unknown error"}`,
-                );
-                const now = Date.now();
-                message = {
-                  role: "assistant",
-                  content: [{ type: "text", text: combinedReply }],
-                  timestamp: now,
-                  // Keep this compatible with Pi stopReason enums even though this message isn't
-                  // persisted to the transcript due to the append failure.
-                  stopReason: "stop",
-                  usage: { input: 0, output: 0, totalTokens: 0 },
-                };
-              }
-            }
             broadcastChatFinal({
               context,
               runId: clientRunId,
               sessionKey: rawSessionKey,
               message,
             });
+          } else {
+            const fallbackRunId = activeAgentRunId ?? clientRunId;
+            const timer = setTimeout(() => {
+              if (!context.agentRunSeq.has(fallbackRunId)) {
+                return;
+              }
+              context.logGateway.warn(
+                `webchat run ${clientRunId} completed without lifecycle end; emitting fallback final`,
+              );
+              context.chatAbortedRuns.set(clientRunId, Date.now());
+              if (fallbackRunId !== clientRunId) {
+                context.chatAbortedRuns.set(fallbackRunId, Date.now());
+              }
+              context.removeChatRun(fallbackRunId, clientRunId, rawSessionKey);
+              broadcastChatFinal({
+                context,
+                runId: clientRunId,
+                sessionKey: rawSessionKey,
+                message,
+              });
+            }, CHAT_FINAL_FALLBACK_DELAY_MS);
+            timer.unref?.();
           }
           context.dedupe.set(`chat:${clientRunId}`, {
             ts: Date.now(),
@@ -654,6 +700,9 @@ export const chatHandlers: GatewayRequestHandlers = {
             },
             error,
           });
+          if (activeAgentRunId) {
+            context.removeChatRun(activeAgentRunId, clientRunId, rawSessionKey);
+          }
           broadcastChatError({
             context,
             runId: clientRunId,

@@ -182,6 +182,8 @@ export async function runAgentTurnWithFallback(params: {
             const cliSessionId = getCliSessionId(params.getActiveSessionEntry(), provider);
             return (async () => {
               let lifecycleTerminalEmitted = false;
+              let sawCliStream = false;
+              let lastCliStreamText = "";
               try {
                 const result = await runCliAgent({
                   sessionId: params.followupRun.run.sessionId,
@@ -200,13 +202,25 @@ export async function runAgentTurnWithFallback(params: {
                   ownerNumbers: params.followupRun.run.ownerNumbers,
                   cliSessionId,
                   images: params.opts?.images,
+                  onTextStream: (text) => {
+                    const nextText = text.trim();
+                    if (!nextText) {
+                      return;
+                    }
+                    sawCliStream = true;
+                    lastCliStreamText = nextText;
+                    emitAgentEvent({
+                      runId,
+                      stream: "assistant",
+                      data: { text: nextText },
+                    });
+                  },
                 });
 
-                // CLI backends don't emit streaming assistant events, so we need to
-                // emit one with the final text so server-chat can populate its buffer
-                // and send the response to TUI/WebSocket clients.
+                // Ensure we always emit a final assistant snapshot if streaming
+                // never started or the final payload differs from last streamed text.
                 const cliText = result.payloads?.[0]?.text?.trim();
-                if (cliText) {
+                if (cliText && (!sawCliStream || cliText !== lastCliStreamText)) {
                   emitAgentEvent({
                     runId,
                     stream: "assistant",

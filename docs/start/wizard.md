@@ -42,7 +42,8 @@ which stores `tools.web.search.apiKey`. Docs: [Web tools](/tools/web).
 
 ## QuickStart vs Advanced
 
-The wizard starts with **QuickStart** (defaults) vs **Advanced** (full control).
+Interactive onboarding currently follows a **QuickStart** path with secure defaults.
+For scripted control, use `anima onboard --non-interactive` flags.
 
 <Tabs>
   <Tab title="QuickStart (defaults)">
@@ -53,8 +54,8 @@ The wizard starts with **QuickStart** (defaults) vs **Advanced** (full control).
     - Tailscale exposure **Off**
     - Telegram + WhatsApp DMs default to **allowlist** (you'll be prompted for your phone number)
   </Tab>
-  <Tab title="Advanced (full control)">
-    - Exposes every step (mode, workspace, gateway, channels, daemon, skills).
+  <Tab title="Scripted Control">
+    - Use non-interactive flags for explicit `mode`, `auth-choice`, gateway, daemon, and skip toggles.
   </Tab>
 </Tabs>
 
@@ -62,8 +63,8 @@ The wizard starts with **QuickStart** (defaults) vs **Advanced** (full control).
 
 **Local mode (default)** walks you through these steps:
 
-1. **Model/Auth** — Anthropic API key (recommended), OpenAI, or Custom Provider
-   (OpenAI-compatible, Anthropic-compatible, or Unknown auto-detect). Pick a default model.
+1. **Model/Auth** — Choose `noxsoft` (recommended), `openaiCodex`, or `apiKey` (Anthropic).
+   Pick a default model.
 2. **Workspace** — Location for agent files (default `~/.anima/workspace`). Seeds bootstrap files.
 3. **Gateway** — Port, bind address, auth mode, Tailscale exposure.
 4. **Channels** — WhatsApp, Telegram, Discord, Google Chat, Mattermost, Signal, BlueBubbles, or iMessage.

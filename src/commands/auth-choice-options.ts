@@ -28,6 +28,12 @@ const AUTH_CHOICE_GROUP_DEFS: {
     choices: ["noxsoft"],
   },
   {
+    value: "openaiCodex",
+    label: "OpenAI Codex OAuth",
+    hint: "Import Codex CLI OAuth credentials for latest GPT Codex models",
+    choices: ["openaiCodex"],
+  },
+  {
     value: "anthropic",
     label: "Anthropic API Key",
     hint: "Direct Anthropic API key for Claude",
@@ -40,6 +46,11 @@ const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
     value: "noxsoft",
     label: "NoxSoft Agent Registration (recommended)",
     hint: "Auto-register as a NoxSoft agent",
+  },
+  {
+    value: "openaiCodex",
+    label: "OpenAI Codex OAuth",
+    hint: "Use Codex CLI credentials (gpt-5.3-codex)",
   },
   { value: "apiKey", label: "Anthropic API key" },
 ];

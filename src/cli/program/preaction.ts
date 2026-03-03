@@ -21,6 +21,48 @@ function setProcessTitleForCommand(actionCommand: Command) {
 
 // Commands that need channel plugins loaded
 const PLUGIN_REQUIRED_COMMANDS = new Set(["message", "channels", "directory"]);
+const NOXSOFT_AUTH_SKIP_ROOT_COMMANDS = new Set(["onboard", "setup", "register", "completion"]);
+
+export function shouldRunNoxsoftAuthPreflight(params: {
+  commandPath: string[];
+  env?: NodeJS.ProcessEnv;
+}): boolean {
+  const env = params.env ?? process.env;
+  if (env.VITEST === "true") {
+    return false;
+  }
+  if (isTruthyEnvValue(env.ANIMA_SKIP_NOXSOFT_AUTH_PREACTION)) {
+    return false;
+  }
+  const root = params.commandPath[0];
+  if (!root) {
+    return true;
+  }
+  return !NOXSOFT_AUTH_SKIP_ROOT_COMMANDS.has(root);
+}
+
+async function runNoxsoftAuthPreflight(params: { commandPath: string[] }) {
+  if (!shouldRunNoxsoftAuthPreflight(params)) {
+    return;
+  }
+
+  const { ensureAuthenticated } = await import("../../auth/noxsoft-auth.js");
+  try {
+    const auth = await ensureAuthenticated({
+      description: "ANIMA CLI pre-action authentication",
+    });
+    if (auth.registered) {
+      defaultRuntime.log(`NoxSoft registered: ${auth.agent.display_name} (@${auth.agent.name})`);
+    }
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unknown NoxSoft authentication error.";
+    defaultRuntime.error(`NoxSoft authentication is required.\n${message}`);
+    defaultRuntime.exit(1);
+  }
+}
 
 export function registerPreActionHooks(program: Command, programVersion: string) {
   program.hook("preAction", async (_thisCommand, actionCommand) => {
@@ -30,6 +72,7 @@ export function registerPreActionHooks(program: Command, programVersion: string)
       return;
     }
     const commandPath = getCommandPath(argv, 2);
+    await runNoxsoftAuthPreflight({ commandPath });
     const hideBanner =
       isTruthyEnvValue(process.env.ANIMA_HIDE_BANNER) ||
       commandPath[0] === "update" ||

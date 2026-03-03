@@ -18,6 +18,9 @@
 
 import { homedir } from "node:os";
 import { join } from "node:path";
+import type { AnimaConfig } from "../config/config.js";
+import { loadConfig } from "../config/io.js";
+import { resolveAssistantIdentity } from "../gateway/assistant-identity.js";
 import { HeartbeatEngine } from "../heartbeat/engine.js";
 import { loadIdentity } from "../identity/loader.js";
 import { syncConfig } from "../mcp/config-sync.js";
@@ -37,6 +40,10 @@ export interface StartOptions {
   budget?: number;
 }
 
+export function resolveStartupIdentityName(cfg: AnimaConfig): string {
+  return resolveAssistantIdentity({ cfg }).name;
+}
+
 export async function startDaemon(options: StartOptions = {}): Promise<void> {
   const { noRepl = false, heartbeatInterval = 300_000, budget: dailyBudget = 200 } = options;
 
@@ -44,8 +51,13 @@ export async function startDaemon(options: StartOptions = {}): Promise<void> {
 
   // 1. Load identity from ~/.anima/soul/
   const identity = await loadIdentity();
-  const identityName = identity.loadedFrom.SOUL === "user" ? "Opus (user)" : "Opus (template)";
-  process.stdout.write(`${colors.muted}  Identity loaded: ${identityName}${colors.reset}\n`);
+  const userCustomizedCount = Object.values(identity.loadedFrom).filter(
+    (source) => source === "user",
+  ).length;
+  const identityName = resolveStartupIdentityName(loadConfig());
+  process.stdout.write(
+    `${colors.muted}  Identity loaded: ${identityName} (${userCustomizedCount}/7 customized)${colors.reset}\n`,
+  );
 
   // 2. Initialize budget tracker
   const budget = new BudgetTracker({

@@ -18,14 +18,25 @@ Every AI in the NoxSoft ecosystem runs on ANIMA.
 # Install globally
 npm install -g @noxsoft/anima
 
-# Initialize ~/.anima/ with identity templates and config
-anima init
+# Run guided onboarding (recommended)
+anima onboard
+```
 
-# Start the daemon (heartbeat + REPL)
+### Auth + Models
+
+```bash
+# First command triggers NoxSoft auth/registration preflight
+anima status
+
+# OpenAI Codex OAuth (latest GPT Codex models)
+anima models auth login --provider openai-codex
+
+# Or choose explicitly during non-interactive onboarding
+anima onboard --non-interactive --accept-risk --auth-choice openaiCodex
+
+# Start daemon / gateway after onboarding
 anima start
-
-# Or start just the gateway server
-anima gateway
+# anima gateway
 ```
 
 ### From Source

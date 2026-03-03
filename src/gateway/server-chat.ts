@@ -6,6 +6,8 @@ import { resolveHeartbeatVisibility } from "../infra/heartbeat-visibility.js";
 import { loadSessionEntry } from "./session-utils.js";
 import { formatForLog } from "./ws-log.js";
 
+const CHAT_DELTA_THROTTLE_MS = 40;
+
 /**
  * Check if webchat broadcasts should be suppressed for heartbeat runs.
  * Returns true if the run is a heartbeat and showOk is false.
@@ -235,7 +237,7 @@ export function createAgentEventHandler({
     chatRunState.buffers.set(clientRunId, text);
     const now = Date.now();
     const last = chatRunState.deltaSentAt.get(clientRunId) ?? 0;
-    if (now - last < 150) {
+    if (now - last < CHAT_DELTA_THROTTLE_MS) {
       return;
     }
     chatRunState.deltaSentAt.set(clientRunId, now);
@@ -380,8 +382,16 @@ export function createAgentEventHandler({
       if (!isToolEvent || toolVerbose !== "off") {
         nodeSendToSession(sessionKey, "agent", isToolEvent ? toolPayload : agentPayload);
       }
-      if (!isAborted && evt.stream === "assistant" && typeof evt.data?.text === "string") {
-        emitChatDelta(sessionKey, clientRunId, evt.seq, evt.data.text);
+      const assistantText =
+        !isAborted && evt.stream === "assistant"
+          ? typeof evt.data?.text === "string"
+            ? evt.data.text
+            : typeof evt.data?.delta === "string"
+              ? `${chatRunState.buffers.get(clientRunId) ?? ""}${evt.data.delta}`
+              : undefined
+          : undefined;
+      if (assistantText !== undefined) {
+        emitChatDelta(sessionKey, clientRunId, evt.seq, assistantText);
       } else if (!isAborted && (lifecyclePhase === "end" || lifecyclePhase === "error")) {
         if (chatLink) {
           const finished = chatRunState.registry.shift(evt.runId);

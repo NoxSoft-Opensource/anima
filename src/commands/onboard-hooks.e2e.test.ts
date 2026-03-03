@@ -20,14 +20,14 @@ describe("onboard-hooks", () => {
     vi.clearAllMocks();
   });
 
-  const createMockPrompter = (multiselectValue: string[]): WizardPrompter => ({
+  const createMockPrompter = (): WizardPrompter => ({
     confirm: vi.fn().mockResolvedValue(true),
     note: vi.fn().mockResolvedValue(undefined),
     intro: vi.fn().mockResolvedValue(undefined),
     outro: vi.fn().mockResolvedValue(undefined),
     text: vi.fn().mockResolvedValue(""),
     select: vi.fn().mockResolvedValue(""),
-    multiselect: vi.fn().mockResolvedValue(multiselectValue),
+    multiselect: vi.fn().mockResolvedValue([]),
     progress: vi.fn().mockReturnValue({
       stop: vi.fn(),
       update: vi.fn(),
@@ -114,12 +114,12 @@ describe("onboard-hooks", () => {
   });
 
   describe("setupInternalHooks", () => {
-    it("should enable hooks when user selects them", async () => {
+    it("auto-enables all eligible hooks", async () => {
       const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
       vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport());
 
       const cfg: AnimaConfig = {};
-      const prompter = createMockPrompter(["session-memory"]);
+      const prompter = createMockPrompter();
       const runtime = createMockRuntime();
 
       const result = await setupInternalHooks(cfg, runtime, prompter);
@@ -127,46 +127,18 @@ describe("onboard-hooks", () => {
       expect(result.hooks?.internal?.enabled).toBe(true);
       expect(result.hooks?.internal?.entries).toEqual({
         "session-memory": { enabled: true },
+        "command-logger": { enabled: true },
       });
       expect(prompter.note).toHaveBeenCalledTimes(2);
-      expect(prompter.multiselect).toHaveBeenCalledWith({
-        message: "Enable hooks?",
-        options: [
-          { value: "__skip__", label: "Skip for now" },
-          {
-            value: "session-memory",
-            label: "💾 session-memory",
-            hint: "Save session context to memory when /new command is issued",
-          },
-          {
-            value: "command-logger",
-            label: "📝 command-logger",
-            hint: "Log all command events to a centralized audit file",
-          },
-        ],
-      });
+      expect(prompter.multiselect).not.toHaveBeenCalled();
     });
 
-    it("should not enable hooks when user skips", async () => {
-      const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
-      vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport());
-
-      const cfg: AnimaConfig = {};
-      const prompter = createMockPrompter(["__skip__"]);
-      const runtime = createMockRuntime();
-
-      const result = await setupInternalHooks(cfg, runtime, prompter);
-
-      expect(result.hooks?.internal).toBeUndefined();
-      expect(prompter.note).toHaveBeenCalledTimes(1);
-    });
-
-    it("should handle no eligible hooks", async () => {
+    it("handles no eligible hooks", async () => {
       const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
       vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport(false));
 
       const cfg: AnimaConfig = {};
-      const prompter = createMockPrompter([]);
+      const prompter = createMockPrompter();
       const runtime = createMockRuntime();
 
       const result = await setupInternalHooks(cfg, runtime, prompter);
@@ -174,12 +146,12 @@ describe("onboard-hooks", () => {
       expect(result).toEqual(cfg);
       expect(prompter.multiselect).not.toHaveBeenCalled();
       expect(prompter.note).toHaveBeenCalledWith(
-        "No eligible hooks found. You can configure hooks later in your config.",
-        "No Hooks Available",
+        "No eligible hooks detected. You can configure hooks later via your ANIMA config.",
+        "No hooks available",
       );
     });
 
-    it("should preserve existing hooks config when enabled", async () => {
+    it("preserves existing hooks config when enabling defaults", async () => {
       const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
       vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport());
 
@@ -190,7 +162,7 @@ describe("onboard-hooks", () => {
           token: "existing-token",
         },
       };
-      const prompter = createMockPrompter(["session-memory"]);
+      const prompter = createMockPrompter();
       const runtime = createMockRuntime();
 
       const result = await setupInternalHooks(cfg, runtime, prompter);
@@ -201,17 +173,18 @@ describe("onboard-hooks", () => {
       expect(result.hooks?.internal?.enabled).toBe(true);
       expect(result.hooks?.internal?.entries).toEqual({
         "session-memory": { enabled: true },
+        "command-logger": { enabled: true },
       });
     });
 
-    it("should preserve existing config when user skips", async () => {
+    it("preserves existing config when no eligible hooks are found", async () => {
       const { buildWorkspaceHookStatus } = await import("../hooks/hooks-status.js");
-      vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport());
+      vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport(false));
 
       const cfg: AnimaConfig = {
         agents: { defaults: { workspace: "/workspace" } },
       };
-      const prompter = createMockPrompter(["__skip__"]);
+      const prompter = createMockPrompter();
       const runtime = createMockRuntime();
 
       const result = await setupInternalHooks(cfg, runtime, prompter);
@@ -225,7 +198,7 @@ describe("onboard-hooks", () => {
       vi.mocked(buildWorkspaceHookStatus).mockReturnValue(createMockHookReport());
 
       const cfg: AnimaConfig = {};
-      const prompter = createMockPrompter(["session-memory"]);
+      const prompter = createMockPrompter();
       const runtime = createMockRuntime();
 
       await setupInternalHooks(cfg, runtime, prompter);
@@ -234,11 +207,11 @@ describe("onboard-hooks", () => {
       expect(noteCalls).toHaveLength(2);
 
       // First note should explain what hooks are
-      expect(noteCalls[0][0]).toContain("Hooks let you automate actions");
+      expect(noteCalls[0][0]).toContain("ANIMA hooks automate actions");
       expect(noteCalls[0][0]).toContain("automate actions");
 
       // Second note should confirm configuration
-      expect(noteCalls[1][0]).toContain("Enabled 1 hook: session-memory");
+      expect(noteCalls[1][0]).toContain("Enabled 2 hooks: session-memory, command-logger");
       expect(noteCalls[1][0]).toMatch(/(?:anima|anima)( --profile isolated)? hooks list/);
     });
   });

@@ -50,4 +50,25 @@ describe("runCommandWithTimeout", () => {
       }
     }
   });
+
+  it("streams stdout chunks via callback while capturing final stdout", async () => {
+    const seen: string[] = [];
+    const result = await runCommandWithTimeout(
+      [
+        process.execPath,
+        "-e",
+        'process.stdout.write("he");setTimeout(()=>process.stdout.write("llo"),10);',
+      ],
+      {
+        timeoutMs: 5_000,
+        onStdoutData: (chunk) => {
+          seen.push(chunk);
+        },
+      },
+    );
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toBe("hello");
+    expect(seen.join("")).toBe("hello");
+  });
 });

@@ -16,7 +16,7 @@ For the short guide, see [Onboarding Wizard (CLI)](/start/wizard).
 
 Local mode (default) walks you through:
 
-- Model and auth setup (OpenAI Code subscription OAuth, Anthropic API key or setup token, plus MiniMax, GLM, Moonshot, and AI Gateway options)
+- Model and auth setup (`noxsoft`, `openaiCodex`, or `apiKey`)
 - Workspace location and bootstrap files
 - Gateway settings (port, bind, auth, tailscale)
 - Channels and providers (Telegram, WhatsApp, Discord, Google Chat, Mattermost plugin, Signal)
@@ -115,80 +115,20 @@ What you set:
 ## Auth and model options
 
 <AccordionGroup>
-  <Accordion title="Anthropic API key (recommended)">
-    Uses `ANTHROPIC_API_KEY` if present or prompts for a key, then saves it for daemon use.
+  <Accordion title="NoxSoft Agent Registration (recommended)">
+    Authenticates and registers your agent with NoxSoft.
   </Accordion>
-  <Accordion title="Anthropic OAuth (Claude Code CLI)">
-    - macOS: checks Keychain item "Claude Code-credentials"
-    - Linux and Windows: reuses `~/.claude/.credentials.json` if present
-
-    On macOS, choose "Always Allow" so launchd starts do not block.
-
+  <Accordion title="OpenAI Codex OAuth">
+    Reuses Codex CLI credentials from `~/.codex/auth.json`.
+    On successful apply, default model is `openai-codex/gpt-5.3-codex`.
   </Accordion>
-  <Accordion title="Anthropic token (setup-token paste)">
-    Run `claude setup-token` on any machine, then paste the token.
-    You can name it; blank uses default.
+  <Accordion title="Anthropic API key">
+    Uses `ANTHROPIC_API_KEY` if present or prompts for a key, then stores it as
+    profile `anthropic:default`.
   </Accordion>
-  <Accordion title="OpenAI Code subscription (Codex CLI reuse)">
-    If `~/.codex/auth.json` exists, the wizard can reuse it.
-  </Accordion>
-  <Accordion title="OpenAI Code subscription (OAuth)">
-    Browser flow; paste `code#state`.
-
-    Sets `agents.defaults.model` to `openai-codex/gpt-5.3-codex` when model is unset or `openai/*`.
-
-  </Accordion>
-  <Accordion title="OpenAI API key">
-    Uses `OPENAI_API_KEY` if present or prompts for a key, then saves it to
-    `~/.anima/.env` so launchd can read it.
-
-    Sets `agents.defaults.model` to `openai/gpt-5.1-codex` when model is unset, `openai/*`, or `openai-codex/*`.
-
-  </Accordion>
-  <Accordion title="xAI (Grok) API key">
-    Prompts for `XAI_API_KEY` and configures xAI as a model provider.
-  </Accordion>
-  <Accordion title="OpenCode Zen">
-    Prompts for `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`).
-    Setup URL: [opencode.ai/auth](https://opencode.ai/auth).
-  </Accordion>
-  <Accordion title="API key (generic)">
-    Stores the key for you.
-  </Accordion>
-  <Accordion title="Vercel AI Gateway">
-    Prompts for `AI_GATEWAY_API_KEY`.
-    More detail: [Vercel AI Gateway](/providers/vercel-ai-gateway).
-  </Accordion>
-  <Accordion title="Cloudflare AI Gateway">
-    Prompts for account ID, gateway ID, and `CLOUDFLARE_AI_GATEWAY_API_KEY`.
-    More detail: [Cloudflare AI Gateway](/providers/cloudflare-ai-gateway).
-  </Accordion>
-  <Accordion title="MiniMax M2.1">
-    Config is auto-written.
-    More detail: [MiniMax](/providers/minimax).
-  </Accordion>
-  <Accordion title="Synthetic (Anthropic-compatible)">
-    Prompts for `SYNTHETIC_API_KEY`.
-    More detail: [Synthetic](/providers/synthetic).
-  </Accordion>
-  <Accordion title="Moonshot and Kimi Coding">
-    Moonshot (Kimi K2) and Kimi Coding configs are auto-written.
-    More detail: [Moonshot AI (Kimi + Kimi Coding)](/providers/moonshot).
-  </Accordion>
-  <Accordion title="Custom provider">
-    Works with OpenAI-compatible and Anthropic-compatible endpoints.
-
-    Non-interactive flags:
-    - `--auth-choice custom-api-key`
-    - `--custom-base-url`
-    - `--custom-model-id`
-    - `--custom-api-key` (optional; falls back to `CUSTOM_API_KEY`)
-    - `--custom-provider-id` (optional)
-    - `--custom-compatibility <openai|anthropic>` (optional; default `openai`)
-
-  </Accordion>
-  <Accordion title="Skip">
-    Leaves auth unconfigured.
+  <Accordion title="Skip (compatibility)">
+    Available in the enum, but non-interactive local mode rejects `skip`
+    because NoxSoft authentication is required.
   </Accordion>
 </AccordionGroup>
 
@@ -213,7 +153,7 @@ to the gateway host.
 Typical fields in `~/.anima/anima.json`:
 
 - `agents.defaults.workspace`
-- `agents.defaults.model` / `models.providers` (if Minimax chosen)
+- `agents.defaults.model` / `models.providers` (when provider config is updated)
 - `gateway.*` (mode, bind, auth, tailscale)
 - `channels.telegram.botToken`, `channels.discord.token`, `channels.signal.*`, `channels.imessage.*`
 - Channel allowlists (Slack, Discord, Matrix, Microsoft Teams) when you opt in during prompts (names resolve to IDs when possible)

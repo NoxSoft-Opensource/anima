@@ -72,14 +72,13 @@ export async function setupSkills(
     ].join("\n"),
     "Skills status",
   );
-
-  const shouldConfigure = await prompter.confirm({
-    message: "Configure skills now? (recommended)",
-    initialValue: true,
-  });
-  if (!shouldConfigure) {
-    return cfg;
-  }
+  await prompter.note(
+    [
+      "Skills setup now continues automatically to reduce onboarding friction.",
+      "Dependency installs remain opt-in in the next step.",
+    ].join("\n"),
+    "Skills setup",
+  );
 
   const installable = missing.filter(
     (skill) => skill.install.length > 0 && skill.missing.bins.length > 0,

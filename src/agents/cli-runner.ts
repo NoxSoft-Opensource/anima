@@ -50,6 +50,7 @@ export async function runCliAgent(params: {
   ownerNumbers?: string[];
   cliSessionId?: string;
   images?: ImageContent[];
+  onTextStream?: (text: string) => void;
 }): Promise<EmbeddedPiRunResult> {
   const started = Date.now();
   const workspaceResolution = resolveRunWorkspaceDir({
@@ -173,6 +174,11 @@ export async function runCliAgent(params: {
     promptArg: argsPrompt,
     useResume,
   });
+  const outputMode = useResume ? (backend.resumeOutput ?? backend.output) : backend.output;
+  const liveStdoutBuffer = {
+    raw: "",
+    streamedText: "",
+  };
 
   const serialize = backend.serialize ?? true;
   const queueKey = serialize ? backendResolved.id : `${backendResolved.id}:${params.runId}`;
@@ -238,6 +244,26 @@ export async function runCliAgent(params: {
         cwd: workspaceDir,
         env,
         input: stdinPayload,
+        onStdoutData: params.onTextStream
+          ? (chunk) => {
+              liveStdoutBuffer.raw += chunk;
+              let nextText = "";
+              if (outputMode === "jsonl") {
+                nextText = parseCliJsonl(liveStdoutBuffer.raw, backend)?.text ?? "";
+              } else if (outputMode === "json") {
+                nextText = parseCliJson(liveStdoutBuffer.raw, backend)?.text ?? "";
+              } else {
+                nextText = liveStdoutBuffer.raw;
+              }
+
+              const normalized = nextText.replace(/\r/g, "");
+              if (!normalized.trim() || normalized === liveStdoutBuffer.streamedText) {
+                return;
+              }
+              liveStdoutBuffer.streamedText = normalized;
+              params.onTextStream?.(normalized);
+            }
+          : undefined,
       });
 
       const stdout = result.stdout.trim();
@@ -270,8 +296,6 @@ export async function runCliAgent(params: {
           status,
         });
       }
-
-      const outputMode = useResume ? (backend.resumeOutput ?? backend.output) : backend.output;
 
       if (outputMode === "text") {
         return { text: stdout, sessionId: undefined };

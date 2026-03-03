@@ -49,6 +49,78 @@ describe("agent event handler", () => {
     nowSpy.mockRestore();
   });
 
+  it("accumulates chunked assistant deltas from data.delta", () => {
+    let now = 1_000;
+    const nowSpy = vi.spyOn(Date, "now").mockImplementation(() => now);
+    const broadcast = vi.fn();
+    const broadcastToConnIds = vi.fn();
+    const nodeSendToSession = vi.fn();
+    const agentRunSeq = new Map<string, number>();
+    const chatRunState = createChatRunState();
+    const toolEventRecipients = createToolEventRecipientRegistry();
+    chatRunState.registry.add("run-delta", {
+      sessionKey: "session-delta",
+      clientRunId: "client-delta",
+    });
+
+    const handler = createAgentEventHandler({
+      broadcast,
+      broadcastToConnIds,
+      nodeSendToSession,
+      agentRunSeq,
+      chatRunState,
+      resolveSessionKeyForRun: () => undefined,
+      clearAgentRunContext: vi.fn(),
+      toolEventRecipients,
+    });
+
+    handler({
+      runId: "run-delta",
+      seq: 1,
+      stream: "assistant",
+      ts: Date.now(),
+      data: { delta: "he" },
+    });
+    now += 100;
+    handler({
+      runId: "run-delta",
+      seq: 2,
+      stream: "assistant",
+      ts: Date.now(),
+      data: { delta: "llo" },
+    });
+    now += 100;
+    handler({
+      runId: "run-delta",
+      seq: 3,
+      stream: "lifecycle",
+      ts: Date.now(),
+      data: { phase: "end" },
+    });
+
+    const chatCalls = broadcast.mock.calls.filter(([event]) => event === "chat");
+    expect(chatCalls).toHaveLength(3);
+    const delta1 = chatCalls[0]?.[1] as {
+      state?: string;
+      message?: { content?: Array<{ text?: string }> };
+    };
+    const delta2 = chatCalls[1]?.[1] as {
+      state?: string;
+      message?: { content?: Array<{ text?: string }> };
+    };
+    const final = chatCalls[2]?.[1] as {
+      state?: string;
+      message?: { content?: Array<{ text?: string }> };
+    };
+    expect(delta1.state).toBe("delta");
+    expect(delta1.message?.content?.[0]?.text).toBe("he");
+    expect(delta2.state).toBe("delta");
+    expect(delta2.message?.content?.[0]?.text).toBe("hello");
+    expect(final.state).toBe("final");
+    expect(final.message?.content?.[0]?.text).toBe("hello");
+    nowSpy.mockRestore();
+  });
+
   it("does not emit chat delta for NO_REPLY streaming text", () => {
     const nowSpy = vi.spyOn(Date, "now").mockReturnValue(1_000);
     const broadcast = vi.fn();

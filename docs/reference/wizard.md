@@ -28,29 +28,10 @@ For a high-level overview, see [Onboarding Wizard](/start/wizard).
       - Full reset (also removes workspace)
   </Step>
   <Step title="Model/Auth">
-    - **Anthropic API key (recommended)**: uses `ANTHROPIC_API_KEY` if present or prompts for a key, then saves it for daemon use.
-    - **Anthropic OAuth (Claude Code CLI)**: on macOS the wizard checks Keychain item "Claude Code-credentials" (choose "Always Allow" so launchd starts don't block); on Linux/Windows it reuses `~/.claude/.credentials.json` if present.
-    - **Anthropic token (paste setup-token)**: run `claude setup-token` on any machine, then paste the token (you can name it; blank = default).
-    - **OpenAI Code (Codex) subscription (Codex CLI)**: if `~/.codex/auth.json` exists, the wizard can reuse it.
-    - **OpenAI Code (Codex) subscription (OAuth)**: browser flow; paste the `code#state`.
-      - Sets `agents.defaults.model` to `openai-codex/gpt-5.2` when model is unset or `openai/*`.
-    - **OpenAI API key**: uses `OPENAI_API_KEY` if present or prompts for a key, then saves it to `~/.anima/.env` so launchd can read it.
-    - **xAI (Grok) API key**: prompts for `XAI_API_KEY` and configures xAI as a model provider.
-    - **OpenCode Zen (multi-model proxy)**: prompts for `OPENCODE_API_KEY` (or `OPENCODE_ZEN_API_KEY`, get it at https://opencode.ai/auth).
-    - **API key**: stores the key for you.
-    - **Vercel AI Gateway (multi-model proxy)**: prompts for `AI_GATEWAY_API_KEY`.
-    - More detail: [Vercel AI Gateway](/providers/vercel-ai-gateway)
-    - **Cloudflare AI Gateway**: prompts for Account ID, Gateway ID, and `CLOUDFLARE_AI_GATEWAY_API_KEY`.
-    - More detail: [Cloudflare AI Gateway](/providers/cloudflare-ai-gateway)
-    - **MiniMax M2.1**: config is auto-written.
-    - More detail: [MiniMax](/providers/minimax)
-    - **Synthetic (Anthropic-compatible)**: prompts for `SYNTHETIC_API_KEY`.
-    - More detail: [Synthetic](/providers/synthetic)
-    - **Moonshot (Kimi K2)**: config is auto-written.
-    - **Kimi Coding**: config is auto-written.
-    - More detail: [Moonshot AI (Kimi + Kimi Coding)](/providers/moonshot)
-    - **Skip**: no auth configured yet.
-    - Pick a default model from detected options (or enter provider/model manually).
+    - **NoxSoft Agent Registration (recommended)**: authenticates/registers your agent with NoxSoft.
+    - **OpenAI Codex OAuth**: reuses Codex CLI credentials from `~/.codex/auth.json`; defaults to `openai-codex/gpt-5.3-codex`.
+    - **Anthropic API key**: uses `ANTHROPIC_API_KEY` if present or prompts for a key, then stores it as `anthropic:default`.
+    - Pick a default model from detected options (or keep the existing model).
     - Wizard runs a model check and warns if the configured model is unknown or missing auth.
     - OAuth credentials live in `~/.anima/credentials/oauth.json`; auth profiles live in `~/.anima/agents/<agentId>/agent/auth-profiles.json` (API keys + OAuth).
     - More detail: [/concepts/oauth](/concepts/oauth)
@@ -115,6 +96,7 @@ Use `--non-interactive` to automate or script onboarding:
 
 ```bash
 anima onboard --non-interactive \
+  --accept-risk \
   --mode local \
   --auth-choice apiKey \
   --anthropic-api-key "$ANTHROPIC_API_KEY" \
@@ -132,79 +114,51 @@ Add `--json` for a machine‑readable summary.
 </Note>
 
 <AccordionGroup>
-  <Accordion title="Gemini example">
+  <Accordion title="NoxSoft registration">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice gemini-api-key \
-      --gemini-api-key "$GEMINI_API_KEY" \
+      --auth-choice noxsoft \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Z.AI example">
+  <Accordion title="OpenAI Codex OAuth">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice zai-api-key \
-      --zai-api-key "$ZAI_API_KEY" \
+      --auth-choice openaiCodex \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Vercel AI Gateway example">
+  <Accordion title="Anthropic API key">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice ai-gateway-api-key \
-      --ai-gateway-api-key "$AI_GATEWAY_API_KEY" \
+      --auth-choice apiKey \
+      --anthropic-api-key "$ANTHROPIC_API_KEY" \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Cloudflare AI Gateway example">
+  <Accordion title="Remote mode">
     ```bash
     anima onboard --non-interactive \
-      --mode local \
-      --auth-choice cloudflare-ai-gateway-api-key \
-      --cloudflare-ai-gateway-account-id "your-account-id" \
-      --cloudflare-ai-gateway-gateway-id "your-gateway-id" \
-      --cloudflare-ai-gateway-api-key "$CLOUDFLARE_AI_GATEWAY_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="Moonshot example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice moonshot-api-key \
-      --moonshot-api-key "$MOONSHOT_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="Synthetic example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice synthetic-api-key \
-      --synthetic-api-key "$SYNTHETIC_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="OpenCode Zen example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice opencode-zen \
-      --opencode-zen-api-key "$OPENCODE_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
+      --accept-risk \
+      --mode remote \
+      --remote-url "ws://gateway-host:18789" \
+      --remote-token "$ANIMA_GATEWAY_TOKEN"
     ```
   </Accordion>
 </AccordionGroup>
+
+<Note>
+`--auth-choice skip` is available for compatibility, but non-interactive local mode rejects it because NoxSoft authentication is required.
+</Note>
 
 ### Add agent (non-interactive)
 
@@ -241,7 +195,7 @@ Notes:
 Typical fields in `~/.anima/anima.json`:
 
 - `agents.defaults.workspace`
-- `agents.defaults.model` / `models.providers` (if Minimax chosen)
+- `agents.defaults.model` / `models.providers` (when provider config is updated)
 - `gateway.*` (mode, bind, auth, tailscale)
 - `channels.telegram.botToken`, `channels.discord.token`, `channels.signal.*`, `channels.imessage.*`
 - Channel allowlists (Slack/Discord/Matrix/Microsoft Teams) when you opt in during the prompts (names resolve to IDs when possible).

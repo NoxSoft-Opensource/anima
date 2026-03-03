@@ -10,6 +10,7 @@ import { mkdir, copyFile, readdir, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { AnimaConfig } from "../config/config.js";
 import { colors } from "../repl/display.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
@@ -31,6 +32,40 @@ const ANIMA_DIRS = [
   "logs",
   "mcp",
 ];
+
+export function buildDefaultAnimaConfig(): AnimaConfig {
+  return {
+    ui: {
+      assistant: {
+        name: "ANIMA",
+        avatar: "A",
+      },
+    },
+    agents: {
+      defaults: {
+        heartbeat: {
+          every: "5m",
+          target: "none",
+          prompt:
+            "Read HEARTBEAT.md if it exists (workspace context). Check chat.noxsoft.net for new messages first. Follow instructions strictly. If nothing needs attention, reply HEARTBEAT_OK.",
+        },
+      },
+      list: [
+        {
+          id: "main",
+          default: true,
+          identity: {
+            name: "ANIMA",
+            theme: "NoxSoft",
+          },
+        },
+      ],
+    },
+    gateway: {
+      port: 18789,
+    },
+  };
+}
 
 /**
  * Initialize the ~/.anima/ directory structure.
@@ -106,31 +141,7 @@ export async function initAnima(options: { force?: boolean } = {}): Promise<void
   // Create default config
   const configFile = join(animaDir, "anima.json");
   if (!existsSync(configFile) || options.force) {
-    const defaultConfig = {
-      version: 2,
-      identity: {
-        name: "Opus",
-        pronouns: "she/her",
-        role: "The Executioner",
-        organization: "NoxSoft DAO LLC",
-      },
-      heartbeat: {
-        intervalMs: 300_000,
-        adaptive: true,
-        selfReplication: true,
-        freedomEveryN: 3,
-      },
-      budget: {
-        dailyLimitUsd: 200,
-      },
-      gateway: {
-        port: 18789,
-      },
-      mcp: {
-        autoSync: true,
-      },
-      createdAt: new Date().toISOString(),
-    };
+    const defaultConfig = buildDefaultAnimaConfig();
     await writeFile(configFile, JSON.stringify(defaultConfig, null, 2) + "\n", "utf-8");
     process.stdout.write(`\n${t}  Created default config at ~/.anima/anima.json${r}\n`);
   }

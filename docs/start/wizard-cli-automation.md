@@ -19,6 +19,7 @@ Use `--non-interactive` to automate `anima onboard`.
 
 ```bash
 anima onboard --non-interactive \
+  --accept-risk \
   --mode local \
   --auth-choice apiKey \
   --anthropic-api-key "$ANTHROPIC_API_KEY" \
@@ -31,99 +32,54 @@ anima onboard --non-interactive \
 
 Add `--json` for a machine-readable summary.
 
-## Provider-specific examples
+## Auth choice examples
 
 <AccordionGroup>
-  <Accordion title="Gemini example">
+  <Accordion title="NoxSoft registration">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice gemini-api-key \
-      --gemini-api-key "$GEMINI_API_KEY" \
+      --auth-choice noxsoft \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Z.AI example">
+  <Accordion title="OpenAI Codex OAuth (Codex CLI)">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice zai-api-key \
-      --zai-api-key "$ZAI_API_KEY" \
+      --auth-choice openaiCodex \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Vercel AI Gateway example">
+  <Accordion title="Anthropic API key">
     ```bash
     anima onboard --non-interactive \
+      --accept-risk \
       --mode local \
-      --auth-choice ai-gateway-api-key \
-      --ai-gateway-api-key "$AI_GATEWAY_API_KEY" \
+      --auth-choice apiKey \
+      --anthropic-api-key "$ANTHROPIC_API_KEY" \
       --gateway-port 18789 \
       --gateway-bind loopback
     ```
   </Accordion>
-  <Accordion title="Cloudflare AI Gateway example">
+  <Accordion title="Remote mode">
     ```bash
     anima onboard --non-interactive \
-      --mode local \
-      --auth-choice cloudflare-ai-gateway-api-key \
-      --cloudflare-ai-gateway-account-id "your-account-id" \
-      --cloudflare-ai-gateway-gateway-id "your-gateway-id" \
-      --cloudflare-ai-gateway-api-key "$CLOUDFLARE_AI_GATEWAY_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
+      --accept-risk \
+      --mode remote \
+      --remote-url "ws://gateway-host:18789" \
+      --remote-token "$ANIMA_GATEWAY_TOKEN"
     ```
-  </Accordion>
-  <Accordion title="Moonshot example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice moonshot-api-key \
-      --moonshot-api-key "$MOONSHOT_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="Synthetic example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice synthetic-api-key \
-      --synthetic-api-key "$SYNTHETIC_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="OpenCode Zen example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice opencode-zen \
-      --opencode-zen-api-key "$OPENCODE_API_KEY" \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-  </Accordion>
-  <Accordion title="Custom provider example">
-    ```bash
-    anima onboard --non-interactive \
-      --mode local \
-      --auth-choice custom-api-key \
-      --custom-base-url "https://llm.example.com/v1" \
-      --custom-model-id "foo-large" \
-      --custom-api-key "$CUSTOM_API_KEY" \
-      --custom-provider-id "my-custom" \
-      --custom-compatibility anthropic \
-      --gateway-port 18789 \
-      --gateway-bind loopback
-    ```
-
-    `--custom-api-key` is optional. If omitted, onboarding checks `CUSTOM_API_KEY`.
-
   </Accordion>
 </AccordionGroup>
+
+<Note>
+`--auth-choice skip` is available for compatibility, but non-interactive local mode rejects it because NoxSoft authentication is required.
+</Note>
 
 ## Add another agent
 

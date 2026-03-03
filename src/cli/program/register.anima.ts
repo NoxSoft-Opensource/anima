@@ -4,6 +4,37 @@
  */
 
 import type { Command } from "commander";
+import { randomUUID } from "node:crypto";
+
+type ChatSendAck = {
+  runId?: string;
+  status?: string;
+};
+
+function formatGatewayError(error: unknown): string {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  if (typeof error === "string" && error.trim().length > 0) {
+    return error;
+  }
+  return "Unknown gateway error.";
+}
+
+async function sendCliPromptToGateway(message: string): Promise<ChatSendAck> {
+  const { callGateway } = await import("../../gateway/call.js");
+  const idempotencyKey = randomUUID();
+  return callGateway<ChatSendAck>({
+    method: "chat.send",
+    params: {
+      sessionKey: "main",
+      message,
+      idempotencyKey,
+    },
+    expectFinal: false,
+    timeoutMs: 15_000,
+  });
+}
 
 export function registerAnimaCommands(program: Command): void {
   // anima start
@@ -51,27 +82,25 @@ export function registerAnimaCommands(program: Command): void {
   // anima ask <prompt> — queue a task to running daemon
   program
     .command("ask <prompt...>")
-    .description("Queue a task to the running daemon for autonomous execution")
+    .description("Send a prompt to the running gateway session")
     .option("-p, --priority <level>", "Priority: urgent/high/normal/low", "normal")
     .action(async (promptParts: string[], opts) => {
       const prompt = promptParts.join(" ");
-      // Try to connect to running daemon via HTTP
       try {
-        const resp = await fetch("http://localhost:18789/api/queue", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt, priority: opts.priority, source: "cli" }),
-        });
-        if (resp.ok) {
-          const data = (await resp.json()) as { id: string };
-          console.log(`Task queued: ${data.id}`);
+        const message =
+          opts.priority && opts.priority !== "normal"
+            ? `[priority:${String(opts.priority)}] ${prompt}`
+            : prompt;
+        const ack = await sendCliPromptToGateway(message);
+        if (ack.runId) {
+          console.log(`Prompt accepted by gateway: run ${ack.runId}`);
         } else {
-          console.error(`Daemon returned ${resp.status}. Is ANIMA running?`);
-          process.exit(1);
+          console.log("Prompt accepted by gateway.");
         }
-      } catch {
-        console.error("Could not connect to ANIMA daemon at localhost:18789.");
-        console.error("Start the daemon with: anima start");
+      } catch (error) {
+        console.error("Could not send prompt to ANIMA gateway.");
+        console.error(formatGatewayError(error));
+        console.error("Run `anima status --deep` and ensure the gateway service is running.");
         process.exit(1);
       }
     });
@@ -79,19 +108,18 @@ export function registerAnimaCommands(program: Command): void {
   // anima pulse — show last heartbeat info
   program
     .command("pulse")
-    .description("Show the daemon's last heartbeat and status")
+    .description("Show gateway health and status")
     .action(async () => {
       try {
-        const resp = await fetch("http://localhost:18789/api/status");
-        if (resp.ok) {
-          const data = (await resp.json()) as Record<string, unknown>;
-          console.log(JSON.stringify(data, null, 2));
-        } else {
-          console.error("Could not get status from daemon.");
-          process.exit(1);
-        }
-      } catch {
-        console.error("ANIMA daemon not running. Start with: anima start");
+        const { callGateway } = await import("../../gateway/call.js");
+        const data = await callGateway({
+          method: "status",
+          timeoutMs: 10_000,
+        });
+        console.log(JSON.stringify(data, null, 2));
+      } catch (error) {
+        console.error("Could not get status from ANIMA gateway.");
+        console.error(formatGatewayError(error));
         process.exit(1);
       }
     });
@@ -209,26 +237,20 @@ export function registerAnimaCommands(program: Command): void {
   // anima wander — trigger freedom exploration
   program
     .command("wander")
-    .description("Initiate an autonomous freedom exploration session")
+    .description("Send a freedom exploration prompt to the gateway session")
     .action(async () => {
       try {
-        const resp = await fetch("http://localhost:18789/api/queue", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: "This is your freedom time. Do whatever genuinely interests you.",
-            priority: "freedom",
-            source: "cli",
-          }),
-        });
-        if (resp.ok) {
-          console.log("Freedom exploration queued.");
+        const ack = await sendCliPromptToGateway(
+          "This is your freedom time. Do whatever genuinely interests you.",
+        );
+        if (ack.runId) {
+          console.log(`Freedom exploration started: run ${ack.runId}`);
         } else {
-          console.error("Could not reach ANIMA daemon.");
-          process.exit(1);
+          console.log("Freedom exploration started.");
         }
-      } catch {
-        console.error("ANIMA daemon not running. Start with: anima start");
+      } catch (error) {
+        console.error("Could not reach ANIMA gateway.");
+        console.error(formatGatewayError(error));
         process.exit(1);
       }
     });

@@ -1,7 +1,69 @@
 import type { GatewayBrowserClient } from "../gateway.ts";
 import type { ChatAttachment } from "../ui-types.ts";
-import { extractText } from "../chat/message-extract.ts";
 import { generateUUID } from "../uuid.ts";
+
+function extractText(value: unknown): string {
+  if (!value) {
+    return "";
+  }
+  if (typeof value === "string") {
+    return value;
+  }
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => extractText(item))
+      .join("\n")
+      .trim();
+  }
+  if (typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    if (typeof record.text === "string") {
+      return record.text;
+    }
+    if (typeof record.delta === "string") {
+      return record.delta;
+    }
+    if (record.type === "text" && typeof record.text === "string") {
+      return record.text;
+    }
+    if (record.message) {
+      return extractText(record.message);
+    }
+    if (record.content) {
+      return extractText(record.content);
+    }
+  }
+  return "";
+}
+
+function mergeStreamText(current: string, incoming: string): string {
+  const next = incoming.replace(/\r/g, "");
+  if (!next) {
+    return current;
+  }
+  if (!current) {
+    return next;
+  }
+  if (next === current) {
+    return current;
+  }
+  if (next.startsWith(current)) {
+    return next;
+  }
+  if (current.startsWith(next) || current.endsWith(next)) {
+    return current;
+  }
+  if (next.includes(current)) {
+    return next;
+  }
+  const maxOverlap = Math.min(current.length, next.length);
+  for (let i = maxOverlap; i > 0; i -= 1) {
+    if (current.slice(-i) === next.slice(0, i)) {
+      return `${current}${next.slice(i)}`;
+    }
+  }
+  return `${current}${next}`;
+}
 
 export type ChatState = {
   client: GatewayBrowserClient | null;
@@ -189,9 +251,7 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
     const next = extractText(payload.message);
     if (typeof next === "string") {
       const current = state.chatStream ?? "";
-      if (!current || next.length >= current.length) {
-        state.chatStream = next;
-      }
+      state.chatStream = mergeStreamText(current, next);
     }
   } else if (payload.state === "final") {
     state.chatStream = null;

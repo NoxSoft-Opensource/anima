@@ -60,6 +60,18 @@ const coreEntries: CoreCliEntry[] = [
     },
   },
   {
+    commands: [
+      {
+        name: "settings",
+        description: "Advanced and complete settings for Gateway and CLI",
+      },
+    ],
+    register: async ({ program }) => {
+      const mod = await import("../settings-cli.js");
+      mod.registerSettingsCli(program);
+    },
+  },
+  {
     commands: [{ name: "config", description: "Read, write, and manage ANIMA configuration" }],
     register: async ({ program }) => {
       const mod = await import("../config-cli.js");

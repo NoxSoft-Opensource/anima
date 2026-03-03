@@ -98,19 +98,31 @@ The Gateway is the single source of truth for sessions, routing, and channel con
 <Steps>
   <Step title="Install Anima">
     ```bash
-    npm install -g anima@latest
+    npm install -g @noxsoft/anima@latest
     ```
   </Step>
-  <Step title="Onboard and install the service">
+  <Step title="Run any command (auto NoxSoft login)">
     ```bash
-    anima onboard --install-daemon
+    anima status
+    ```
+
+    First command authenticates with NoxSoft and auto-registers the agent when needed.
+
+  </Step>
+  <Step title="Run onboarding (recommended)">
+    ```bash
+    anima onboard
     ```
   </Step>
-  <Step title="Pair WhatsApp and start the Gateway">
+  <Step title="Pick auth + start using it">
     ```bash
-    anima channels login
-    anima gateway --port 18789
+    # OpenAI Codex (latest GPT Codex models)
+    anima models auth login --provider openai-codex
+
+    # or run onboarding non-interactively with explicit auth choice:
+    anima onboard --non-interactive --accept-risk --auth-choice openaiCodex
     ```
+
   </Step>
 </Steps>
 

@@ -67,7 +67,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
   const authChoice = opts.authChoice ?? inferredAuthChoice.choice ?? "noxsoft";
   if (authChoice === "skip") {
     runtime.error(
-      "NoxSoft authentication is required for onboarding. Use --auth-choice noxsoft or --auth-choice apiKey.",
+      "NoxSoft authentication is required for onboarding. Use --auth-choice noxsoft, --auth-choice openaiCodex, or --auth-choice apiKey.",
     );
     runtime.exit(1);
     return;

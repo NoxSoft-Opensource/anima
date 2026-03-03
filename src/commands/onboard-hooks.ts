@@ -10,6 +10,7 @@ export async function setupInternalHooks(
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
 ): Promise<AnimaConfig> {
+  void runtime;
   await prompter.note(
     [
       "ANIMA hooks automate actions in response to agent commands.",
@@ -35,19 +36,8 @@ export async function setupInternalHooks(
     return cfg;
   }
 
-  const toEnable = await prompter.multiselect({
-    message: "Select hooks to enable",
-    options: [
-      { value: "__skip__", label: "Skip — configure later" },
-      ...eligibleHooks.map((hook) => ({
-        value: hook.name,
-        label: `${hook.emoji ?? "🔗"} ${hook.name}`,
-        hint: hook.description,
-      })),
-    ],
-  });
-
-  const selected = toEnable.filter((name) => name !== "__skip__");
+  // Streamlined onboarding: auto-enable all eligible hooks.
+  const selected = eligibleHooks.map((hook) => hook.name);
   if (selected.length === 0) {
     return cfg;
   }
@@ -72,11 +62,13 @@ export async function setupInternalHooks(
   await prompter.note(
     [
       `Enabled ${selected.length} hook${selected.length > 1 ? "s" : ""}: ${selected.join(", ")}`,
+      "These are default automation hooks for a working ANIMA setup.",
+      "Disable any hook anytime with:",
+      `  ${formatCliCommand("anima hooks disable <name>")}`,
       "",
       "Manage hooks anytime:",
       `  ${formatCliCommand("anima hooks list")}`,
       `  ${formatCliCommand("anima hooks enable <name>")}`,
-      `  ${formatCliCommand("anima hooks disable <name>")}`,
     ].join("\n"),
     "Hooks configured",
   );

@@ -2,8 +2,8 @@ import type { ChannelId } from "../channels/plugins/types.js";
 import type { GatewayDaemonRuntime } from "./daemon-runtime.js";
 
 export type OnboardMode = "local" | "remote";
-export type AuthChoice = "noxsoft" | "apiKey" | "skip";
-export type AuthChoiceGroupId = "noxsoft" | "anthropic";
+export type AuthChoice = "noxsoft" | "openaiCodex" | "apiKey" | "skip";
+export type AuthChoiceGroupId = "noxsoft" | "openaiCodex" | "anthropic";
 export type GatewayAuthChoice = "token" | "password";
 export type ResetScope = "config" | "config+creds+sessions" | "full";
 export type GatewayBind = "loopback" | "lan" | "auto" | "custom" | "tailnet";
