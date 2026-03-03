@@ -142,14 +142,14 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
       });
     }
 
-    ws.onopen = () => {
+    ws.addEventListener("open", () => {
       connectDelayTimer = window.setTimeout(() => {
         connectDelayTimer = null;
         sendConnect();
       }, 100);
-    };
+    });
 
-    ws.onmessage = (event) => {
+    ws.addEventListener("message", (event) => {
       let parsed: unknown;
       try {
         parsed = JSON.parse(String(event.data));
@@ -187,17 +187,17 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
         }
         finishOk((frame.payload ?? {}) as T);
       }
-    };
+    });
 
-    ws.onerror = () => {
+    ws.addEventListener("error", () => {
       finishError(new Error(`Gateway websocket error while requesting ${method}`));
-    };
+    });
 
-    ws.onclose = () => {
+    ws.addEventListener("close", () => {
       if (!settled) {
         finishError(new Error(`Gateway websocket closed while requesting ${method}`));
       }
-    };
+    });
   });
 }
 
@@ -385,12 +385,14 @@ async function requestViaGatewayRpc<T>(path: string, options?: RequestInit): Pro
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   try {
+    const headers = new Headers(options?.headers ?? {});
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
+    }
+
     const resp = await fetch(`${BASE_URL}${path}`, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
-      },
+      headers,
     });
 
     if (!resp.ok) {
@@ -590,8 +592,10 @@ export function connectWebSocket(
 ): WebSocket {
   const ws = new WebSocket("ws://localhost:18789/ws");
 
-  ws.onmessage = onMessage;
-  ws.onerror = onError || (() => {});
+  ws.addEventListener("message", onMessage);
+  if (onError) {
+    ws.addEventListener("error", onError);
+  }
 
   return ws;
 }
