@@ -82,6 +82,44 @@ describe("runCliAgent resume cleanup", () => {
     expect(killArgs).toEqual(["-9", String(selfPid + 1)]);
   });
 
+  it("does not pass exec-only flags to codex resume", async () => {
+    runExecMock
+      .mockResolvedValueOnce({
+        stdout: "",
+        stderr: "",
+      }) // cleanupSuspendedCliProcesses (ps)
+      .mockResolvedValueOnce({
+        stdout: "",
+        stderr: "",
+      }); // cleanupResumeProcesses (ps)
+    runCommandWithTimeoutMock.mockResolvedValueOnce({
+      stdout: "ok",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
+
+    await runCliAgent({
+      sessionId: "s1",
+      sessionFile: "/tmp/session.jsonl",
+      workspaceDir: "/tmp",
+      prompt: "hi",
+      provider: "codex-cli",
+      model: "gpt-5.2-codex",
+      timeoutMs: 1_000,
+      runId: "run-resume-args",
+      cliSessionId: "thread-abc",
+    });
+
+    const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
+    expect(command).toBeTruthy();
+    expect(command?.slice(0, 4)).toEqual(["codex", "exec", "resume", "thread-abc"]);
+    expect(command).not.toContain("--color");
+    expect(command).not.toContain("--sandbox");
+    expect(command).not.toContain("--skip-git-repo-check");
+  });
+
   it("falls back to per-agent workspace when workspaceDir is missing", async () => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-cli-runner-"));
     const fallbackWorkspace = path.join(tempDir, "workspace-main");
@@ -351,10 +389,14 @@ describe("cleanupResumeProcesses", () => {
   });
 
   it("skips kill when no resume processes match ppid", async () => {
+    const selfPid = process.pid;
+    const unrelatedPpidA = selfPid + 101;
+    const unrelatedPpidB = selfPid + 202;
     runExecMock.mockResolvedValueOnce({
-      stdout: ["  300 100 codex exec resume abc-123", "  301 200 codex exec resume abc-123"].join(
-        "\n",
-      ),
+      stdout: [
+        `  300 ${unrelatedPpidA} codex exec resume abc-123`,
+        `  301 ${unrelatedPpidB} codex exec resume abc-123`,
+      ].join("\n"),
       stderr: "",
     });
 

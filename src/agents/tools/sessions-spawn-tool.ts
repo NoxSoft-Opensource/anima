@@ -11,7 +11,11 @@ import { resolveAgentConfig } from "../agent-scope.js";
 import { AGENT_LANE_SUBAGENT } from "../lanes.js";
 import { resolveDefaultModelForAgent } from "../model-selection.js";
 import { optionalStringEnum } from "../schema/typebox.js";
-import { buildSubagentSystemPrompt } from "../subagent-announce.js";
+import {
+  buildSubagentSystemPrompt,
+  type SubagentIdentityProfile,
+  type SubagentTeamContext,
+} from "../subagent-announce.js";
 import { getSubagentDepthFromSessionStore } from "../subagent-depth.js";
 import { countActiveRunsForSession, registerSubagentRun } from "../subagent-registry.js";
 import { jsonResult, readStringParam } from "./common.js";
@@ -29,6 +33,24 @@ const SessionsSpawnToolSchema = Type.Object({
   thinking: Type.Optional(Type.String()),
   runTimeoutSeconds: Type.Optional(Type.Number({ minimum: 0 })),
   cleanup: optionalStringEnum(["delete", "keep"] as const),
+  identity: Type.Optional(
+    Type.Object({
+      name: Type.Optional(Type.String()),
+      role: Type.Optional(Type.String()),
+      mission: Type.Optional(Type.String()),
+      style: Type.Optional(Type.String()),
+      directives: Type.Optional(Type.Array(Type.String())),
+    }),
+  ),
+  team: Type.Optional(
+    Type.Object({
+      id: Type.Optional(Type.String()),
+      name: Type.Optional(Type.String()),
+      objective: Type.Optional(Type.String()),
+      orchestrator: Type.Optional(Type.String()),
+      memberId: Type.Optional(Type.String()),
+    }),
+  ),
 });
 
 function splitModelRef(ref?: string) {
@@ -61,6 +83,64 @@ function normalizeModelSelection(value: unknown): string | undefined {
   return undefined;
 }
 
+function normalizePromptText(value: unknown, maxChars = 240): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  const trimmed = value.replace(/\s+/g, " ").trim();
+  if (!trimmed) {
+    return undefined;
+  }
+  return trimmed.slice(0, maxChars);
+}
+
+function normalizePromptList(value: unknown, maxItems = 8): string[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  const normalized = value
+    .map((entry) => normalizePromptText(entry, 240))
+    .filter((entry): entry is string => Boolean(entry))
+    .slice(0, maxItems);
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeSubagentIdentity(value: unknown): SubagentIdentityProfile | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+  const candidate = value as Record<string, unknown>;
+  const profile: SubagentIdentityProfile = {
+    name: normalizePromptText(candidate.name, 80),
+    role: normalizePromptText(candidate.role, 120),
+    mission: normalizePromptText(candidate.mission, 220),
+    style: normalizePromptText(candidate.style, 180),
+    directives: normalizePromptList(candidate.directives, 8),
+  };
+  if (!profile.name && !profile.role && !profile.mission && !profile.style && !profile.directives) {
+    return undefined;
+  }
+  return profile;
+}
+
+function normalizeSubagentTeam(value: unknown): SubagentTeamContext | undefined {
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+  const candidate = value as Record<string, unknown>;
+  const team: SubagentTeamContext = {
+    id: normalizePromptText(candidate.id, 80),
+    name: normalizePromptText(candidate.name, 100),
+    objective: normalizePromptText(candidate.objective, 260),
+    orchestrator: normalizePromptText(candidate.orchestrator, 120),
+    memberId: normalizePromptText(candidate.memberId, 80),
+  };
+  if (!team.id && !team.name && !team.objective && !team.orchestrator && !team.memberId) {
+    return undefined;
+  }
+  return team;
+}
+
 export function createSessionsSpawnTool(opts?: {
   agentSessionKey?: string;
   agentChannel?: GatewayMessageChannel;
@@ -87,6 +167,8 @@ export function createSessionsSpawnTool(opts?: {
       const requestedAgentId = readStringParam(params, "agentId");
       const modelOverride = readStringParam(params, "model");
       const thinkingOverrideRaw = readStringParam(params, "thinking");
+      const identity = normalizeSubagentIdentity(params.identity);
+      const team = normalizeSubagentTeam(params.team);
       const cleanup =
         params.cleanup === "keep" || params.cleanup === "delete" ? params.cleanup : "keep";
       const requesterOrigin = normalizeDeliveryContext({
@@ -265,6 +347,8 @@ export function createSessionsSpawnTool(opts?: {
         task,
         childDepth,
         maxSpawnDepth,
+        identity,
+        team,
       });
 
       const childIdem = crypto.randomUUID();

@@ -32,9 +32,19 @@ export function normalizeProviderId(provider: string): string {
   return provider.trim().toLowerCase();
 }
 
+const BUILTIN_CLI_PROVIDER_IDS = new Set<string>([
+  "claude-cli",
+  "codex-cli",
+  "anthropic",
+  "openai-codex",
+  "openai",
+  "claude",
+  "codex",
+]);
+
 export function isCliProvider(provider: string, cfg?: AnimaConfig): boolean {
   const normalized = normalizeProviderId(provider);
-  if (normalized === "claude-cli") {
+  if (BUILTIN_CLI_PROVIDER_IDS.has(normalized)) {
     return true;
   }
   const backends = cfg?.agents?.defaults?.cliBackends ?? {};

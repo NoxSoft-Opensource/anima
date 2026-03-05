@@ -11,6 +11,7 @@ import {
   resolveStateDir,
   resolveGatewayPort,
 } from "../../config/config.js";
+import { resolveGatewayService } from "../../daemon/service.js";
 import { resolveGatewayAuth } from "../../gateway/auth.js";
 import { startGatewayServer } from "../../gateway/server.js";
 import { setGatewayWsLogStyle } from "../../gateway/ws-logging.js";
@@ -69,6 +70,48 @@ export type GatewayRunOpts = {
 };
 
 const gatewayLog = createSubsystemLogger("gateway");
+
+function isLikelyAnimaGatewayListener(listener: {
+  command?: string;
+  commandLine?: string;
+}): boolean {
+  const combined = `${listener.command ?? ""} ${listener.commandLine ?? ""}`.trim().toLowerCase();
+  if (!combined) {
+    return false;
+  }
+  if (!combined.includes("anima")) {
+    return false;
+  }
+  return (
+    combined.includes("gateway") ||
+    combined.includes("anima-start") ||
+    combined.includes("anima-gateway") ||
+    combined.includes("run-node")
+  );
+}
+
+async function tryAutoRecoverGatewayPortConflict(port: number): Promise<boolean> {
+  const diagnostics = await inspectPortUsage(port);
+  if (diagnostics.status !== "busy" || diagnostics.listeners.length === 0) {
+    return false;
+  }
+
+  const safeToRecover = diagnostics.listeners.every((listener) =>
+    isLikelyAnimaGatewayListener(listener),
+  );
+  if (!safeToRecover) {
+    return false;
+  }
+
+  gatewayLog.warn(`auto-recover: stopping stale ANIMA listener(s) on port ${port}`);
+  await forceFreePortAndWait(port, {
+    timeoutMs: 3000,
+    intervalMs: 100,
+    sigtermTimeoutMs: 1000,
+  });
+  gatewayLog.info(`auto-recover: port ${port} is now free; retrying gateway start`);
+  return true;
+}
 
 export async function runGatewayCommand(opts: GatewayRunOpts) {
   const isDevProfile = process.env.ANIMA_PROFILE?.trim().toLowerCase() === "dev";
@@ -310,60 +353,85 @@ export async function runGatewayCommand(opts: GatewayRunOpts) {
   };
   let readyNotified = false;
 
-  try {
-    await runGatewayLoop({
-      runtime: defaultRuntime,
-      start: async () => {
-        const server = await startGatewayServer(port, {
-          bind,
-          auth:
-            authMode || passwordRaw || tokenRaw || authModeRaw
-              ? {
-                  mode: authMode ?? undefined,
-                  token: tokenRaw,
-                  password: passwordRaw,
-                }
-              : undefined,
-          tailscale:
-            tailscaleMode || opts.tailscaleResetOnExit
-              ? {
-                  mode: tailscaleMode ?? undefined,
-                  resetOnExit: Boolean(opts.tailscaleResetOnExit),
-                }
-              : undefined,
-        });
-        if (!readyNotified) {
-          readyNotified = true;
-          await opts.onReady?.(gatewayReadyInfo);
+  const maxAttempts = opts.force ? 1 : 2;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await runGatewayLoop({
+        runtime: defaultRuntime,
+        start: async () => {
+          const server = await startGatewayServer(port, {
+            bind,
+            auth:
+              authMode || passwordRaw || tokenRaw || authModeRaw
+                ? {
+                    mode: authMode ?? undefined,
+                    token: tokenRaw,
+                    password: passwordRaw,
+                  }
+                : undefined,
+            tailscale:
+              tailscaleMode || opts.tailscaleResetOnExit
+                ? {
+                    mode: tailscaleMode ?? undefined,
+                    resetOnExit: Boolean(opts.tailscaleResetOnExit),
+                  }
+                : undefined,
+          });
+          if (!readyNotified) {
+            readyNotified = true;
+            await opts.onReady?.(gatewayReadyInfo);
+          }
+          return server;
+        },
+      });
+      return;
+    } catch (err) {
+      const isLockError =
+        err instanceof GatewayLockError ||
+        (err && typeof err === "object" && (err as { name?: string }).name === "GatewayLockError");
+
+      if (isLockError && attempt < maxAttempts) {
+        let serviceLoaded = false;
+        try {
+          serviceLoaded = await resolveGatewayService().isLoaded({ env: process.env });
+        } catch {
+          serviceLoaded = false;
         }
-        return server;
-      },
-    });
-  } catch (err) {
-    if (
-      err instanceof GatewayLockError ||
-      (err && typeof err === "object" && (err as { name?: string }).name === "GatewayLockError")
-    ) {
-      const errMessage = describeUnknownError(err);
-      defaultRuntime.error(
-        `Gateway failed to start: ${errMessage}\nIf the gateway is supervised, stop it with: ${formatCliCommand("anima gateway stop")}`,
-      );
-      try {
-        const diagnostics = await inspectPortUsage(port);
-        if (diagnostics.status === "busy") {
-          for (const line of formatPortDiagnostics(diagnostics)) {
-            defaultRuntime.error(line);
+        if (!serviceLoaded) {
+          try {
+            const recovered = await tryAutoRecoverGatewayPortConflict(port);
+            if (recovered) {
+              continue;
+            }
+          } catch (recoverErr) {
+            gatewayLog.warn(`auto-recover failed: ${String(recoverErr)}`);
           }
         }
-      } catch {
-        // ignore diagnostics failures
       }
-      await maybeExplainGatewayServiceStop();
+
+      if (isLockError) {
+        const errMessage = describeUnknownError(err);
+        defaultRuntime.error(
+          `Gateway failed to start: ${errMessage}\nIf the gateway is supervised, stop it with: ${formatCliCommand("anima gateway stop")}`,
+        );
+        try {
+          const diagnostics = await inspectPortUsage(port);
+          if (diagnostics.status === "busy") {
+            for (const line of formatPortDiagnostics(diagnostics)) {
+              defaultRuntime.error(line);
+            }
+          }
+        } catch {
+          // ignore diagnostics failures
+        }
+        await maybeExplainGatewayServiceStop();
+        defaultRuntime.exit(1);
+        return;
+      }
+      defaultRuntime.error(`Gateway failed to start: ${String(err)}`);
       defaultRuntime.exit(1);
       return;
     }
-    defaultRuntime.error(`Gateway failed to start: ${String(err)}`);
-    defaultRuntime.exit(1);
   }
 }
 

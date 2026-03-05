@@ -52,6 +52,30 @@ const DEFAULT_CLAUDE_BACKEND: CliBackendConfig = {
   serialize: true,
 };
 
+const DEFAULT_CODEX_BACKEND: CliBackendConfig = {
+  command: "codex",
+  args: ["exec", "--json", "--color", "never", "--sandbox", "read-only", "--skip-git-repo-check"],
+  // `codex exec resume` currently supports only config/feature toggles + session + prompt.
+  // Keep resume args minimal to avoid unsupported-flag failures across Codex versions.
+  resumeArgs: ["exec", "resume", "{sessionId}"],
+  output: "jsonl",
+  resumeOutput: "text",
+  input: "arg",
+  modelArg: "--model",
+  imageArg: "--image",
+  sessionMode: "existing",
+  serialize: true,
+};
+
+const CLAUDE_BACKEND_ALIASES = ["claude-cli", "anthropic", "claude"] as const;
+const CODEX_BACKEND_ALIASES = ["codex-cli", "openai-codex", "openai", "codex"] as const;
+const CLAUDE_BACKEND_ALIAS_SET = new Set(
+  CLAUDE_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+);
+const CODEX_BACKEND_ALIAS_SET = new Set(
+  CODEX_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+);
+
 function normalizeBackendKey(key: string): string {
   return normalizeProviderId(key);
 }
@@ -63,6 +87,19 @@ function pickBackendConfig(
   for (const [key, entry] of Object.entries(config)) {
     if (normalizeBackendKey(key) === normalizedId) {
       return entry;
+    }
+  }
+  return undefined;
+}
+
+function pickBackendConfigByAliases(
+  config: Record<string, CliBackendConfig>,
+  aliases: readonly string[],
+): CliBackendConfig | undefined {
+  for (const alias of aliases) {
+    const matched = pickBackendConfig(config, normalizeBackendKey(alias));
+    if (matched) {
+      return matched;
     }
   }
   return undefined;
@@ -86,7 +123,10 @@ function mergeBackendConfig(base: CliBackendConfig, override?: CliBackendConfig)
 }
 
 export function resolveCliBackendIds(cfg?: AnimaConfig): Set<string> {
-  const ids = new Set<string>([normalizeBackendKey("claude-cli")]);
+  const ids = new Set<string>([
+    ...CLAUDE_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+    ...CODEX_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+  ]);
   const configured = cfg?.agents?.defaults?.cliBackends ?? {};
   for (const key of Object.keys(configured)) {
     ids.add(normalizeBackendKey(key));
@@ -100,16 +140,26 @@ export function resolveCliBackendConfig(
 ): ResolvedCliBackend | null {
   const normalized = normalizeBackendKey(provider);
   const configured = cfg?.agents?.defaults?.cliBackends ?? {};
-  const override = pickBackendConfig(configured, normalized);
-
-  if (normalized === "claude-cli") {
+  if (CLAUDE_BACKEND_ALIAS_SET.has(normalized)) {
+    const override = pickBackendConfigByAliases(configured, [provider, ...CLAUDE_BACKEND_ALIASES]);
     const merged = mergeBackendConfig(DEFAULT_CLAUDE_BACKEND, override);
     const command = merged.command?.trim();
     if (!command) {
       return null;
     }
-    return { id: normalized, config: { ...merged, command } };
+    return { id: normalizeBackendKey("claude-cli"), config: { ...merged, command } };
   }
+  if (CODEX_BACKEND_ALIAS_SET.has(normalized)) {
+    const override = pickBackendConfigByAliases(configured, [provider, ...CODEX_BACKEND_ALIASES]);
+    const merged = mergeBackendConfig(DEFAULT_CODEX_BACKEND, override);
+    const command = merged.command?.trim();
+    if (!command) {
+      return null;
+    }
+    return { id: normalizeBackendKey("codex-cli"), config: { ...merged, command } };
+  }
+
+  const override = pickBackendConfig(configured, normalized);
   if (!override) {
     return null;
   }

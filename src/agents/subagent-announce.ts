@@ -25,6 +25,22 @@ import { type AnnounceQueueItem, enqueueAnnounce } from "./subagent-announce-que
 import { getSubagentDepthFromSessionStore } from "./subagent-depth.js";
 import { readLatestAssistantReply } from "./tools/agent-step.js";
 
+export type SubagentIdentityProfile = {
+  name?: string;
+  role?: string;
+  mission?: string;
+  style?: string;
+  directives?: string[];
+};
+
+export type SubagentTeamContext = {
+  id?: string;
+  name?: string;
+  objective?: string;
+  orchestrator?: string;
+  memberId?: string;
+};
+
 function formatDurationShort(valueMs?: number) {
   if (!valueMs || !Number.isFinite(valueMs) || valueMs <= 0) {
     return "n/a";
@@ -254,6 +270,8 @@ export function buildSubagentSystemPrompt(params: {
   childDepth?: number;
   /** Config value: max allowed spawn depth. */
   maxSpawnDepth?: number;
+  identity?: SubagentIdentityProfile;
+  team?: SubagentTeamContext;
 }) {
   const taskText =
     typeof params.task === "string" && params.task.trim()
@@ -311,6 +329,41 @@ export function buildSubagentSystemPrompt(params: {
     lines.push(
       "## Sub-Agent Spawning",
       "You are a leaf worker and CANNOT spawn further sub-agents. Focus on your assigned task.",
+      "",
+    );
+  }
+
+  const identity = params.identity;
+  const identityLines = [
+    identity?.name ? `- Name: ${identity.name}` : undefined,
+    identity?.role ? `- Role: ${identity.role}` : undefined,
+    identity?.mission ? `- Mission: ${identity.mission}` : undefined,
+    identity?.style ? `- Style: ${identity.style}` : undefined,
+  ].filter((line): line is string => Boolean(line));
+  if (identityLines.length > 0) {
+    lines.push("## Identity Profile", ...identityLines);
+    if (Array.isArray(identity?.directives) && identity.directives.length > 0) {
+      lines.push("- Directives:");
+      for (const directive of identity.directives) {
+        lines.push(`  - ${directive}`);
+      }
+    }
+    lines.push("");
+  }
+
+  const team = params.team;
+  const teamLines = [
+    team?.name ? `- Team: ${team.name}` : undefined,
+    team?.id ? `- Team ID: ${team.id}` : undefined,
+    team?.objective ? `- Team objective: ${team.objective}` : undefined,
+    team?.memberId ? `- Your member id: ${team.memberId}` : undefined,
+    team?.orchestrator ? `- Orchestrator: ${team.orchestrator}` : undefined,
+  ].filter((line): line is string => Boolean(line));
+  if (teamLines.length > 0) {
+    lines.push(
+      "## Team Context",
+      ...teamLines,
+      "- Coordinate your output for the orchestrator and other team members.",
       "",
     );
   }

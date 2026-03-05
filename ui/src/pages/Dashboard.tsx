@@ -6,11 +6,16 @@ import {
   getSVRNStatus,
   type DaemonStatus,
   type QueueItem,
+  type SubagentStatus,
+  type SubagentStatusEntry,
   type SVRNStatus,
 } from "../api";
+import MarkdownText from "../components/MarkdownText";
+import { buildOperatorConnectParams, readGatewayChallengeNonce } from "../gateway-connect";
+import { resolveGatewayConnectAuth, resolveGatewayWsUrl } from "../gateway-connection";
 import { resolveInjectedAssistantIdentity } from "../ui/assistant-identity";
 
-const GATEWAY_WS_URL = "ws://localhost:18789/ws";
+const GATEWAY_WS_URL = resolveGatewayWsUrl();
 const CHAT_SESSION_KEY = "main";
 const GATEWAY_PROTOCOL_VERSION = 3;
 
@@ -46,6 +51,14 @@ type ChatMessage = {
 type PendingRequest = {
   resolve: (value: unknown) => void;
   reject: (error: Error) => void;
+};
+
+const EMPTY_SUBAGENT_STATUS: SubagentStatus = {
+  total: 0,
+  active: 0,
+  recent: 0,
+  failed: 0,
+  latest: [],
 };
 
 function makeId(): string {
@@ -294,6 +307,131 @@ function QueueDisplay({ items }: { items: QueueItem[] }) {
   );
 }
 
+function formatSubagentLabel(key: string): string {
+  const trimmed = key.trim();
+  if (!trimmed) {
+    return "subagent";
+  }
+  const marker = ":subagent:";
+  const markerIndex = trimmed.lastIndexOf(marker);
+  if (markerIndex >= 0) {
+    return `subagent:${trimmed.slice(markerIndex + marker.length)}`;
+  }
+  return trimmed.length > 56 ? `${trimmed.slice(0, 53)}...` : trimmed;
+}
+
+function subagentTone(status: SubagentStatusEntry["status"]): string {
+  switch (status) {
+    case "active":
+      return "var(--color-success)";
+    case "recent":
+      return "var(--color-accent)";
+    case "failed":
+      return "var(--color-error)";
+    default:
+      return "var(--color-muted)";
+  }
+}
+
+function SubagentStatusCard({ subagents }: { subagents: SubagentStatus }) {
+  return (
+    <div className="card">
+      <div className="card-header" style={{ marginBottom: "12px" }}>
+        <span className="card-title">Subagents</span>
+        <span className="card-subtitle">{subagents.total} tracked</span>
+      </div>
+
+      <div className="grid grid-4" style={{ marginBottom: "10px" }}>
+        <div className="card" style={{ marginBottom: 0, textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              color: "var(--color-text)",
+            }}
+          >
+            {subagents.total}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--color-muted)" }}>TOTAL</div>
+        </div>
+        <div className="card" style={{ marginBottom: 0, textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              color: "var(--color-success)",
+            }}
+          >
+            {subagents.active}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--color-muted)" }}>ACTIVE</div>
+        </div>
+        <div className="card" style={{ marginBottom: 0, textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              color: "var(--color-accent)",
+            }}
+          >
+            {subagents.recent}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--color-muted)" }}>RECENT</div>
+        </div>
+        <div className="card" style={{ marginBottom: 0, textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: "20px",
+              fontWeight: 700,
+              fontFamily: "var(--font-heading)",
+              color: subagents.failed > 0 ? "var(--color-error)" : "var(--color-muted)",
+            }}
+          >
+            {subagents.failed}
+          </div>
+          <div style={{ fontSize: "11px", color: "var(--color-muted)" }}>FAILED</div>
+        </div>
+      </div>
+
+      {subagents.latest.length === 0 ? (
+        <div style={{ fontSize: "12px", color: "var(--color-muted)" }}>No subagent runs yet.</div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {subagents.latest.map((entry) => (
+            <div
+              key={`${entry.key}:${entry.updatedAt ?? "none"}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "10px",
+                borderBottom: "1px solid var(--color-border)",
+                paddingBottom: "6px",
+              }}
+            >
+              <span className="mono" style={{ fontSize: "11px", color: "var(--color-muted)" }}>
+                {formatSubagentLabel(entry.key)}
+              </span>
+              <span
+                className="badge"
+                style={{
+                  background: "var(--color-accent-glow)",
+                  color: subagentTone(entry.status),
+                }}
+              >
+                {entry.status.toUpperCase()}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SVRNCard({ svrn }: { svrn: SVRNStatus | null }) {
   if (!svrn) {
     return (
@@ -438,9 +576,9 @@ export default function Dashboard(): React.ReactElement {
         } catch {
           // SVRN endpoint can be optional
         }
-      } catch {
+      } catch (err) {
         if (active) {
-          setError("Could not connect to ANIMA daemon");
+          setError(err instanceof Error ? err.message : "Could not connect to ANIMA daemon");
         }
       }
     }
@@ -486,6 +624,9 @@ export default function Dashboard(): React.ReactElement {
 
   useEffect(() => {
     let disposed = false;
+    let connectInFlight = false;
+    let didConnect = false;
+    let connectNonce: string | undefined;
 
     function clearPendingWithError(message: string) {
       for (const pending of pendingRef.current.values()) {
@@ -515,25 +656,38 @@ export default function Dashboard(): React.ReactElement {
     }
 
     async function sendConnect() {
+      if (disposed || connectInFlight || didConnect) {
+        return;
+      }
+      connectInFlight = true;
       try {
-        await sendRequest("connect", {
+        const auth = resolveGatewayConnectAuth();
+        if (!auth) {
+          throw new Error(
+            "Gateway token missing. Re-open this page once with ?token=ANIMA_GATEWAY_TOKEN.",
+          );
+        }
+        const connectParams = await buildOperatorConnectParams({
           minProtocol: GATEWAY_PROTOCOL_VERSION,
           maxProtocol: GATEWAY_PROTOCOL_VERSION,
           client: {
-            id: "anima-control-ui",
+            id: "webchat-ui",
             version: "1.0.0",
             platform: "web",
             mode: "webchat",
           },
-          role: "operator",
           scopes: ["operator.admin"],
           caps: [],
+          auth,
+          nonce: connectNonce,
         });
+        await sendRequest("connect", connectParams);
 
         if (disposed) {
           return;
         }
 
+        didConnect = true;
         setChatConnected(true);
         setChatError(null);
         void loadHistory();
@@ -542,6 +696,8 @@ export default function Dashboard(): React.ReactElement {
           setChatConnected(false);
           setChatError(err instanceof Error ? err.message : String(err));
         }
+      } finally {
+        connectInFlight = false;
       }
     }
 
@@ -623,6 +779,9 @@ export default function Dashboard(): React.ReactElement {
     }
 
     function connect() {
+      connectInFlight = false;
+      didConnect = false;
+      connectNonce = undefined;
       const ws = new WebSocket(GATEWAY_WS_URL);
       wsRef.current = ws;
       setChatConnected(false);
@@ -664,6 +823,10 @@ export default function Dashboard(): React.ReactElement {
 
         if (frame.type === "event") {
           if (frame.event === "connect.challenge") {
+            const nonce = readGatewayChallengeNonce(frame.payload);
+            if (nonce) {
+              connectNonce = nonce;
+            }
             void sendConnect();
             return;
           }
@@ -678,6 +841,8 @@ export default function Dashboard(): React.ReactElement {
       };
 
       ws.onclose = () => {
+        connectInFlight = false;
+        didConnect = false;
         setChatConnected(false);
         clearPendingWithError("Gateway websocket closed");
         scheduleReconnect();
@@ -747,6 +912,12 @@ export default function Dashboard(): React.ReactElement {
   }
 
   if (error) {
+    const lowerError = error.toLowerCase();
+    const errorHint = lowerError.includes("missing scope")
+      ? "Reload this page on localhost/HTTPS so device identity can be signed."
+      : lowerError.includes("gateway token missing")
+        ? "Open this page once with ?token=ANIMA_GATEWAY_TOKEN."
+        : "Start the daemon with: anima start";
     return (
       <div>
         <h1 className="page-title">{homeTitle}</h1>
@@ -754,7 +925,7 @@ export default function Dashboard(): React.ReactElement {
           <div style={{ fontSize: "48px", marginBottom: "16px", opacity: 0.3 }}>~</div>
           <div style={{ color: "var(--color-muted)", fontSize: "15px" }}>{error}</div>
           <div style={{ color: "var(--color-muted)", fontSize: "13px", marginTop: "8px" }}>
-            Start the daemon with: <span className="mono">anima start</span>
+            {errorHint}
           </div>
         </div>
       </div>
@@ -774,6 +945,8 @@ export default function Dashboard(): React.ReactElement {
       </div>
     );
   }
+
+  const subagentStatus = status.subagents ?? EMPTY_SUBAGENT_STATUS;
 
   return (
     <div>
@@ -807,7 +980,7 @@ export default function Dashboard(): React.ReactElement {
                   <div className="live-chat-role">
                     {message.role === "user" ? "You" : assistantName}
                   </div>
-                  <div>{message.text}</div>
+                  <MarkdownText value={message.text} className="live-chat-markdown" />
                 </div>
               </div>
             ))}
@@ -816,7 +989,7 @@ export default function Dashboard(): React.ReactElement {
               <div className="live-chat-row assistant">
                 <div className="live-chat-bubble assistant">
                   <div className="live-chat-role">{assistantName}</div>
-                  <div>{chatStream}</div>
+                  <MarkdownText value={chatStream} className="live-chat-markdown" />
                 </div>
               </div>
             )}
@@ -965,6 +1138,7 @@ export default function Dashboard(): React.ReactElement {
           </div>
 
           <QueueDisplay items={queue} />
+          <SubagentStatusCard subagents={subagentStatus} />
           <SVRNCard svrn={svrn} />
         </div>
       </div>

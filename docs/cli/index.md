@@ -24,6 +24,7 @@ This page describes the current CLI behavior. If commands change, update this do
 - [`message`](/cli/message)
 - [`agent`](/cli/agent)
 - [`agents`](/cli/agents)
+- [`agents ready`](/cli/agents-ready)
 - [`acp`](/cli/acp)
 - [`status`](/cli/status)
 - [`health`](/cli/health)
@@ -128,6 +129,7 @@ anima [--dev] [--profile <name>] <command>
   agents
     list
     add
+    ready
     delete
   acp
   status

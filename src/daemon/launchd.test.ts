@@ -9,6 +9,7 @@ import {
   parseLaunchctlPrint,
   repairLaunchAgentBootstrap,
   resolveLaunchAgentPlistPath,
+  startLaunchAgent,
 } from "./launchd.js";
 
 function parseLaunchctlCalls(raw: string): string[][] {
@@ -34,6 +35,9 @@ async function writeLaunchctlStub(binDir: string) {
         'if (args[0] === "list") {',
         '  const output = process.env.ANIMA_TEST_LAUNCHCTL_LIST_OUTPUT || "";',
         "  process.stdout.write(output);",
+        "}",
+        'if (process.env.ANIMA_TEST_LAUNCHCTL_FAIL_PRINT === "1" && args[0] === "print") {',
+        "  process.exit(1);",
         "}",
         "process.exit(0);",
         "",
@@ -67,6 +71,9 @@ async function writeLaunchctlStub(binDir: string) {
       "fi",
       'if [ "$1" = "list" ]; then',
       "  printf '%s' \"${ANIMA_TEST_LAUNCHCTL_LIST_OUTPUT:-}\"",
+      "fi",
+      'if [ "$ANIMA_TEST_LAUNCHCTL_FAIL_PRINT" = "1" ] && [ "$1" = "print" ]; then',
+      "  exit 1",
       "fi",
       "exit 0",
       "",
@@ -136,14 +143,31 @@ describe("launchd runtime parsing", () => {
       lastExitReason: "exited",
     });
   });
+
+  it("uses the first top-level state when nested sections repeat state keys", () => {
+    const output = [
+      "state = running",
+      "pid = 4242",
+      "resource coalition = {",
+      "  state = active",
+      "}",
+    ].join("\n");
+    expect(parseLaunchctlPrint(output)).toEqual({
+      state: "running",
+      pid: 4242,
+    });
+  });
 });
 
 describe("launchctl list detection", () => {
   it("detects the resolved label in launchctl list", async () => {
-    await withLaunchctlStub({ listOutput: "123 0 net.noxsoft.anima.gateway\n" }, async ({ env }) => {
-      const listed = await isLaunchAgentListed({ env });
-      expect(listed).toBe(true);
-    });
+    await withLaunchctlStub(
+      { listOutput: "123 0 net.noxsoft.anima.gateway\n" },
+      async ({ env }) => {
+        const listed = await isLaunchAgentListed({ env });
+        expect(listed).toBe(true);
+      },
+    );
   });
 
   it("returns false when the label is missing", async () => {
@@ -169,6 +193,51 @@ describe("launchd bootstrap repair", () => {
       expect(calls).toContainEqual(["bootstrap", domain, plistPath]);
       expect(calls).toContainEqual(["kickstart", "-k", `${domain}/${label}`]);
     });
+  });
+});
+
+describe("launchd start", () => {
+  it("kickstarts when agent is already loaded", async () => {
+    await withLaunchctlStub({}, async ({ env, logPath }) => {
+      await startLaunchAgent({ env, stdout: new PassThrough() });
+
+      const calls = parseLaunchctlCalls(await fs.readFile(logPath, "utf8"));
+      const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
+      const label = "net.noxsoft.anima.gateway";
+
+      expect(calls).toContainEqual(["print", `${domain}/${label}`]);
+      expect(calls).toContainEqual(["kickstart", "-k", `${domain}/${label}`]);
+      expect(calls.some((c) => c[0] === "bootstrap")).toBe(false);
+    });
+  });
+
+  it("bootstraps when agent is not loaded but plist exists", async () => {
+    const originalFailPrint = process.env.ANIMA_TEST_LAUNCHCTL_FAIL_PRINT;
+    process.env.ANIMA_TEST_LAUNCHCTL_FAIL_PRINT = "1";
+    try {
+      await withLaunchctlStub({}, async ({ env, logPath }) => {
+        const plistPath = resolveLaunchAgentPlistPath(env);
+        await fs.mkdir(path.dirname(plistPath), { recursive: true });
+        await fs.writeFile(plistPath, "<plist/>", "utf8");
+
+        await startLaunchAgent({ env, stdout: new PassThrough() });
+
+        const calls = parseLaunchctlCalls(await fs.readFile(logPath, "utf8"));
+        const domain = typeof process.getuid === "function" ? `gui/${process.getuid()}` : "gui/501";
+        const label = "net.noxsoft.anima.gateway";
+        const serviceId = `${domain}/${label}`;
+
+        expect(calls).toContainEqual(["enable", serviceId]);
+        expect(calls).toContainEqual(["bootstrap", domain, plistPath]);
+        expect(calls).toContainEqual(["kickstart", "-k", serviceId]);
+      });
+    } finally {
+      if (originalFailPrint === undefined) {
+        delete process.env.ANIMA_TEST_LAUNCHCTL_FAIL_PRINT;
+      } else {
+        process.env.ANIMA_TEST_LAUNCHCTL_FAIL_PRINT = originalFailPrint;
+      }
+    }
   });
 });
 

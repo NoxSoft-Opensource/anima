@@ -8,6 +8,7 @@ const resolveGatewayProgramArguments = vi.fn(async () => ({
 const serviceInstall = vi.fn().mockResolvedValue(undefined);
 const serviceUninstall = vi.fn().mockResolvedValue(undefined);
 const serviceStop = vi.fn().mockResolvedValue(undefined);
+const serviceStart = vi.fn().mockResolvedValue(undefined);
 const serviceRestart = vi.fn().mockResolvedValue(undefined);
 const serviceIsLoaded = vi.fn().mockResolvedValue(false);
 const serviceReadCommand = vi.fn().mockResolvedValue(null);
@@ -46,6 +47,7 @@ vi.mock("../daemon/service.js", () => ({
     install: serviceInstall,
     uninstall: serviceUninstall,
     stop: serviceStop,
+    start: serviceStart,
     restart: serviceRestart,
     isLoaded: serviceIsLoaded,
     readCommand: serviceReadCommand,
@@ -244,7 +246,7 @@ describe("daemon-cli coverage", () => {
   });
 
   it("starts and stops the daemon via service helpers", async () => {
-    serviceRestart.mockClear();
+    serviceStart.mockClear();
     serviceStop.mockClear();
     serviceIsLoaded.mockResolvedValue(true);
 
@@ -256,14 +258,14 @@ describe("daemon-cli coverage", () => {
     await program.parseAsync(["daemon", "start"], { from: "user" });
     await program.parseAsync(["daemon", "stop"], { from: "user" });
 
-    expect(serviceRestart).toHaveBeenCalledTimes(1);
+    expect(serviceStart).toHaveBeenCalledTimes(1);
     expect(serviceStop).toHaveBeenCalledTimes(1);
   });
 
   it("emits json for daemon start/stop", async () => {
     runtimeLogs.length = 0;
     runtimeErrors.length = 0;
-    serviceRestart.mockClear();
+    serviceStart.mockClear();
     serviceStop.mockClear();
     serviceIsLoaded.mockResolvedValue(true);
 

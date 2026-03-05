@@ -1,5 +1,5 @@
 ---
-summary: "CLI reference for `anima agents` (list/add/delete/set identity)"
+summary: "CLI reference for `anima agents` (list/add/delete/set identity/readiness swarm)"
 read_when:
   - You want multiple isolated agents (workspaces + routing + auth)
 title: "agents"
@@ -19,10 +19,21 @@ Related:
 ```bash
 anima agents list
 anima agents add work --workspace ~/.anima/workspace-work
+anima agents ready
 anima agents set-identity --workspace ~/.anima/workspace --from-identity
 anima agents set-identity --agent main --avatar avatars/anima.png
 anima agents delete work
 ```
+
+## Readiness swarm
+
+Use `ready` to deploy a specialized subagent team for full product readiness:
+
+```bash
+anima agents ready --tracks security,testing,reliability
+```
+
+See full options on [agents ready](/cli/agents-ready).
 
 ## Identity files
 

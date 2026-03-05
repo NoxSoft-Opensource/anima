@@ -275,6 +275,7 @@ describe("createAnimaCodingTools", () => {
       "sessions_send",
       "sessions_spawn",
       "subagents",
+      "subagents_team",
       "session_status",
       "image",
     ]);
@@ -297,6 +298,7 @@ describe("createAnimaCodingTools", () => {
     expect(names.has("sessions_history")).toBe(false);
     expect(names.has("sessions_send")).toBe(false);
     expect(names.has("sessions_spawn")).toBe(false);
+    expect(names.has("subagents_team")).toBe(false);
     // Explicit subagent orchestration tool remains available (list/steer/kill with safeguards).
     expect(names.has("subagents")).toBe(true);
 
@@ -345,6 +347,7 @@ describe("createAnimaCodingTools", () => {
     expect(names.has("sessions_spawn")).toBe(false);
     expect(names.has("sessions_list")).toBe(false);
     expect(names.has("sessions_history")).toBe(false);
+    expect(names.has("subagents_team")).toBe(false);
     expect(names.has("subagents")).toBe(true);
   });
   it("supports allow-only sub-agent tool policy", () => {

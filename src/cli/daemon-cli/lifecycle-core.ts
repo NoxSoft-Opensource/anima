@@ -125,28 +125,28 @@ export async function runServiceStart(params: {
     fail(`${params.serviceNoun} service check failed: ${String(err)}`);
     return;
   }
-  if (!loaded) {
-    const hints = await maybeAugmentSystemdHints(params.renderStartHints());
-    emit({
-      ok: true,
-      result: "not-loaded",
-      message: `${params.serviceNoun} service ${params.service.notLoadedText}.`,
-      hints,
-      service: buildDaemonServiceSnapshot(params.service, loaded),
-    });
-    if (!json) {
-      defaultRuntime.log(`${params.serviceNoun} service ${params.service.notLoadedText}.`);
-      for (const hint of hints) {
-        defaultRuntime.log(`Start with: ${hint}`);
-      }
-    }
-    return;
-  }
+
   try {
-    await params.service.restart({ env: process.env, stdout });
+    await params.service.start({ env: process.env, stdout });
   } catch (err) {
-    const hints = params.renderStartHints();
-    fail(`${params.serviceNoun} start failed: ${String(err)}`, hints);
+    if (!loaded) {
+      const hints = await maybeAugmentSystemdHints(params.renderStartHints());
+      emit({
+        ok: true,
+        result: "not-loaded",
+        message: `${params.serviceNoun} service ${params.service.notLoadedText}.`,
+        hints,
+        service: buildDaemonServiceSnapshot(params.service, loaded),
+      });
+      if (!json) {
+        defaultRuntime.log(`${params.serviceNoun} service ${params.service.notLoadedText}.`);
+        for (const hint of hints) {
+          defaultRuntime.log(`Start with: ${hint}`);
+        }
+      }
+      return;
+    }
+    fail(`${params.serviceNoun} start failed: ${String(err)}`, params.renderStartHints());
     return;
   }
 
@@ -227,21 +227,37 @@ export async function runServiceRestart(params: {
     return false;
   }
   if (!loaded) {
-    const hints = await maybeAugmentSystemdHints(params.renderStartHints());
-    emit({
-      ok: true,
-      result: "not-loaded",
-      message: `${params.serviceNoun} service ${params.service.notLoadedText}.`,
-      hints,
-      service: buildDaemonServiceSnapshot(params.service, loaded),
-    });
-    if (!json) {
-      defaultRuntime.log(`${params.serviceNoun} service ${params.service.notLoadedText}.`);
-      for (const hint of hints) {
-        defaultRuntime.log(`Start with: ${hint}`);
+    try {
+      await params.service.start({ env: process.env, stdout });
+      let started = true;
+      try {
+        started = await params.service.isLoaded({ env: process.env });
+      } catch {
+        started = true;
       }
+      emit({
+        ok: true,
+        result: "started",
+        service: buildDaemonServiceSnapshot(params.service, started),
+      });
+      return true;
+    } catch {
+      const hints = await maybeAugmentSystemdHints(params.renderStartHints());
+      emit({
+        ok: true,
+        result: "not-loaded",
+        message: `${params.serviceNoun} service ${params.service.notLoadedText}.`,
+        hints,
+        service: buildDaemonServiceSnapshot(params.service, loaded),
+      });
+      if (!json) {
+        defaultRuntime.log(`${params.serviceNoun} service ${params.service.notLoadedText}.`);
+        for (const hint of hints) {
+          defaultRuntime.log(`Start with: ${hint}`);
+        }
+      }
+      return false;
     }
-    return false;
   }
   try {
     await params.service.restart({ env: process.env, stdout });

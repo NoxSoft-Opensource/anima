@@ -76,13 +76,15 @@ export function registerAnimaCommands(program: Command): void {
   // anima migrate
   program
     .command("migrate")
-    .description("Import identity from Claude Coherence Protocol")
+    .description("Import identity from Codex/OpenClaw/Claude coherence protocol")
     .option("--source <path>", "Source directory for coherence protocol")
+    .option("--preset <name>", "Source preset: auto|codex|openclaw|claude", "auto")
     .option("--dry-run", "Show what would be migrated without making changes")
     .action(async (opts) => {
       const { migrateFromCoherence } = await import("../migrate.js");
       await migrateFromCoherence({
         source: opts.source,
+        preset: opts.preset,
         dryRun: opts.dryRun,
       });
     });

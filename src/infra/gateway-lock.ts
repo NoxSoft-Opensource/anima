@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
@@ -67,6 +68,10 @@ function parseProcCmdline(raw: string): string[] {
 
 function isGatewayArgv(args: string[]): boolean {
   const normalized = args.map(normalizeProcArg);
+  const processName = normalized[0] ?? "";
+  if (processName.endsWith("anima-start") || processName.endsWith("anima-gateway")) {
+    return true;
+  }
   if (!normalized.includes("gateway")) {
     return false;
   }
@@ -84,6 +89,26 @@ function isGatewayArgv(args: string[]): boolean {
 
   const exe = normalized[0] ?? "";
   return exe.endsWith("/anima") || exe === "anima";
+}
+
+function parseShellLikeArgs(raw: string): string[] {
+  const out: string[] = [];
+  const matches = raw.match(/"[^"]*"|'[^']*'|\S+/g) ?? [];
+  for (const entry of matches) {
+    const trimmed = entry.trim();
+    if (!trimmed) {
+      continue;
+    }
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      out.push(trimmed.slice(1, -1));
+    } else {
+      out.push(trimmed);
+    }
+  }
+  return out;
 }
 
 function readLinuxCmdline(pid: number): string[] | null {
@@ -111,6 +136,21 @@ function readLinuxStartTime(pid: number): number | null {
   }
 }
 
+function readUnixPsArgs(pid: number): string[] | null {
+  const res = spawnSync("ps", ["-p", String(pid), "-o", "args="], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  if (res.status !== 0) {
+    return null;
+  }
+  const line = (res.stdout || "").trim();
+  if (!line) {
+    return null;
+  }
+  return parseShellLikeArgs(line);
+}
+
 function resolveGatewayOwnerStatus(
   pid: number,
   payload: LockPayload | null,
@@ -119,24 +159,38 @@ function resolveGatewayOwnerStatus(
   if (!isAlive(pid)) {
     return "dead";
   }
-  if (platform !== "linux") {
+  if (pid === process.pid && platform !== "linux") {
+    // Re-entrant acquisition from the same process must remain blocked.
     return "alive";
   }
+  if (platform === "linux") {
+    const payloadStartTime = payload?.startTime;
+    if (Number.isFinite(payloadStartTime)) {
+      const currentStartTime = readLinuxStartTime(pid);
+      if (currentStartTime == null) {
+        return "unknown";
+      }
+      return currentStartTime === payloadStartTime ? "alive" : "dead";
+    }
 
-  const payloadStartTime = payload?.startTime;
-  if (Number.isFinite(payloadStartTime)) {
-    const currentStartTime = readLinuxStartTime(pid);
-    if (currentStartTime == null) {
+    const args = readLinuxCmdline(pid);
+    if (!args) {
       return "unknown";
     }
-    return currentStartTime === payloadStartTime ? "alive" : "dead";
+    return isGatewayArgv(args) ? "alive" : "dead";
   }
 
-  const args = readLinuxCmdline(pid);
-  if (!args) {
-    return "unknown";
+  if (platform === "darwin" || platform === "freebsd" || platform === "openbsd") {
+    const args = readUnixPsArgs(pid);
+    if (!args) {
+      return "unknown";
+    }
+    // On BSD/macOS, process titles can be truncated or rewritten.
+    // Treat unrecognized args as unknown and rely on stale-timeout cleanup.
+    return isGatewayArgv(args) ? "alive" : "unknown";
   }
-  return isGatewayArgv(args) ? "alive" : "dead";
+
+  return "alive";
 }
 
 async function readLockPayload(lockPath: string): Promise<LockPayload | null> {

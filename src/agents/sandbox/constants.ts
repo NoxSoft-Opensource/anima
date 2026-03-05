@@ -23,6 +23,7 @@ export const DEFAULT_TOOL_ALLOW = [
   "sessions_send",
   "sessions_spawn",
   "subagents",
+  "subagents_team",
   "session_status",
 ] as const;
 

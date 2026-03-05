@@ -159,6 +159,61 @@ describe("anima-tools: subagents (sessions_spawn model + thinking)", () => {
     });
   });
 
+  it("sessions_spawn injects identity + team context into the child system prompt", async () => {
+    resetSubagentRegistryForTests();
+    callGatewayMock.mockReset();
+    const calls: Array<{ method?: string; params?: unknown }> = [];
+
+    callGatewayMock.mockImplementation(async (opts: unknown) => {
+      const request = opts as { method?: string; params?: unknown };
+      calls.push(request);
+      if (request.method === "agent") {
+        return { runId: "run-identity", status: "accepted" };
+      }
+      return {};
+    });
+
+    const tool = createAnimaTools({
+      agentSessionKey: "discord:group:req",
+      agentChannel: "discord",
+    }).find((candidate) => candidate.name === "sessions_spawn");
+    if (!tool) {
+      throw new Error("missing sessions_spawn tool");
+    }
+
+    const result = await tool.execute("call-identity", {
+      task: "build launch checklist",
+      label: "builder",
+      identity: {
+        name: "Axiom Scout",
+        role: "research lead",
+        mission: "find high-signal launch opportunities",
+        style: "concise and evidence-first",
+        directives: ["report risks early", "avoid low-confidence claims"],
+      },
+      team: {
+        id: "launch-alpha",
+        name: "Launch Alpha",
+        objective: "prepare a launch execution plan",
+        orchestrator: "Axiom",
+        memberId: "research-1",
+      },
+    });
+    expect(result.details).toMatchObject({
+      status: "accepted",
+    });
+
+    const agentCall = calls.find((call) => call.method === "agent");
+    const extraSystemPrompt = (agentCall?.params as { extraSystemPrompt?: string } | undefined)
+      ?.extraSystemPrompt;
+    expect(extraSystemPrompt).toContain("## Identity Profile");
+    expect(extraSystemPrompt).toContain("Name: Axiom Scout");
+    expect(extraSystemPrompt).toContain("Role: research lead");
+    expect(extraSystemPrompt).toContain("## Team Context");
+    expect(extraSystemPrompt).toContain("Team objective: prepare a launch execution plan");
+    expect(extraSystemPrompt).toContain("Orchestrator: Axiom");
+  });
+
   it("sessions_spawn rejects invalid thinking levels", async () => {
     resetSubagentRegistryForTests();
     callGatewayMock.mockReset();

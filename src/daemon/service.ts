@@ -5,6 +5,7 @@ import {
   readLaunchAgentProgramArguments,
   readLaunchAgentRuntime,
   restartLaunchAgent,
+  startLaunchAgent,
   stopLaunchAgent,
   uninstallLaunchAgent,
 } from "./launchd.js";
@@ -14,6 +15,7 @@ import {
   readScheduledTaskCommand,
   readScheduledTaskRuntime,
   restartScheduledTask,
+  startScheduledTask,
   stopScheduledTask,
   uninstallScheduledTask,
 } from "./schtasks.js";
@@ -23,6 +25,7 @@ import {
   readSystemdServiceExecStart,
   readSystemdServiceRuntime,
   restartSystemdService,
+  startSystemdService,
   stopSystemdService,
   uninstallSystemdService,
 } from "./systemd.js";
@@ -46,6 +49,10 @@ export type GatewayService = {
     stdout: NodeJS.WritableStream;
   }) => Promise<void>;
   stop: (args: {
+    env?: Record<string, string | undefined>;
+    stdout: NodeJS.WritableStream;
+  }) => Promise<void>;
+  start: (args: {
     env?: Record<string, string | undefined>;
     stdout: NodeJS.WritableStream;
   }) => Promise<void>;
@@ -81,6 +88,12 @@ export function resolveGatewayService(): GatewayService {
           env: args.env,
         });
       },
+      start: async (args) => {
+        await startLaunchAgent({
+          stdout: args.stdout,
+          env: args.env,
+        });
+      },
       restart: async (args) => {
         await restartLaunchAgent({
           stdout: args.stdout,
@@ -110,6 +123,12 @@ export function resolveGatewayService(): GatewayService {
           env: args.env,
         });
       },
+      start: async (args) => {
+        await startSystemdService({
+          stdout: args.stdout,
+          env: args.env,
+        });
+      },
       restart: async (args) => {
         await restartSystemdService({
           stdout: args.stdout,
@@ -135,6 +154,12 @@ export function resolveGatewayService(): GatewayService {
       },
       stop: async (args) => {
         await stopScheduledTask({
+          stdout: args.stdout,
+          env: args.env,
+        });
+      },
+      start: async (args) => {
+        await startScheduledTask({
           stdout: args.stdout,
           env: args.env,
         });

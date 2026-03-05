@@ -267,7 +267,9 @@
         "model",
         "thinking",
         "runTimeoutSeconds",
-        "cleanup"
+        "cleanup",
+        "identity.role",
+        "team.name"
       ]
     },
     "subagents": {
@@ -278,6 +280,11 @@
         "kill": { "label": "kill", "detailKeys": ["target"] },
         "steer": { "label": "steer", "detailKeys": ["target"] }
       }
+    },
+    "subagents_team": {
+      "emoji": "🧠",
+      "title": "Subagent Team",
+      "detailKeys": ["teamName", "teamId", "objective", "members", "mode"]
     },
     "session_status": {
       "emoji": "📊",

@@ -60,7 +60,12 @@ const SUBAGENT_TOOL_DENY_ALWAYS = [
  * Additional tools denied for leaf sub-agents (depth >= maxSpawnDepth).
  * These are tools that only make sense for orchestrator sub-agents that can spawn children.
  */
-const SUBAGENT_TOOL_DENY_LEAF = ["sessions_list", "sessions_history", "sessions_spawn"];
+const SUBAGENT_TOOL_DENY_LEAF = [
+  "sessions_list",
+  "sessions_history",
+  "sessions_spawn",
+  "subagents_team",
+];
 
 /**
  * Build the deny list for a sub-agent at a given depth.

@@ -1184,6 +1184,7 @@
                   "cli/index",
                   "cli/agent",
                   "cli/agents",
+                  "cli/agents-ready",
                   "cli/approvals",
                   "cli/browser",
                   "cli/channels",

@@ -78,6 +78,7 @@ describe("sessions tools", () => {
     expect(schemaProp("sessions_spawn", "thinking").type).toBe("string");
     expect(schemaProp("sessions_spawn", "runTimeoutSeconds").type).toBe("number");
     expect(schemaProp("subagents", "recentMinutes").type).toBe("number");
+    expect(schemaProp("subagents_team", "members").type).toBe("array");
   });
 
   it("sessions_list filters kinds and includes messages", async () => {

@@ -79,6 +79,7 @@ export const resolveGatewayProgramArguments = vi.fn().mockResolvedValue({
 export const serviceInstall = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
 export const serviceIsLoaded = vi.fn().mockResolvedValue(false) as unknown as MockFn;
 export const serviceStop = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
+export const serviceStart = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
 export const serviceRestart = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
 export const serviceUninstall = vi.fn().mockResolvedValue(undefined) as unknown as MockFn;
 export const callGateway = vi
@@ -203,6 +204,7 @@ vi.mock("../daemon/service.js", () => ({
     install: serviceInstall,
     uninstall: serviceUninstall,
     stop: serviceStop,
+    start: serviceStart,
     restart: serviceRestart,
     isLoaded: serviceIsLoaded,
     readCommand: vi.fn(),
@@ -373,6 +375,7 @@ beforeEach(() => {
   serviceInstall.mockReset().mockResolvedValue(undefined);
   serviceIsLoaded.mockReset().mockResolvedValue(false);
   serviceStop.mockReset().mockResolvedValue(undefined);
+  serviceStart.mockReset().mockResolvedValue(undefined);
   serviceRestart.mockReset().mockResolvedValue(undefined);
   serviceUninstall.mockReset().mockResolvedValue(undefined);
   callGateway.mockReset().mockRejectedValue(new Error("gateway closed"));

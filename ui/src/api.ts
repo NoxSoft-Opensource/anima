@@ -1,13 +1,23 @@
 /**
  * ANIMA API Client — wraps fetch calls to the daemon gateway.
  *
- * Default endpoint: http://localhost:18789
+ * Default endpoint: same origin as the Control UI, fallback localhost.
  */
 
-const BASE_URL = "http://localhost:18789";
-const GATEWAY_WS_URL = "ws://localhost:18789/ws";
+import { buildOperatorConnectParams, readGatewayChallengeNonce } from "./gateway-connect";
+import {
+  resolveGatewayBaseUrl,
+  resolveGatewayConnectAuth,
+  resolveGatewayWsUrl,
+} from "./gateway-connection";
+
+const BASE_URL = resolveGatewayBaseUrl();
+const GATEWAY_WS_URL = resolveGatewayWsUrl();
 const GATEWAY_PROTOCOL_VERSION = 3;
 const RPC_TIMEOUT_MS = 10_000;
+const SUBAGENT_ACTIVE_WINDOW_MS = 2 * 60_000;
+const SUBAGENT_RECENT_WINDOW_MS = 15 * 60_000;
+const SUBAGENT_LATEST_LIMIT = 8;
 
 type RpcResponseFrame = {
   type: "res";
@@ -80,6 +90,8 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
     const ws = new WebSocket(GATEWAY_WS_URL);
     let settled = false;
     let connected = false;
+    let connectInFlight = false;
+    let connectNonce: string | undefined;
     let connectReqId = "";
     let methodReqId = "";
     let connectDelayTimer: number | null = null;
@@ -125,27 +137,49 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
       );
     }
 
-    function sendConnect() {
-      connectReqId = makeId();
-      sendFrame(connectReqId, "connect", {
-        minProtocol: GATEWAY_PROTOCOL_VERSION,
-        maxProtocol: GATEWAY_PROTOCOL_VERSION,
-        client: {
-          id: "anima-control-ui-api",
-          version: "1.0.0",
-          platform: "web",
-          mode: "webchat",
-        },
-        role: "operator",
-        scopes: ["operator.admin"],
-        caps: [],
-      });
+    async function sendConnect() {
+      if (connected || connectReqId || connectInFlight) {
+        return;
+      }
+      connectInFlight = true;
+      const auth = resolveGatewayConnectAuth();
+      if (!auth) {
+        connectInFlight = false;
+        finishError(
+          new Error(
+            "Gateway token missing. Re-open this page once with ?token=ANIMA_GATEWAY_TOKEN.",
+          ),
+        );
+        return;
+      }
+      try {
+        const connectParams = await buildOperatorConnectParams({
+          minProtocol: GATEWAY_PROTOCOL_VERSION,
+          maxProtocol: GATEWAY_PROTOCOL_VERSION,
+          client: {
+            id: "webchat-ui",
+            version: "1.0.0",
+            platform: "web",
+            mode: "webchat",
+          },
+          scopes: ["operator.admin"],
+          caps: [],
+          auth,
+          nonce: connectNonce,
+        });
+        connectReqId = makeId();
+        sendFrame(connectReqId, "connect", connectParams);
+        connectInFlight = false;
+      } catch (err) {
+        connectInFlight = false;
+        finishError(err instanceof Error ? err : new Error(String(err)));
+      }
     }
 
     ws.addEventListener("open", () => {
       connectDelayTimer = window.setTimeout(() => {
         connectDelayTimer = null;
-        sendConnect();
+        void sendConnect();
       }, 100);
     });
 
@@ -160,7 +194,11 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
       const frame = parsed as RpcResponseFrame | RpcEventFrame;
       if (frame.type === "event") {
         if (frame.event === "connect.challenge") {
-          sendConnect();
+          const nonce = readGatewayChallengeNonce(frame.payload);
+          if (nonce) {
+            connectNonce = nonce;
+          }
+          void sendConnect();
         }
         return;
       }
@@ -170,6 +208,8 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
       }
 
       if (frame.id === connectReqId) {
+        connectReqId = "";
+        connectInFlight = false;
         if (!frame.ok) {
           finishError(new Error(frame.error?.message || "Gateway connect failed"));
           return;
@@ -204,6 +244,7 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
 function mapDaemonStatus(
   status: GatewayStatusPayload,
   lastHeartbeat: LastHeartbeatPayload | null,
+  subagents: SubagentStatus = createEmptySubagentStatus(),
 ): DaemonStatus {
   const firstAgent = Array.isArray(status.heartbeat?.agents) ? status.heartbeat?.agents[0] : null;
   const interval =
@@ -239,6 +280,77 @@ function mapDaemonStatus(
     mcp: {
       servers: [],
     },
+    subagents,
+  };
+}
+
+function createEmptySubagentStatus(): SubagentStatus {
+  return {
+    total: 0,
+    active: 0,
+    recent: 0,
+    failed: 0,
+    latest: [],
+  };
+}
+
+function normalizeUpdatedAt(updatedAt: number | undefined): number | null {
+  return typeof updatedAt === "number" && Number.isFinite(updatedAt) ? updatedAt : null;
+}
+
+function isSubagentSessionKey(key: string | undefined): boolean {
+  const normalized = key?.trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+  return normalized.startsWith("subagent:") || normalized.includes(":subagent:");
+}
+
+function deriveSubagentStatus(payload: GatewaySessionsPayload): SubagentStatus {
+  if (!Array.isArray(payload.sessions) || payload.sessions.length === 0) {
+    return createEmptySubagentStatus();
+  }
+
+  const now = Date.now();
+  const rows = payload.sessions
+    .filter((entry) => isSubagentSessionKey(entry.key))
+    .map((entry) => {
+      const updatedAtMs = normalizeUpdatedAt(entry.updatedAt);
+      const ageMs = updatedAtMs == null ? Number.POSITIVE_INFINITY : Math.max(0, now - updatedAtMs);
+      const failed = entry.abortedLastRun === true;
+
+      let status: SubagentStatusEntry["status"] = "idle";
+      if (failed) {
+        status = "failed";
+      } else if (ageMs <= SUBAGENT_ACTIVE_WINDOW_MS) {
+        status = "active";
+      } else if (ageMs <= SUBAGENT_RECENT_WINDOW_MS) {
+        status = "recent";
+      }
+
+      return {
+        key: entry.key?.trim() || makeId(),
+        status,
+        updatedAt: updatedAtMs != null ? new Date(updatedAtMs).toISOString() : null,
+        updatedAtMs,
+      };
+    })
+    .toSorted((a, b) => (b.updatedAtMs ?? 0) - (a.updatedAtMs ?? 0));
+
+  if (rows.length === 0) {
+    return createEmptySubagentStatus();
+  }
+
+  return {
+    total: rows.length,
+    active: rows.filter((row) => row.status === "active").length,
+    recent: rows.filter((row) => row.status === "recent").length,
+    failed: rows.filter((row) => row.status === "failed").length,
+    latest: rows.slice(0, SUBAGENT_LATEST_LIMIT).map((row) => ({
+      key: row.key,
+      status: row.status,
+      updatedAt: row.updatedAt,
+    })),
   };
 }
 
@@ -328,11 +440,17 @@ async function requestViaGatewayRpc<T>(path: string, options?: RequestInit): Pro
   const method = (options?.method || "GET").toUpperCase();
 
   if (method === "GET" && path === "/api/status") {
-    const [status, lastHeartbeat] = await Promise.all([
+    const [status, lastHeartbeat, sessions] = await Promise.all([
       gatewayRpc<GatewayStatusPayload>("status", {}),
       gatewayRpc<LastHeartbeatPayload>("last-heartbeat", {}).catch(() => null),
+      gatewayRpc<GatewaySessionsPayload>("sessions.list", {
+        limit: 200,
+        includeGlobal: true,
+        includeUnknown: true,
+      }).catch(() => ({ sessions: [] })),
     ]);
-    return mapDaemonStatus(status, lastHeartbeat) as T;
+    const subagents = deriveSubagentStatus(sessions);
+    return mapDaemonStatus(status, lastHeartbeat, subagents) as T;
   }
 
   if (method === "GET" && path === "/api/identity") {
@@ -455,6 +573,21 @@ export interface DaemonStatus {
   mcp: {
     servers: MCPServerStatus[];
   };
+  subagents?: SubagentStatus;
+}
+
+export interface SubagentStatusEntry {
+  key: string;
+  status: "active" | "recent" | "idle" | "failed";
+  updatedAt: string | null;
+}
+
+export interface SubagentStatus {
+  total: number;
+  active: number;
+  recent: number;
+  failed: number;
+  latest: SubagentStatusEntry[];
 }
 
 export interface MCPServerStatus {
@@ -590,7 +723,7 @@ export function connectWebSocket(
   onMessage: (event: MessageEvent) => void,
   onError?: (event: Event) => void,
 ): WebSocket {
-  const ws = new WebSocket("ws://localhost:18789/ws");
+  const ws = new WebSocket(GATEWAY_WS_URL);
 
   ws.addEventListener("message", onMessage);
   if (onError) {

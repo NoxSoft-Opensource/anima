@@ -275,6 +275,23 @@ export async function stopSystemdService({
   stdout.write(`${formatLine("Stopped systemd service", unitName)}\n`);
 }
 
+export async function startSystemdService({
+  stdout,
+  env,
+}: {
+  stdout: NodeJS.WritableStream;
+  env?: Record<string, string | undefined>;
+}): Promise<void> {
+  await assertSystemdAvailable();
+  const serviceName = resolveSystemdServiceName(env ?? {});
+  const unitName = `${serviceName}.service`;
+  const res = await execSystemctl(["--user", "start", unitName]);
+  if (res.code !== 0) {
+    throw new Error(`systemctl start failed: ${res.stderr || res.stdout}`.trim());
+  }
+  stdout.write(`${formatLine("Started systemd service", unitName)}\n`);
+}
+
 export async function restartSystemdService({
   stdout,
   env,

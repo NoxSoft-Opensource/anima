@@ -117,7 +117,10 @@ const coreEntries: CoreCliEntry[] = [
     commands: [
       { name: "start", description: "Start gateway + portal + dashboard (simple mode)" },
       { name: "init", description: "Scaffold the ~/.anima/ identity and workspace structure" },
-      { name: "migrate", description: "Import identity from Claude Coherence Protocol" },
+      {
+        name: "migrate",
+        description: "Import identity from Codex/OpenClaw/Claude coherence protocol",
+      },
       { name: "ask", description: "Queue a task to the running ANIMA daemon" },
       { name: "pulse", description: "Show the daemon's last heartbeat and status" },
       { name: "soul", description: "View the current persistent identity summary" },

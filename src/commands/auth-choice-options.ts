@@ -23,8 +23,8 @@ const AUTH_CHOICE_GROUP_DEFS: {
 }[] = [
   {
     value: "noxsoft",
-    label: "NoxSoft Agent",
-    hint: "Register as a NoxSoft agent — recommended",
+    label: "Platform Identity",
+    hint: "NoxSoft account link for platform access (not a model backend)",
     choices: ["noxsoft"],
   },
   {
@@ -44,8 +44,8 @@ const AUTH_CHOICE_GROUP_DEFS: {
 const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
   {
     value: "noxsoft",
-    label: "NoxSoft Agent Registration (recommended)",
-    hint: "Auto-register as a NoxSoft agent",
+    label: "NoxSoft Platform Account",
+    hint: "Account link for NoxSoft platform access",
   },
   {
     value: "openaiCodex",

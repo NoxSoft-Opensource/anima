@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const CORE_PACKAGE_NAMES = new Set(["anima"]);
+const CORE_PACKAGE_NAMES = new Set(["anima", "@noxsoft/anima"]);
 
 async function readPackageName(dir: string): Promise<string | null> {
   try {

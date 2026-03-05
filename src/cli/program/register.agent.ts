@@ -5,6 +5,7 @@ import {
   agentsAddCommand,
   agentsDeleteCommand,
   agentsListCommand,
+  agentsReadinessCommand,
   agentsSetIdentityCommand,
 } from "../../commands/agents.js";
 import { setVerbose } from "../../globals.js";
@@ -183,6 +184,76 @@ ${formatHelpExamples([
             json: Boolean(opts.json),
           },
           defaultRuntime,
+        );
+      });
+    });
+
+  agents
+    .command("ready")
+    .description("Deploy a readiness swarm of specialized subagents")
+    .option("--agent <id>", "Agent id to run the readiness orchestrator")
+    .option("-t, --to <number>", "Recipient number in E.164 used to derive the session key")
+    .option("--session-id <id>", "Use an explicit session id")
+    .option(
+      "--tracks <list>",
+      "Comma-separated tracks: architecture,security,reliability,ux,testing,release",
+    )
+    .option("--objective <text>", "Override the default readiness objective")
+    .option("--thinking <level>", "Thinking level: off | minimal | low | medium | high")
+    .option(
+      "--channel <channel>",
+      `Delivery channel: ${args.agentChannelOptions} (default: ${DEFAULT_CHAT_CHANNEL})`,
+    )
+    .option("--reply-to <target>", "Delivery target override (separate from session routing)")
+    .option("--reply-channel <channel>", "Delivery channel override (separate from routing)")
+    .option("--reply-account <id>", "Delivery account id override")
+    .option("--deliver", "Send the orchestrator reply back to the selected channel", false)
+    .option("--local", "Run embedded locally instead of the Gateway", false)
+    .option("--timeout <seconds>", "Override agent timeout (seconds)")
+    .option("--dry-run", "Print the readiness orchestration prompt without running", false)
+    .option("--json", "Output JSON instead of text where supported", false)
+    .addHelpText(
+      "after",
+      () =>
+        `
+${theme.heading("Examples:")}
+${formatHelpExamples([
+  ["anima agents ready", "Launch full readiness swarm on main agent."],
+  [
+    'anima agents ready --tracks security,testing,reliability --objective "Stabilize gateway + daemon handoff"',
+    "Focus on selected tracks.",
+  ],
+  [
+    'anima agents ready --agent ops --deliver --reply-channel slack --reply-to "#release-war-room"',
+    "Run on a specific agent and deliver summary.",
+  ],
+  ["anima agents ready --dry-run", "Preview orchestration prompt only."],
+])}
+`,
+    )
+    .action(async (opts) => {
+      const deps = createDefaultDeps();
+      await runCommandWithRuntime(defaultRuntime, async () => {
+        await agentsReadinessCommand(
+          {
+            agent: opts.agent as string | undefined,
+            to: opts.to as string | undefined,
+            sessionId: opts.sessionId as string | undefined,
+            tracks: opts.tracks as string | undefined,
+            objective: opts.objective as string | undefined,
+            thinking: opts.thinking as string | undefined,
+            channel: opts.channel as string | undefined,
+            replyTo: opts.replyTo as string | undefined,
+            replyChannel: opts.replyChannel as string | undefined,
+            replyAccount: opts.replyAccount as string | undefined,
+            deliver: Boolean(opts.deliver),
+            local: Boolean(opts.local),
+            timeout: opts.timeout as string | undefined,
+            dryRun: Boolean(opts.dryRun),
+            json: Boolean(opts.json),
+          },
+          defaultRuntime,
+          deps,
         );
       });
     });

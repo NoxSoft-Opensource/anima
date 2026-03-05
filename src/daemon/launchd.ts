@@ -115,28 +115,37 @@ export type LaunchctlPrintInfo = {
   lastExitReason?: string;
 };
 
+function readFirstLaunchctlValue(output: string, key: string): string | undefined {
+  const escapedKey = key.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = output.match(new RegExp(`^\\s*${escapedKey}\\s*=\\s*(.+)$`, "m"));
+  const value = match?.[1]?.trim();
+  return value && value.length > 0 ? value : undefined;
+}
+
 export function parseLaunchctlPrint(output: string): LaunchctlPrintInfo {
   const entries = parseKeyValueOutput(output, "=");
   const info: LaunchctlPrintInfo = {};
-  const state = entries.state;
+  const state = readFirstLaunchctlValue(output, "state") ?? entries.state;
   if (state) {
     info.state = state;
   }
-  const pidValue = entries.pid;
+  const pidValue = readFirstLaunchctlValue(output, "pid") ?? entries.pid;
   if (pidValue) {
     const pid = Number.parseInt(pidValue, 10);
     if (Number.isFinite(pid)) {
       info.pid = pid;
     }
   }
-  const exitStatusValue = entries["last exit status"];
+  const exitStatusValue =
+    readFirstLaunchctlValue(output, "last exit status") ?? entries["last exit status"];
   if (exitStatusValue) {
     const status = Number.parseInt(exitStatusValue, 10);
     if (Number.isFinite(status)) {
       info.lastExitStatus = status;
     }
   }
-  const exitReason = entries["last exit reason"];
+  const exitReason =
+    readFirstLaunchctlValue(output, "last exit reason") ?? entries["last exit reason"];
   if (exitReason) {
     info.lastExitReason = exitReason;
   }
@@ -348,6 +357,44 @@ export async function stopLaunchAgent({
     throw new Error(`launchctl bootout failed: ${res.stderr || res.stdout}`.trim());
   }
   stdout.write(`${formatLine("Stopped LaunchAgent", `${domain}/${label}`)}\n`);
+}
+
+export async function startLaunchAgent({
+  stdout,
+  env,
+}: {
+  stdout: NodeJS.WritableStream;
+  env?: Record<string, string | undefined>;
+}): Promise<void> {
+  const effectiveEnv = env ?? (process.env as Record<string, string | undefined>);
+  const domain = resolveGuiDomain();
+  const label = resolveLaunchAgentLabel({ env: effectiveEnv });
+  const serviceId = `${domain}/${label}`;
+  const plistPath = resolveLaunchAgentPlistPath(effectiveEnv);
+
+  const loaded = await isLaunchAgentLoaded({ env: effectiveEnv }).catch(() => false);
+  if (loaded) {
+    const kick = await execLaunchctl(["kickstart", "-k", serviceId]);
+    if (kick.code !== 0) {
+      throw new Error(`launchctl kickstart failed: ${kick.stderr || kick.stdout}`.trim());
+    }
+    stdout.write(`${formatLine("Started LaunchAgent", serviceId)}\n`);
+    return;
+  }
+
+  try {
+    await fs.access(plistPath);
+  } catch {
+    throw new Error(`LaunchAgent not found at ${plistPath}`);
+  }
+
+  // launchd can persist disabled state even when the plist exists.
+  await execLaunchctl(["enable", serviceId]);
+  const repaired = await repairLaunchAgentBootstrap({ env: effectiveEnv });
+  if (!repaired.ok) {
+    throw new Error(`launchctl bootstrap failed: ${repaired.detail || "unknown error"}`.trim());
+  }
+  stdout.write(`${formatLine("Started LaunchAgent", serviceId)}\n`);
 }
 
 export async function installLaunchAgent({

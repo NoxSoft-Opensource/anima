@@ -292,6 +292,11 @@ function isTaskNotRunning(res: { stdout: string; stderr: string; code: number })
   return detail.includes("not running");
 }
 
+function isTaskAlreadyRunning(res: { stdout: string; stderr: string; code: number }): boolean {
+  const detail = (res.stderr || res.stdout).toLowerCase();
+  return detail.includes("already running");
+}
+
 export async function stopScheduledTask({
   stdout,
   env,
@@ -306,6 +311,22 @@ export async function stopScheduledTask({
     throw new Error(`schtasks end failed: ${res.stderr || res.stdout}`.trim());
   }
   stdout.write(`${formatLine("Stopped Scheduled Task", taskName)}\n`);
+}
+
+export async function startScheduledTask({
+  stdout,
+  env,
+}: {
+  stdout: NodeJS.WritableStream;
+  env?: Record<string, string | undefined>;
+}): Promise<void> {
+  await assertSchtasksAvailable();
+  const taskName = resolveTaskName(env ?? (process.env as Record<string, string | undefined>));
+  const res = await execSchtasks(["/Run", "/TN", taskName]);
+  if (res.code !== 0 && !isTaskAlreadyRunning(res)) {
+    throw new Error(`schtasks run failed: ${res.stderr || res.stdout}`.trim());
+  }
+  stdout.write(`${formatLine("Started Scheduled Task", taskName)}\n`);
 }
 
 export async function restartScheduledTask({

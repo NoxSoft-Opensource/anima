@@ -85,6 +85,7 @@ vi.mock("../daemon/service.js", () => ({
     install: vi.fn(),
     uninstall: vi.fn(),
     stop: vi.fn(),
+    start: vi.fn(),
     restart: vi.fn(),
     isLoaded: serviceIsLoaded,
     readCommand: vi.fn(),
