@@ -8,7 +8,7 @@ import { replaceCliName, resolveCliName } from "../cli-name.js";
 const CLI_NAME = resolveCliName();
 
 const EXAMPLES = [
-  ["anima start", "Wake the life system — heartbeat, memory, and REPL."],
+  ["anima start", "Start gateway, open portal/dashboard links, and run in simple mode."],
   ["anima soul", "View persistent identity — who you are across sessions."],
   ["anima pulse", "Check the heartbeat — is the system alive and well."],
   ["anima journal", "Read and write to persistent memory."],

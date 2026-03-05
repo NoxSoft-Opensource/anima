@@ -1,39 +1,23 @@
 /**
- * anima start — Start the ANIMA daemon with heartbeat + REPL.
+ * anima start — simple startup mode.
  *
- * Startup sequence:
- * 1. Load identity from ~/.anima/soul/
- * 2. Initialize BudgetTracker with daily limit
- * 3. Initialize SessionOrchestrator with budget
- * 4. Sync MCP config to ~/.claude/mcp.json
- * 5. Initialize HeartbeatEngine with adaptive intervals
- * 6. Initialize RequestQueue
- * 7. Start heartbeat (async, runs first beat then schedules)
- * 8. Start SVRN node if enabled (compute contributor)
- * 9. Initialize auto-updater
- * 10. Print ANIMA boot banner with identity + budget + SVRN + update status
- * 11. Start AnimaRepl (unless --no-repl)
- * 12. Register SIGINT/SIGTERM handlers for graceful shutdown
+ * Starts the Gateway + portal + dashboard, prints clean links, and keeps
+ * runtime logs in the dashboard/log file by default.
  */
 
-import { homedir } from "node:os";
-import { join } from "node:path";
 import type { AnimaConfig } from "../config/config.js";
-import { loadConfig } from "../config/io.js";
+import type { GatewayReadyInfo } from "./gateway-cli/run.js";
+import { openUrl } from "../commands/onboard-helpers.js";
+import { loadConfig, resolveGatewayPort } from "../config/config.js";
 import { resolveAssistantIdentity } from "../gateway/assistant-identity.js";
-import { HeartbeatEngine } from "../heartbeat/engine.js";
-import { loadIdentity } from "../identity/loader.js";
-import { syncConfig } from "../mcp/config-sync.js";
-import { colors, banner } from "../repl/display.js";
-import { AnimaRepl } from "../repl/interface.js";
-import { RequestQueue } from "../repl/queue.js";
-import { BudgetTracker } from "../sessions/budget.js";
-import { SessionOrchestrator } from "../sessions/orchestrator.js";
-import { loadSVRNConfig } from "../svrn/config.js";
-import { SVRNNode, isSVRNAvailable } from "../svrn/node.js";
-import { AnimaAutoUpdater, loadAutoUpdateConfig } from "../updater/auto-update.js";
+import { runGatewayCommand } from "./gateway-cli/run.js";
 
 export interface StartOptions {
+  port?: number;
+  noOpen?: boolean;
+  showLogs?: boolean;
+  force?: boolean;
+  // Deprecated legacy flags kept for compatibility with older scripts.
   daemon?: boolean;
   noRepl?: boolean;
   heartbeatInterval?: number;
@@ -44,162 +28,64 @@ export function resolveStartupIdentityName(cfg: AnimaConfig): string {
   return resolveAssistantIdentity({ cfg }).name;
 }
 
+function writeLine(message = ""): void {
+  process.stdout.write(`${message}\n`);
+}
+
+function printReadyLinks(
+  info: GatewayReadyInfo,
+  opts: { opened: boolean; noOpen: boolean; showLogs: boolean },
+): void {
+  writeLine("");
+  writeLine("ANIMA is ready.");
+  writeLine(`Gateway:   ${info.gatewayWsUrl}`);
+  writeLine(`Portal:    ${info.portalUrl}`);
+  writeLine(`Dashboard: ${info.dashboardUrl}`);
+  writeLine(`Logs:      ${info.logFile}`);
+  if (opts.noOpen) {
+    writeLine("Browser launch disabled (--no-open).");
+  } else if (opts.opened) {
+    writeLine("Dashboard opened in browser.");
+  } else {
+    writeLine("Could not auto-open browser. Open the Dashboard URL manually.");
+  }
+  if (!opts.showLogs) {
+    writeLine("CLI logs are hidden. Use the dashboard for runtime visibility.");
+  }
+  writeLine("Press Ctrl+C to stop.");
+  writeLine("");
+}
+
 export async function startDaemon(options: StartOptions = {}): Promise<void> {
-  const { noRepl = false, heartbeatInterval = 300_000, budget: dailyBudget = 200 } = options;
+  const cfg = loadConfig();
+  const identityName = resolveStartupIdentityName(cfg);
+  const resolvedPort =
+    typeof options.port === "number" && Number.isFinite(options.port)
+      ? Math.floor(options.port)
+      : resolveGatewayPort(cfg);
+  if (!Number.isFinite(resolvedPort) || resolvedPort <= 0) {
+    throw new Error("Invalid gateway port.");
+  }
 
-  process.stdout.write(`${colors.muted}  Initializing ANIMA...${colors.reset}\n`);
+  const showLogs = Boolean(options.showLogs);
+  const noOpen = Boolean(options.noOpen);
 
-  // 1. Load identity from ~/.anima/soul/
-  const identity = await loadIdentity();
-  const userCustomizedCount = Object.values(identity.loadedFrom).filter(
-    (source) => source === "user",
-  ).length;
-  const identityName = resolveStartupIdentityName(loadConfig());
-  process.stdout.write(
-    `${colors.muted}  Identity loaded: ${identityName} (${userCustomizedCount}/7 customized)${colors.reset}\n`,
-  );
+  writeLine(`Starting ANIMA (${identityName})...`);
+  writeLine(`Mode: gateway + portal + dashboard`);
+  writeLine(`Port: ${resolvedPort}`);
+  if (!showLogs) {
+    writeLine("Console logs: hidden (dashboard/log file only)");
+  }
 
-  // 2. Initialize budget tracker
-  const budget = new BudgetTracker({
-    dailyLimitUsd: dailyBudget,
+  await runGatewayCommand({
+    port: resolvedPort,
+    force: Boolean(options.force),
+    allowUnconfigured: true,
+    verbose: showLogs,
+    consoleSilent: !showLogs,
+    onReady: async (info) => {
+      const opened = noOpen ? false : await openUrl(info.dashboardUrl).catch(() => false);
+      printReadyLinks(info, { opened, noOpen, showLogs });
+    },
   });
-  await budget.load();
-
-  // 3. Initialize session orchestrator
-  const orchestrator = new SessionOrchestrator(budget);
-
-  // 4. Sync MCP config
-  try {
-    const syncResult = await syncConfig();
-    const total = syncResult.added.length + syncResult.updated.length + syncResult.preserved.length;
-    process.stdout.write(
-      `${colors.muted}  MCP: ${total} servers synced (${syncResult.added.length} added, ${syncResult.removed.length} removed)${colors.reset}\n`,
-    );
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`${colors.warning}  MCP sync warning: ${msg}${colors.reset}\n`);
-  }
-
-  // 5. Initialize heartbeat engine
-  const heartbeat = new HeartbeatEngine(orchestrator, {
-    intervalMs: heartbeatInterval,
-  });
-
-  // 6. Initialize request queue
-  const queue = new RequestQueue();
-  await queue.load();
-
-  // 7. Start heartbeat
-  process.stdout.write(
-    `${colors.muted}  Starting heartbeat (interval: ${heartbeatInterval / 1000}s)...${colors.reset}\n`,
-  );
-
-  // Start heartbeat without awaiting (it runs its first beat then schedules)
-  heartbeat.start().catch((err) => {
-    const msg = err instanceof Error ? err.message : String(err);
-    process.stderr.write(`${colors.error}  Heartbeat start error: ${msg}${colors.reset}\n`);
-  });
-
-  // 8. Start SVRN node if enabled
-  const svrnConfig = await loadSVRNConfig();
-  let svrnNode: SVRNNode | undefined;
-
-  const svrnAvailable = await isSVRNAvailable();
-  if (!svrnAvailable) {
-    process.stdout.write(
-      `${colors.muted}  SVRN Node: @noxsoft/svrn-node not installed (skipping)${colors.reset}\n`,
-    );
-  } else {
-    svrnNode = new SVRNNode(svrnConfig);
-    await svrnNode.init();
-
-    if (svrnConfig.enabled) {
-      try {
-        await svrnNode.start();
-        const balance = svrnNode.getEarnings().getBalance();
-        process.stdout.write(
-          `${colors.success}  SVRN Node: Active${colors.reset} ${colors.muted}|${colors.reset} ` +
-            `${colors.accent}Balance: ${balance.toFixed(3)} UCU${colors.reset} ${colors.muted}|${colors.reset} ` +
-            `${colors.muted}Node: ${svrnNode.getNodeId().slice(0, 8)}...${colors.reset}\n`,
-        );
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        process.stderr.write(`${colors.warning}  SVRN node warning: ${msg}${colors.reset}\n`);
-      }
-    } else {
-      process.stdout.write(
-        `${colors.muted}  SVRN Node: Disabled (run \`anima svrn enable\` to earn UCU)${colors.reset}\n`,
-      );
-    }
-  }
-
-  // 9. Initialize auto-updater
-  const autoUpdateConfig = loadAutoUpdateConfig();
-  const dataDir = join(homedir(), ".anima");
-  const updater = new AnimaAutoUpdater(autoUpdateConfig, dataDir);
-
-  if (autoUpdateConfig.enabled) {
-    updater.start();
-    const intervalLabel = `${autoUpdateConfig.checkIntervalHours}h`;
-    process.stdout.write(
-      `${colors.muted}  Auto-update: ${colors.success}enabled${colors.reset} ` +
-        `${colors.muted}(checking every ${intervalLabel}, channel: ${autoUpdateConfig.channel})${colors.reset}\n`,
-    );
-
-    // Check if an update is already available (from the immediate check)
-    updater.on("update-available", (info) => {
-      process.stdout.write(
-        `\n${colors.warning}  Update available: v${info.currentVersion} -> v${info.latestVersion}${colors.reset}` +
-          ` ${colors.muted}(run \`anima self-update\` or \`:update install\` to install)${colors.reset}\n`,
-      );
-    });
-  } else {
-    process.stdout.write(`${colors.muted}  Auto-update: Disabled${colors.reset}\n`);
-  }
-
-  // 10. Print ANIMA boot banner
-  const budgetRemaining = budget.getRemaining();
-  process.stdout.write(banner(identityName, heartbeat.getBeatCount(), budgetRemaining));
-  process.stdout.write("\n");
-
-  // 11. Start REPL (unless headless)
-  if (!noRepl) {
-    const repl = new AnimaRepl({
-      orchestrator,
-      heartbeat,
-      budget,
-      queue,
-      svrnNode,
-      updater,
-    });
-
-    await repl.start();
-  } else {
-    // Headless mode — just keep running
-    process.stdout.write(`${colors.success}  ANIMA running in headless mode.${colors.reset}\n`);
-    process.stdout.write(
-      `${colors.muted}  Heartbeat active. Press Ctrl+C to stop.${colors.reset}\n`,
-    );
-
-    // Register signal handlers for graceful shutdown
-    const shutdown = async () => {
-      process.stdout.write(`\n${colors.muted}  Shutting down...${colors.reset}\n`);
-      heartbeat.stop();
-      updater.stop();
-      if (svrnNode) {
-        await svrnNode.stop();
-      }
-      await queue.save();
-      await budget.persist();
-      process.stdout.write(`${colors.accent}  Amor Fati.${colors.reset}\n`);
-      process.exit(0);
-    };
-
-    process.on("SIGINT", shutdown);
-    process.on("SIGTERM", shutdown);
-
-    // Keep process alive
-    const keepAlive = setInterval(() => {}, 60_000);
-    keepAlive.unref();
-  }
 }

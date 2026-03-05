@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { GatewayAuthMode } from "../../config/config.js";
 import type { GatewayWsLogStyle } from "../../gateway/ws-logging.js";
+import { resolveControlUiLinks } from "../../commands/onboard-helpers.js";
 import {
   CONFIG_PATH,
   loadConfig,
@@ -16,6 +17,11 @@ import { setGatewayWsLogStyle } from "../../gateway/ws-logging.js";
 import { setVerbose } from "../../globals.js";
 import { GatewayLockError } from "../../infra/gateway-lock.js";
 import { formatPortDiagnostics, inspectPortUsage } from "../../infra/ports.js";
+import {
+  getResolvedConsoleSettings,
+  getResolvedLoggerSettings,
+  setLoggerOverride,
+} from "../../logging.js";
 import { setConsoleSubsystemFilter, setConsoleTimestampPrefix } from "../../logging/console.js";
 import { createSubsystemLogger } from "../../logging/subsystem.js";
 import { defaultRuntime } from "../../runtime.js";
@@ -31,7 +37,16 @@ import {
   toOptionString,
 } from "./shared.js";
 
-type GatewayRunOpts = {
+export type GatewayReadyInfo = {
+  port: number;
+  bind: "auto" | "lan" | "loopback" | "custom" | "tailnet";
+  gatewayWsUrl: string;
+  portalUrl: string;
+  dashboardUrl: string;
+  logFile: string;
+};
+
+export type GatewayRunOpts = {
   port?: unknown;
   bind?: unknown;
   token?: unknown;
@@ -49,17 +64,30 @@ type GatewayRunOpts = {
   rawStreamPath?: unknown;
   dev?: boolean;
   reset?: boolean;
+  consoleSilent?: boolean;
+  onReady?: (info: GatewayReadyInfo) => Promise<void> | void;
 };
 
 const gatewayLog = createSubsystemLogger("gateway");
 
-async function runGatewayCommand(opts: GatewayRunOpts) {
+export async function runGatewayCommand(opts: GatewayRunOpts) {
   const isDevProfile = process.env.ANIMA_PROFILE?.trim().toLowerCase() === "dev";
   const devMode = Boolean(opts.dev) || isDevProfile;
   if (opts.reset && !devMode) {
     defaultRuntime.error("Use --reset with --dev.");
     defaultRuntime.exit(1);
     return;
+  }
+
+  if (opts.consoleSilent && !opts.verbose && !opts.claudeCliLogs) {
+    const loggerSettings = getResolvedLoggerSettings();
+    const consoleSettings = getResolvedConsoleSettings();
+    setLoggerOverride({
+      level: loggerSettings.level,
+      file: loggerSettings.file,
+      consoleLevel: "silent",
+      consoleStyle: consoleSettings.style,
+    });
   }
 
   setConsoleTimestampPrefix(true);
@@ -261,11 +289,32 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
     return;
   }
 
+  const links = resolveControlUiLinks({
+    port,
+    bind,
+    customBindHost: cfg.gateway?.customBindHost,
+    basePath: cfg.gateway?.controlUi?.basePath,
+  });
+  const maybeToken = resolvedAuthMode === "token" && hasToken ? tokenValue : "";
+  const appendToken = (url: string) =>
+    maybeToken ? `${url}#token=${encodeURIComponent(maybeToken)}` : url;
+  const dashboardUrl = appendToken(new URL("dashboard", links.httpUrl).toString());
+  const portalUrl = appendToken(links.httpUrl);
+  const gatewayReadyInfo: GatewayReadyInfo = {
+    port,
+    bind,
+    gatewayWsUrl: links.wsUrl,
+    portalUrl,
+    dashboardUrl,
+    logFile: getResolvedLoggerSettings().file,
+  };
+  let readyNotified = false;
+
   try {
     await runGatewayLoop({
       runtime: defaultRuntime,
-      start: async () =>
-        await startGatewayServer(port, {
+      start: async () => {
+        const server = await startGatewayServer(port, {
           bind,
           auth:
             authMode || passwordRaw || tokenRaw || authModeRaw
@@ -282,7 +331,13 @@ async function runGatewayCommand(opts: GatewayRunOpts) {
                   resetOnExit: Boolean(opts.tailscaleResetOnExit),
                 }
               : undefined,
-        }),
+        });
+        if (!readyNotified) {
+          readyNotified = true;
+          await opts.onReady?.(gatewayReadyInfo);
+        }
+        return server;
+      },
     });
   } catch (err) {
     if (

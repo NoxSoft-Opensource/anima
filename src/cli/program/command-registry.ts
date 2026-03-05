@@ -115,7 +115,7 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "start", description: "Launch the ANIMA daemon with heartbeat and REPL" },
+      { name: "start", description: "Start gateway + portal + dashboard (simple mode)" },
       { name: "init", description: "Scaffold the ~/.anima/ identity and workspace structure" },
       { name: "migrate", description: "Import identity from Claude Coherence Protocol" },
       { name: "ask", description: "Queue a task to the running ANIMA daemon" },

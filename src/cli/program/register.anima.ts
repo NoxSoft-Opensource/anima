@@ -40,18 +40,26 @@ export function registerAnimaCommands(program: Command): void {
   // anima start
   program
     .command("start")
-    .description("Launch the ANIMA daemon with heartbeat and REPL")
-    .option("--daemon", "Run as background daemon (detach from terminal)")
-    .option("--no-repl", "Headless mode (no terminal REPL)")
-    .option("--heartbeat-interval <ms>", "Heartbeat interval in milliseconds", "300000")
-    .option("--budget <usd>", "Daily budget limit in USD", "200")
+    .description("Start gateway + portal + dashboard in simple mode")
+    .option("--port <port>", "Gateway port override")
+    .option("--show-logs", "Show gateway logs in the CLI (advanced)", false)
+    .option("--no-open", "Do not auto-open the dashboard in a browser", false)
+    .option("--force", "Kill any existing listener on the target port before starting", false)
     .action(async (opts) => {
+      const port =
+        opts.port !== undefined && opts.port !== null
+          ? Number.parseInt(String(opts.port), 10)
+          : undefined;
+      if (opts.port !== undefined && (!Number.isFinite(port) || (port ?? 0) <= 0)) {
+        console.error("Invalid --port value");
+        process.exit(1);
+      }
       const { startDaemon } = await import("../start.js");
       await startDaemon({
-        daemon: opts.daemon,
-        noRepl: !opts.repl,
-        heartbeatInterval: parseInt(opts.heartbeatInterval, 10),
-        budget: parseFloat(opts.budget),
+        port,
+        showLogs: Boolean(opts.showLogs),
+        noOpen: Boolean(opts.noOpen),
+        force: Boolean(opts.force),
       });
     });
 
