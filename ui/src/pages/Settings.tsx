@@ -11,7 +11,7 @@ import {
   registerInviteCode,
   saveRawConfig,
   setHeartbeatsEnabled,
-  setProviderConfig,
+  setProviderConfig as saveProviderConfig,
   setRegistrationToken,
   setVoiceWakeConfig,
   toggleProviderRotation,
@@ -237,7 +237,7 @@ export default function Settings(): React.ReactElement {
     setSaving(true);
     setStatusMessage(null);
     try {
-      await setProviderConfig(
+      await saveProviderConfig(
         providerConfig.providers.map((p) => ({
           id: p.id,
           name: p.name,
@@ -295,7 +295,7 @@ export default function Settings(): React.ReactElement {
         enabled: true,
         priority: existing.length + 1,
       };
-      await setProviderConfig([
+      await saveProviderConfig([
         ...existing.map((p) => ({
           id: p.id,
           name: p.name,
