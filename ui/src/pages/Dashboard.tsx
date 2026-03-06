@@ -29,14 +29,25 @@ import {
 
 const GATEWAY_WS_URL = resolveGatewayWsUrl();
 
-/** Strip inline directive tags (e.g. [[reply_to_current]], [[audio_as_voice]]) from display text. */
+// ── Message parsing ──────────────────────────────────────────────────────────
 const DIRECTIVE_TAG_RE = /\[\[\s*(?:reply_to_current|reply_to\s*:[^\]\n]*|audio_as_voice)\s*\]\]/gi;
-function stripDirectiveTags(text: string): string {
-  return text
-    .replace(DIRECTIVE_TAG_RE, "")
+
+type ParsedDirective = { tag: string; raw: string };
+
+/** Parse agent text into clean display text + extracted directives. */
+function parseAgentText(raw: string): { text: string; directives: ParsedDirective[] } {
+  const directives: ParsedDirective[] = [];
+  const text = raw
+    .replace(DIRECTIVE_TAG_RE, (match) => {
+      const tag = match.replace(/[[\]\s]/g, "").trim();
+      directives.push({ tag, raw: match.trim() });
+      return "";
+    })
     .replace(/[ \t]+/g, " ")
     .trim();
+  return { text, directives };
 }
+
 const CHAT_SESSION_KEY = "main";
 const GATEWAY_PROTOCOL_VERSION = 3;
 
@@ -62,11 +73,33 @@ type ChatEventPayload = {
   errorMessage?: string;
 };
 
+// ── Agent event types ────────────────────────────────────────────────────────
+type AgentEventPayload = {
+  runId?: string;
+  seq?: number;
+  stream?: "lifecycle" | "tool" | "assistant" | "error";
+  ts?: number;
+  data?: Record<string, unknown>;
+  sessionKey?: string;
+};
+
+type ToolActivity = {
+  id: string;
+  name: string;
+  input?: string;
+  result?: string;
+  status: "running" | "done" | "error";
+  timestamp: number;
+};
+
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
   timestamp: number;
+  directives?: ParsedDirective[];
+  toolActivity?: ToolActivity[];
+  runId?: string;
 };
 
 type PendingRequest = {
@@ -307,6 +340,110 @@ function SubagentStatusCard({ subagents }: { subagents: SubagentStatus | undefin
   );
 }
 
+// ── Expandable tool activity panel (shown in finalized messages) ──────────────
+function ToolActivityPanel({ tools }: { tools: ToolActivity[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const done = tools.filter((t) => t.status === "done").length;
+  const errors = tools.filter((t) => t.status === "error").length;
+
+  return (
+    <div className="tool-activity-panel">
+      <button type="button" className="tool-activity-toggle" onClick={() => setExpanded((v) => !v)}>
+        <span className="tool-activity-icon">{expanded ? "▾" : "▸"}</span>
+        <span className="tool-activity-summary">
+          {tools.length} tool{tools.length !== 1 ? "s" : ""} used
+          {errors > 0 && <span className="tool-count-error"> · {errors} failed</span>}
+          {done > 0 && !errors && <span className="tool-count-ok"> · all succeeded</span>}
+        </span>
+      </button>
+      {expanded && (
+        <div className="tool-activity-list">
+          {tools.map((tool) => (
+            <ToolActivityItem key={tool.id} tool={tool} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToolActivityItem({ tool }: { tool: ToolActivity }) {
+  const [showDetail, setShowDetail] = useState(false);
+  const statusIcon = tool.status === "done" ? "✓" : tool.status === "error" ? "✗" : "◌";
+  const statusClass =
+    tool.status === "done" ? "success" : tool.status === "error" ? "error" : "running";
+
+  return (
+    <div className={`tool-activity-item ${statusClass}`}>
+      <button
+        type="button"
+        className="tool-activity-item-header"
+        onClick={() => setShowDetail((v) => !v)}
+      >
+        <span className={`tool-status-icon ${statusClass}`}>{statusIcon}</span>
+        <span className="tool-name">{tool.name}</span>
+        {(tool.input || tool.result) && (
+          <span className="tool-detail-toggle">{showDetail ? "▾" : "▸"}</span>
+        )}
+      </button>
+      {showDetail && (tool.input || tool.result) && (
+        <div className="tool-detail-body">
+          {tool.input && (
+            <div className="tool-detail-section">
+              <div className="tool-detail-label">Input</div>
+              <pre className="tool-detail-pre">{tool.input}</pre>
+            </div>
+          )}
+          {tool.result && (
+            <div className="tool-detail-section">
+              <div className="tool-detail-label">Result</div>
+              <pre className="tool-detail-pre">{tool.result}</pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Live tool activity (shown during streaming) ─────────────────────────────
+function LiveToolActivity({
+  runId,
+  activity,
+}: {
+  runId: string | null;
+  activity: Map<string, ToolActivity[]>;
+}) {
+  const tools = runId ? activity.get(runId) : undefined;
+  if (!tools || tools.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="live-tool-activity">
+      {tools.map((tool) => (
+        <div key={tool.id} className={`live-tool-chip ${tool.status}`}>
+          <span className="live-tool-dot" />
+          <span className="live-tool-name">{tool.name}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Directive badges (subtle indicators for parsed directives) ───────────────
+function DirectiveBadges({ directives }: { directives: ParsedDirective[] }) {
+  return (
+    <div className="directive-badges">
+      {directives.map((d, i) => (
+        <span key={i} className="directive-badge" title={d.raw}>
+          {d.tag.replace(/_/g, " ")}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function Dashboard(): React.ReactElement {
   const [status, setStatus] = useState<DaemonStatus | null>(null);
   const [runtime, setRuntime] = useState<RuntimeInspectResponse | null>(null);
@@ -338,6 +475,12 @@ export default function Dashboard(): React.ReactElement {
   const [speechListening, setSpeechListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [voiceNames, setVoiceNames] = useState<string[]>([]);
+
+  const [runToolActivity, setRunToolActivity] = useState<Map<string, ToolActivity[]>>(new Map());
+  const runToolActivityRef = useRef<Map<string, ToolActivity[]>>(new Map());
+  useEffect(() => {
+    runToolActivityRef.current = runToolActivity;
+  }, [runToolActivity]);
 
   const wsRef = useRef<WebSocket | null>(null);
   const pendingRef = useRef<Map<string, PendingRequest>>(new Map());
@@ -651,6 +794,63 @@ export default function Dashboard(): React.ReactElement {
       }, 1500);
     }
 
+    function handleAgentEvent(payload: AgentEventPayload) {
+      if (payload.sessionKey && payload.sessionKey !== CHAT_SESSION_KEY) {
+        return;
+      }
+      const runId = payload.runId;
+      if (!runId) {
+        return;
+      }
+
+      if (payload.stream === "tool") {
+        const d = payload.data || {};
+        const name = typeof d.name === "string" ? d.name : typeof d.tool === "string" ? d.tool : "";
+        if (!name) {
+          return;
+        }
+        const phase = typeof d.phase === "string" ? d.phase : "";
+        const inputStr = d.input
+          ? typeof d.input === "string"
+            ? d.input
+            : JSON.stringify(d.input, null, 2)
+          : undefined;
+        const resultStr = d.result
+          ? typeof d.result === "string"
+            ? d.result
+            : JSON.stringify(d.result, null, 2)
+          : undefined;
+
+        setRunToolActivity((prev) => {
+          const existing = prev.get(runId) || [];
+          if (phase === "start" || phase === "call") {
+            return new Map(prev).set(runId, [
+              ...existing,
+              { id: makeId(), name, input: inputStr, status: "running", timestamp: Date.now() },
+            ]);
+          }
+          // Update existing tool entry with result
+          const updated = [...existing];
+          const last = updated.findLastIndex((t) => t.name === name && t.status === "running");
+          if (last >= 0) {
+            updated[last] = {
+              ...updated[last],
+              status: phase === "error" ? "error" : "done",
+              result: resultStr || updated[last].result,
+            };
+          }
+          return new Map(prev).set(runId, updated);
+        });
+      }
+
+      if (payload.stream === "lifecycle") {
+        const phase = typeof payload.data?.phase === "string" ? payload.data.phase : "";
+        if (phase === "start") {
+          setRunToolActivity((prev) => new Map(prev).set(runId, []));
+        }
+      }
+    }
+
     function handleChatEvent(payload: ChatEventPayload) {
       if (payload.sessionKey && payload.sessionKey !== CHAT_SESSION_KEY) {
         return;
@@ -669,8 +869,11 @@ export default function Dashboard(): React.ReactElement {
         if (payload.runId && currentRunId && payload.runId !== currentRunId) {
           return;
         }
-        const finalText = extractText(payload.message).trim() || chatStreamRef.current.trim();
-        if (finalText) {
+        const rawText = extractText(payload.message).trim() || chatStreamRef.current.trim();
+        const { text: finalText, directives } = parseAgentText(rawText);
+        const runId = payload.runId || activeRunIdRef.current || undefined;
+        const tools = runId ? runToolActivityRef.current.get(runId) : undefined;
+        if (finalText || (tools && tools.length > 0)) {
           setChatMessages((prev) => [
             ...prev,
             {
@@ -678,8 +881,18 @@ export default function Dashboard(): React.ReactElement {
               role: "assistant",
               text: finalText,
               timestamp: Date.now(),
+              directives: directives.length > 0 ? directives : undefined,
+              toolActivity: tools && tools.length > 0 ? tools : undefined,
+              runId: runId || undefined,
             },
           ]);
+        }
+        if (runId) {
+          setRunToolActivity((prev) => {
+            const next = new Map(prev);
+            next.delete(runId);
+            return next;
+          });
         }
         activeRunIdRef.current = null;
         setChatBusy(false);
@@ -762,6 +975,9 @@ export default function Dashboard(): React.ReactElement {
           }
           if (frame.event === "chat") {
             handleChatEvent((frame.payload || {}) as ChatEventPayload);
+          }
+          if (frame.event === "agent") {
+            handleAgentEvent((frame.payload || {}) as AgentEventPayload);
           }
         }
       });
@@ -1073,10 +1289,15 @@ export default function Dashboard(): React.ReactElement {
                     <div className="live-chat-role">
                       {message.role === "user" ? "You" : assistantName}
                     </div>
-                    <MarkdownText
-                      value={stripDirectiveTags(message.text)}
-                      className="live-chat-markdown"
-                    />
+                    {message.toolActivity && message.toolActivity.length > 0 && (
+                      <ToolActivityPanel tools={message.toolActivity} />
+                    )}
+                    {message.text && (
+                      <MarkdownText value={message.text} className="live-chat-markdown" />
+                    )}
+                    {message.directives && message.directives.length > 0 && (
+                      <DirectiveBadges directives={message.directives} />
+                    )}
                   </div>
                 </div>
               ))}
@@ -1085,8 +1306,9 @@ export default function Dashboard(): React.ReactElement {
                 <div className="live-chat-row assistant">
                   <div className="live-chat-bubble assistant">
                     <div className="live-chat-role">{assistantName}</div>
+                    <LiveToolActivity runId={activeRunIdRef.current} activity={runToolActivity} />
                     <MarkdownText
-                      value={stripDirectiveTags(chatStream)}
+                      value={parseAgentText(chatStream).text}
                       className="live-chat-markdown"
                     />
                   </div>
