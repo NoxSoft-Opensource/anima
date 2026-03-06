@@ -182,13 +182,9 @@ export async function runCliAgent(params: {
   // (noxsoft, coherence, etc.) from ~/.claude/mcp.json.
   const mcpConfigPath = join(homedir(), ".claude", "mcp.json");
   if (backend.command === "claude" && existsSync(mcpConfigPath)) {
-    // Insert before the prompt arg (last element) so CLI parses it correctly.
-    const promptArgIndex = args.indexOf(argsPrompt ?? "");
-    if (promptArgIndex >= 0) {
-      args.splice(promptArgIndex, 0, "--mcp-config", mcpConfigPath);
-    } else {
-      args.push("--mcp-config", mcpConfigPath);
-    }
+    // Insert at the beginning of args (before any positional prompt arg)
+    // to avoid interfering with prompt argument parsing.
+    args.unshift("--mcp-config", mcpConfigPath);
   }
 
   const outputMode = useResume ? (backend.resumeOutput ?? backend.output) : backend.output;

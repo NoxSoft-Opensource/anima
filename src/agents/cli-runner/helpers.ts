@@ -410,23 +410,45 @@ export function parseCliJson(raw: string, backend: CliBackendConfig): CliOutput 
 }
 
 export function parseCliJsonl(raw: string, backend: CliBackendConfig): CliOutput | null {
-  const lines = raw
-    .split(/\r?\n/g)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  if (lines.length === 0) {
+  const trimmed = raw.trim();
+  if (!trimmed) {
+    return null;
+  }
+  // Claude CLI --output-format json emits a single-line JSON array [obj, obj, ...].
+  // Try to parse the whole thing as an array first, then fall back to line-by-line.
+  let items: unknown[];
+  try {
+    const wholeJson = JSON.parse(trimmed);
+    if (Array.isArray(wholeJson)) {
+      items = wholeJson;
+    } else if (isRecord(wholeJson)) {
+      items = [wholeJson];
+    } else {
+      items = [];
+    }
+  } catch {
+    // Not a single JSON value — try line-by-line JSONL.
+    items = [];
+    for (const line of trimmed.split(/\r?\n/g)) {
+      const l = line.trim();
+      if (!l) {
+        continue;
+      }
+      try {
+        items.push(JSON.parse(l));
+      } catch {
+        continue;
+      }
+    }
+  }
+  if (items.length === 0) {
     return null;
   }
   let sessionId: string | undefined;
   let usage: CliUsage | undefined;
   const texts: string[] = [];
-  for (const line of lines) {
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(line);
-    } catch {
-      continue;
-    }
+  for (const entry of items) {
+    const parsed = entry;
     if (!isRecord(parsed)) {
       continue;
     }
@@ -439,11 +461,19 @@ export function parseCliJsonl(raw: string, backend: CliBackendConfig): CliOutput
     if (isRecord(parsed.usage)) {
       usage = toUsage(parsed.usage) ?? usage;
     }
-    const item = isRecord(parsed.item) ? parsed.item : null;
-    if (item && typeof item.text === "string") {
-      const type = typeof item.type === "string" ? item.type.toLowerCase() : "";
+    // Claude CLI --output-format json: {"type":"result","result":"..."}
+    if (typeof parsed.result === "string" && parsed.result.trim()) {
+      const lineType = typeof parsed.type === "string" ? parsed.type.toLowerCase() : "";
+      if (!lineType || lineType === "result") {
+        texts.push(parsed.result);
+      }
+    }
+    // Codex-style: {"item":{"type":"message","text":"..."}}
+    const parsedItem = isRecord(parsed.item) ? parsed.item : null;
+    if (parsedItem && typeof parsedItem.text === "string") {
+      const type = typeof parsedItem.type === "string" ? parsedItem.type.toLowerCase() : "";
       if (!type || type.includes("message")) {
-        texts.push(item.text);
+        texts.push(parsedItem.text);
       }
     }
   }

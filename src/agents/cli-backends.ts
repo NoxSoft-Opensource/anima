@@ -38,7 +38,7 @@ const DEFAULT_CLAUDE_BACKEND: CliBackendConfig = {
     "--resume",
     "{sessionId}",
   ],
-  output: "json",
+  output: "jsonl",
   input: "arg",
   modelArg: "--model",
   modelAliases: CLAUDE_MODEL_ALIASES,
