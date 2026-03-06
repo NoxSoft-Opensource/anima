@@ -392,7 +392,7 @@ export default function Settings(): React.ReactElement {
             <div className="runtime-stat">
               <div className="runtime-stat-label">Working mode</div>
               <div className="runtime-stat-value">
-                {runtime?.mission.state.workingMode || "unknown"}
+                {runtime?.mission?.state?.workingMode || "unknown"}
               </div>
             </div>
             <div className="runtime-stat">
@@ -402,7 +402,7 @@ export default function Settings(): React.ReactElement {
             <div className="runtime-stat">
               <div className="runtime-stat-label">Mission repo</div>
               <div className="runtime-stat-value mono">
-                {runtime?.mission.repo.url || "not linked"}
+                {runtime?.mission?.repo?.url || "not linked"}
               </div>
             </div>
           </div>
@@ -418,9 +418,9 @@ export default function Settings(): React.ReactElement {
             Imported continuity archives available to ANIMA from{" "}
             <span className="mono">~/.anima/important-history</span>.
           </div>
-          {runtime?.mission.importantHistory.length ? (
+          {runtime?.mission?.importantHistory?.length ? (
             <div className="activity-list top-gap">
-              {runtime.mission.importantHistory.map((entry) => (
+              {runtime?.mission?.importantHistory?.map((entry) => (
                 <div key={entry.id} className="inner-world-entry">
                   <div className="activity-row">
                     <div>

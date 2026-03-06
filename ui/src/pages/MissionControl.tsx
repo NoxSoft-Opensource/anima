@@ -370,12 +370,12 @@ export default function MissionControl(): React.ReactElement {
             </div>
           </div>
           <div className="runtime-stat-detail">
-            {snapshot?.importantHistory.length ?? 0} entries
+            {snapshot?.importantHistory?.length ?? 0} entries
           </div>
         </div>
-        {snapshot?.importantHistory.length ? (
+        {snapshot?.importantHistory?.length ? (
           <div className="activity-list top-gap">
-            {snapshot.importantHistory.map((entry) => (
+            {snapshot?.importantHistory?.map((entry) => (
               <div key={entry.id} className="inner-world-entry">
                 <div className="activity-row">
                   <div>

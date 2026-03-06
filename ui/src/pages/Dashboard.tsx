@@ -342,9 +342,9 @@ export default function Dashboard(): React.ReactElement {
 
   const assistantName =
     runtime?.assistant?.name?.trim() || registration?.agent?.display_name || "ANIMA";
-  const workingMode = runtime?.mission.state.workingMode ?? "write";
-  const repoStatus = runtime?.mission.repo ?? runtime?.mission.state.repo;
-  const speechState = runtime?.mission.state.speech;
+  const workingMode = runtime?.mission?.state?.workingMode ?? "write";
+  const repoStatus = runtime?.mission?.repo ?? runtime?.mission?.state?.repo;
+  const speechState = runtime?.mission?.state?.speech;
 
   const refreshDashboard = useCallback(async () => {
     setRefreshing(true);
@@ -1251,7 +1251,7 @@ export default function Dashboard(): React.ReactElement {
             <div className="stats-grid compact">
               <RuntimeStat
                 label="Mission dir"
-                value={runtime?.mission.directory || "~/.anima/mission-control"}
+                value={runtime?.mission?.directory || "~/.anima/mission-control"}
               />
               <RuntimeStat
                 label="Repo"
@@ -1260,7 +1260,7 @@ export default function Dashboard(): React.ReactElement {
               />
               <RuntimeStat
                 label="History"
-                value={String(runtime?.mission.importantHistory.length ?? 0)}
+                value={String(runtime?.mission?.importantHistory?.length ?? 0)}
                 detail="archived continuity files"
               />
             </div>
@@ -1268,7 +1268,7 @@ export default function Dashboard(): React.ReactElement {
               Preferred flow: create a private GitHub or GitLab repo, then connect the SSH remote in
               Mission Control or Settings so ANIMA can persist continuity safely.
             </div>
-            {runtime?.mission.files.find((file) => file.fileName === "self-directives.md") ? (
+            {runtime?.mission?.files?.find((file) => file.fileName === "self-directives.md") ? (
               <details className="details-panel top-gap" open>
                 <summary>Self directives</summary>
                 <MarkdownText
@@ -1295,7 +1295,7 @@ export default function Dashboard(): React.ReactElement {
           <details className="card details-panel">
             <summary>Inner World</summary>
             <div className="activity-list top-gap">
-              {(runtime?.mission.innerWorld || []).map((entry) => (
+              {(runtime?.mission?.innerWorld || []).map((entry) => (
                 <div key={entry.id} className="inner-world-entry">
                   <div className="activity-row">
                     <div>
@@ -1312,9 +1312,9 @@ export default function Dashboard(): React.ReactElement {
 
           <details className="card details-panel">
             <summary>Important History</summary>
-            {(runtime?.mission.importantHistory || []).length ? (
+            {(runtime?.mission?.importantHistory || []).length ? (
               <div className="activity-list top-gap">
-                {(runtime?.mission.importantHistory || []).map((entry) => (
+                {(runtime?.mission?.importantHistory || []).map((entry) => (
                   <div key={entry.id} className="inner-world-entry">
                     <div className="activity-row">
                       <div>
