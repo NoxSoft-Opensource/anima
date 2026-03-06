@@ -1,4 +1,7 @@
 import type { ImageContent } from "@mariozechner/pi-ai";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { AnimaConfig } from "../config/config.js";
 import type { EmbeddedPiRunResult } from "./pi-embedded-runner.js";
@@ -174,6 +177,20 @@ export async function runCliAgent(params: {
     promptArg: argsPrompt,
     useResume,
   });
+
+  // Inject --mcp-config so agent sessions pick up ANIMA-managed MCP servers
+  // (noxsoft, coherence, etc.) from ~/.claude/mcp.json.
+  const mcpConfigPath = join(homedir(), ".claude", "mcp.json");
+  if (backend.command === "claude" && existsSync(mcpConfigPath)) {
+    // Insert before the prompt arg (last element) so CLI parses it correctly.
+    const promptArgIndex = args.indexOf(argsPrompt ?? "");
+    if (promptArgIndex >= 0) {
+      args.splice(promptArgIndex, 0, "--mcp-config", mcpConfigPath);
+    } else {
+      args.push("--mcp-config", mcpConfigPath);
+    }
+  }
+
   const outputMode = useResume ? (backend.resumeOutput ?? backend.output) : backend.output;
   const liveStdoutBuffer = {
     raw: "",
