@@ -86,6 +86,15 @@ export async function finalizeOnboardingWizard(
     });
   }
 
+  // Auto-sync MCP registry to ~/.claude/mcp.json so NoxSoft MCP and other
+  // registered servers are available to the agent from the first session.
+  try {
+    const { syncConfig } = await import("../mcp/config-sync.js");
+    await syncConfig();
+  } catch {
+    // Non-fatal — user can run `anima mcp update` manually.
+  }
+
   const explicitInstallDaemon =
     typeof opts.installDaemon === "boolean" ? opts.installDaemon : undefined;
   let installDaemon: boolean;

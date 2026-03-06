@@ -151,6 +151,28 @@ export async function startGatewaySidecars(params: {
     params.log.warn(`ANIMA Gateway plugin services failed to start: ${String(err)}`);
   }
 
+  // Auto-sync MCP registry to ~/.claude/mcp.json so agent sessions have access
+  // to all registered MCP servers (noxsoft, coherence, etc.) without manual setup.
+  try {
+    const { syncConfig } = await import("../mcp/config-sync.js");
+    const syncResult = await syncConfig();
+    const parts: string[] = [];
+    if (syncResult.added.length) {
+      parts.push(`added ${syncResult.added.join(", ")}`);
+    }
+    if (syncResult.updated.length) {
+      parts.push(`updated ${syncResult.updated.join(", ")}`);
+    }
+    if (syncResult.removed.length) {
+      parts.push(`removed ${syncResult.removed.join(", ")}`);
+    }
+    if (parts.length) {
+      params.log.warn(`MCP config synced: ${parts.join("; ")}`);
+    }
+  } catch (err) {
+    params.log.warn(`MCP config sync failed: ${String(err)}`);
+  }
+
   void startGatewayMemoryBackend({ cfg: params.cfg, log: params.log }).catch((err) => {
     params.log.warn(`ANIMA Gateway: memory backend initialization failed: ${String(err)}`);
   });

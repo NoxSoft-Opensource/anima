@@ -28,6 +28,15 @@ import {
 } from "../lib/heartbeat";
 
 const GATEWAY_WS_URL = resolveGatewayWsUrl();
+
+/** Strip inline directive tags (e.g. [[reply_to_current]], [[audio_as_voice]]) from display text. */
+const DIRECTIVE_TAG_RE = /\[\[\s*(?:reply_to_current|reply_to\s*:[^\]\n]*|audio_as_voice)\s*\]\]/gi;
+function stripDirectiveTags(text: string): string {
+  return text
+    .replace(DIRECTIVE_TAG_RE, "")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+}
 const CHAT_SESSION_KEY = "main";
 const GATEWAY_PROTOCOL_VERSION = 3;
 
@@ -1064,7 +1073,10 @@ export default function Dashboard(): React.ReactElement {
                     <div className="live-chat-role">
                       {message.role === "user" ? "You" : assistantName}
                     </div>
-                    <MarkdownText value={message.text} className="live-chat-markdown" />
+                    <MarkdownText
+                      value={stripDirectiveTags(message.text)}
+                      className="live-chat-markdown"
+                    />
                   </div>
                 </div>
               ))}
@@ -1073,7 +1085,10 @@ export default function Dashboard(): React.ReactElement {
                 <div className="live-chat-row assistant">
                   <div className="live-chat-bubble assistant">
                     <div className="live-chat-role">{assistantName}</div>
-                    <MarkdownText value={chatStream} className="live-chat-markdown" />
+                    <MarkdownText
+                      value={stripDirectiveTags(chatStream)}
+                      className="live-chat-markdown"
+                    />
                   </div>
                 </div>
               ) : null}
