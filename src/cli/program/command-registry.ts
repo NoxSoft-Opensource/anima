@@ -115,6 +115,33 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
+      { name: "setup-token", description: "Set your Anthropic API key — the fastest way to get started" },
+    ],
+    register: async ({ program }) => {
+      const { setupTokenCommand, hasAnthropicToken, autoDetectToken } = await import("../../commands/setup-token.js");
+      program
+        .command("setup-token")
+        .description("Set your Anthropic API key — no claude CLI login needed")
+        .option("--token <key>", "Anthropic API key (sk-ant-api01-... or sk-ant-oat01-...)")
+        .option("--skip-validation", "Skip live API check (use if offline)")
+        .option("--json", "Output JSON result", false)
+        .addHelpText("after", `
+Examples:
+  anima setup-token                      # Interactive — prompts for key + validates
+  anima setup-token --token sk-ant-...   # Non-interactive — set key directly
+  anima setup-token --json               # JSON output for scripts/CI
+        `)
+        .action(async (opts) => {
+          await setupTokenCommand({
+            token: opts.token as string | undefined,
+            skipValidation: Boolean(opts.skipValidation),
+            json: Boolean(opts.json),
+          });
+        });
+    },
+  },
+  {
+    commands: [
       { name: "start", description: "Start gateway + portal + dashboard (simple mode)" },
       { name: "init", description: "Scaffold the ~/.anima/ identity and workspace structure" },
       {

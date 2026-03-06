@@ -14,6 +14,8 @@ import type { SessionSystemPromptReport } from "../config/sessions/types.js";
 import type { NormalizedUsage } from "./usage.js";
 import { resolveCliBackendConfig } from "./cli-backends.js";
 import { runCliAgent } from "./cli-runner.js";
+import { runAnthropicDirectAgent } from "./anthropic-direct-runner.js";
+import { loadAuthProfileStore } from "./auth-profiles/store.js";
 import { normalizeProviderId } from "./model-selection.js";
 
 export type EmbeddedPiAgentMeta = Record<string, unknown>;
@@ -123,20 +125,82 @@ export async function runEmbeddedPiAgent(...args: unknown[]): Promise<EmbeddedPi
   }
 
   const provider = normalizeEmbeddedProvider(params.provider);
-  const cliProvider = resolveCompatCliProvider(provider, params.config);
-  const backend = resolveCliBackendConfig(cliProvider, params.config);
-  if (!backend) {
-    throw new Error(
-      `No CLI backend available for provider "${provider}" (resolved "${cliProvider}"). Configure agents.defaults.cliBackends and install the matching CLI.`,
-    );
-  }
-
   const startedAt = Date.now();
   const runId = params.runId?.trim() || crypto.randomUUID();
   const timeoutMs =
     typeof params.timeoutMs === "number" && params.timeoutMs > 0 ? params.timeoutMs : 120_000;
   let assistantStarted = false;
   const streamTasks: Promise<void>[] = [];
+
+  // --- Direct API path (no claude CLI needed) ---
+  // If the provider is anthropic and we have a stored token credential,
+  // call api.anthropic.com directly. This works with sk-ant-api01-* and sk-ant-oat01-* tokens.
+  if (provider === "anthropic" || provider === "claude") {
+    const store = loadAuthProfileStore();
+    const profile =
+      store.profiles["anthropic:default"] ??
+      store.profiles[store.lastGood?.["anthropic"] ?? ""] ??
+      null;
+    const directToken =
+      profile?.type === "token" ? profile.token
+      : profile?.type === "oauth" ? profile.access
+      : null;
+
+    if (directToken) {
+      await emitAgentEvent(params, "lifecycle", { phase: "start", startedAt });
+      try {
+        const result = await runAnthropicDirectAgent({
+          token: directToken,
+          sessionId: params.sessionId,
+          sessionKey: params.sessionKey,
+          agentId: params.agentId,
+          sessionFile: params.sessionFile,
+          workspaceDir: params.workspaceDir,
+          config: params.config,
+          prompt: params.prompt,
+          model: params.model,
+          thinkLevel: params.thinkLevel,
+          timeoutMs,
+          runId,
+          extraSystemPrompt: params.extraSystemPrompt,
+          ownerNumbers: params.ownerNumbers,
+          onPartialReply: async (payload) => {
+            if (!assistantStarted) {
+              assistantStarted = true;
+              await params.onAssistantMessageStart?.();
+            }
+            await params.onPartialReply?.(payload);
+            await emitAgentEvent(params, "assistant", { text: payload.text });
+          },
+          onAssistantMessageStart: params.onAssistantMessageStart,
+        });
+        await emitAgentEvent(params, "lifecycle", {
+          phase: "end",
+          durationMs: Date.now() - startedAt,
+          status: result.status,
+        });
+        return result;
+      } catch (err) {
+        await emitAgentEvent(params, "lifecycle", {
+          phase: "error",
+          error: String(err instanceof Error ? err.message : err),
+        });
+        throw err;
+      }
+    }
+  }
+
+  // --- CLI runner path (claude / codex binary required) ---
+  const cliProvider = resolveCompatCliProvider(provider, params.config);
+  const backend = resolveCliBackendConfig(cliProvider, params.config);
+  if (!backend) {
+    throw new Error(
+      `No CLI backend available for provider "${provider}" (resolved "${cliProvider}").\n` +
+      `Either:\n` +
+      `  • Run: anima setup-token  (set an Anthropic API key — no CLI needed)\n` +
+      `  • Install the matching CLI and log in`,
+    );
+  }
 
   await emitAgentEvent(params, "lifecycle", {
     phase: "start",

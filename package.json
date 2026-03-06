@@ -27,6 +27,7 @@
     "dist/",
     "templates/",
     "skills/",
+    "docs/reference/templates/",
     "LICENSE",
     "README.md",
     "CHANGELOG.md"

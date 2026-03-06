@@ -54,6 +54,37 @@ export function registerAnimaCommands(program: Command): void {
         console.error("Invalid --port value");
         process.exit(1);
       }
+
+      // --- Onboarding gate ---
+      // If ANIMA has never been set up (no NoxSoft auth, no API token), guide
+      // the user through setup before starting the daemon.
+      const { hasAnthropicToken } = await import("../../commands/setup-token.js");
+      const { ensureAuthenticated } = await import("../../auth/noxsoft-auth.js");
+      let isOnboarded = hasAnthropicToken();
+      if (!isOnboarded) {
+        // Check NoxSoft auth as a secondary signal
+        try {
+          await ensureAuthenticated({ description: "start gate check" });
+          isOnboarded = true; // NoxSoft is registered — treat as onboarded
+        } catch {
+          isOnboarded = false;
+        }
+      }
+      if (!isOnboarded) {
+        console.log("\n Welcome to ANIMA\n");
+        console.log(" Looks like this is your first time. Let's get you set up!\n");
+        console.log(" Step 1 of 2 — Set your Anthropic API key:");
+        console.log("   anima setup-token\n");
+        console.log(" Step 2 of 2 — Register with NoxSoft (free):");
+        console.log("   anima onboard\n");
+        console.log(" Or run the full interactive wizard:");
+        console.log("   anima onboard --wizard\n");
+        console.log(" Tip: If you already have Claude Code installed, run:");
+        console.log("   anima setup-token   (auto-detects your existing login)\n");
+        process.exit(0);
+        return;
+      }
+
       const { startDaemon } = await import("../start.js");
       await startDaemon({
         port,
