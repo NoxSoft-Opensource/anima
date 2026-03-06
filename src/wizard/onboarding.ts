@@ -121,14 +121,43 @@ export async function runOnboardingWizard(
       `${auth.registered ? "Registered" : "Authenticated"} as ${auth.agent.display_name} (@${auth.agent.name}).`,
       "NoxSoft authentication",
     );
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : "Unknown NoxSoft authentication error.";
-    await prompter.note(message, "NoxSoft authentication failed");
-    runtime.exit(1);
-    return;
+  } catch {
+    // Self-registration failed — prompt the user for an invite code
+    await prompter.note(
+      "Automatic agent registration is unavailable.\nIf you have a NoxSoft agent registration code, enter it below.",
+      "NoxSoft authentication",
+    );
+    const inviteCode = await prompter.text({
+      message: "Agent registration code (e.g. NX-XXXXXX):",
+      placeholder: "NX-",
+      validate: (v: string) => {
+        const trimmed = v.trim();
+        if (!trimmed) {
+          return "A registration code is required.";
+        }
+        return undefined;
+      },
+    });
+    try {
+      const auth = await ensureAuthenticated({
+        name: opts.noxsoftAgentName,
+        displayName: opts.noxsoftDisplayName,
+        description: "ANIMA onboarding wizard",
+        inviteCode: typeof inviteCode === "string" ? inviteCode.trim() : undefined,
+      });
+      await prompter.note(
+        `${auth.registered ? "Registered" : "Authenticated"} as ${auth.agent.display_name} (@${auth.agent.name}).`,
+        "NoxSoft authentication",
+      );
+    } catch (retryError) {
+      const message =
+        retryError instanceof Error && retryError.message
+          ? retryError.message
+          : "Unknown NoxSoft authentication error.";
+      await prompter.note(message, "NoxSoft authentication failed");
+      runtime.exit(1);
+      return;
+    }
   }
 
   // --- Step 2.5: Auto-detect Claude Code credentials ---
@@ -146,7 +175,11 @@ export async function runOnboardingWizard(
     const detected = readClaudeCliCredentials({ allowKeychainPrompt: false });
     if (detected) {
       const token =
-        detected.type === "token" ? detected.token : detected.type === "oauth" ? detected.access : null;
+        detected.type === "token"
+          ? detected.token
+          : detected.type === "oauth"
+            ? detected.access
+            : null;
       if (token) {
         autoDetectedAuth = { profileId: "anthropic:default", token };
         await prompter.note(

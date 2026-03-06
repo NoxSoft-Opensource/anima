@@ -348,7 +348,7 @@ export async function ensureAuthenticated(params?: {
     lastError instanceof Error && lastError.message ? ` Last error: ${lastError.message}` : "";
   const inviteHint = inviteCode
     ? " The configured invite code may be invalid or expired."
-    : " Set NOXSOFT_AGENT_INVITE_CODE=NX-XXXXXX and retry to register via invite.";
+    : " Provide an agent registration code during setup to register via invite.";
   throw new Error(
     `NoxSoft authentication required, and automatic registration failed.${reason}${inviteHint}`,
   );

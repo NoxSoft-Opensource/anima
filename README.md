@@ -40,6 +40,7 @@ anima setup-token --token sk-ant-api01-...
 ```
 
 > **Token formats supported:**
+>
 > - `sk-ant-api01-...` — Anthropic Console API key
 > - `sk-ant-oat01-...` — Claude Code OAuth token (auto-detected if Claude Code is installed)
 
@@ -77,14 +78,21 @@ Your agent will run its heartbeat cycle on its own schedule, read its soul files
 
 ---
 
-## Auth Options
+## Auth
 
-| Method | Command | Notes |
-|--------|---------|-------|
-| Anthropic API key | `anima setup-token` | Fastest. Works immediately. |
-| Claude Code auto-detect | `anima setup-token` | Auto-detected if Claude Code installed. |
-| Full onboarding wizard | `anima onboard --wizard` | Includes NoxSoft registration + gateway config. |
-| OpenAI Codex | `anima models auth login --provider openai-codex` | For GPT Codex models. |
+ANIMA uses a three-layer auth system. See [docs/security/auth-flow.md](docs/security/auth-flow.md) for full details.
+
+| Layer             | What                                       | How                                                                              |
+| ----------------- | ------------------------------------------ | -------------------------------------------------------------------------------- |
+| **AI Provider**   | Anthropic API key for Claude inference     | `anima setup-token` — auto-detects Claude Code credentials, or paste your key    |
+| **Gateway**       | WebSocket auth between clients and gateway | Token or password, auto-generated during `anima init`                            |
+| **NoxSoft Agent** | Agent identity on the NoxSoft network      | Auto-registered during `anima init` — paste your registration code when prompted |
+
+| Method                  | Command                  | Notes                                           |
+| ----------------------- | ------------------------ | ----------------------------------------------- |
+| Anthropic API key       | `anima setup-token`      | Fastest. Works immediately.                     |
+| Claude Code auto-detect | `anima setup-token`      | Auto-detected if Claude Code installed.         |
+| Full onboarding wizard  | `anima onboard --wizard` | Includes NoxSoft registration + gateway config. |
 
 ANIMA calls `api.anthropic.com` directly — **no claude CLI login required** when using `setup-token`.
 
@@ -145,7 +153,7 @@ Three-tier memory architecture backed by SQLite + sqlite-vec:
 - **Semantic Memory** -- vector-indexed knowledge chunks for similarity search
 - **Procedural Memory** -- learned procedures, patterns, operational knowledge
 
-Embedding providers: OpenAI, Google Gemini, Voyage AI.
+Embedding providers: Anthropic, OpenAI, Google Gemini, Voyage AI (configurable).
 
 ### Gateway Server
 
@@ -171,7 +179,7 @@ import {
 
 ### Channel System
 
-Messaging channel abstraction with pluggable adapters. Ships with a web channel; plugins available for Telegram, Discord, WhatsApp, Slack, Signal, iMessage, MS Teams, Google Chat, IRC, LINE, and BlueBubbles.
+Messaging channel abstraction with pluggable adapters. Ships with a web channel and NoxSoft Chat/Email channels. Community plugins available for Telegram, Discord, WhatsApp, Slack, Signal, iMessage, and more.
 
 ### Platform Apps
 
@@ -227,7 +235,7 @@ The main configuration file is `~/.anima/anima.json` (JSON5 supported), created 
 | `heartbeat` | Interval, adaptive mode, self-replication, freedom    |
 | `budget`    | Daily spending limits                                 |
 | `gateway`   | Port, binding, tools, discovery, canvas host          |
-| `channels`  | Channel-specific config (whatsapp, telegram, etc.)    |
+| `channels`  | Channel-specific config (web, noxsoft-chat, etc.)     |
 | `memory`    | Memory backend configuration                          |
 | `plugins`   | Plugin entries and settings                           |
 | `models`    | Model provider configuration                          |
@@ -374,9 +382,13 @@ ANIMA_PROFILE=dev anima start
 
 ANIMA's channel system provides a unified messaging abstraction. Each channel is a pluggable adapter implementing gateway, messaging, auth, setup, pairing, security, outbound, threading, heartbeat, directory, and status interfaces.
 
-### Supported Channels
+### Built-in Channels
 
-Web (built-in), Telegram, Discord, WhatsApp, Slack, Signal, iMessage, MS Teams, Google Chat, IRC, LINE, BlueBubbles.
+Web, NoxSoft Chat, NoxSoft Email.
+
+### Community Plugin Channels
+
+Telegram, Discord, WhatsApp, Slack, Signal, iMessage, MS Teams, Google Chat, IRC, LINE, BlueBubbles.
 
 ### Channel Plugin SDK
 
@@ -649,6 +661,21 @@ pnpm test
 ```
 
 Run `pnpm check` before submitting changes. See the [Ethical AI Framework](#ethical-ai-framework) for the principles that guide development.
+
+---
+
+## Documentation
+
+- [Auth Flow](docs/security/auth-flow.md) — Three-layer authentication architecture
+- [Gateway API](docs/reference/api.md) — WebSocket RPC protocol reference (~90 methods)
+- [Configuration](docs/reference/config.md) — Full config schema reference
+- [SOUL.md](docs/SOUL.md) | [VALUES.md](docs/VALUES.md) | [GOVERNANCE.md](docs/GOVERNANCE.md) | [ETHICS.md](docs/ETHICS.md) — Ethical AI framework
+
+---
+
+## Acknowledgements
+
+ANIMA builds on the shoulders of [Claude Code](https://claude.com/claude-code) by Anthropic, [OpenClaw](https://github.com/nicepkg/openclaw) (formerly Claw), and [Codex](https://openai.com/index/codex/) by OpenAI. The upstream agent runtime originates from [@mariozechner/pi-agent-core](https://github.com/nicepkg/openclaw). Credential auto-detection supports Claude Code and OpenClaw auth profiles.
 
 ---
 

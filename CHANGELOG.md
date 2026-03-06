@@ -2,6 +2,40 @@
 
 ANIMA — NoxSoft AI Life System
 
+## 5.0.0 (2026-03-07)
+
+### Breaking Changes
+
+- **Version jump to 5.0.0**: Major release consolidating all improvements since 3.0.0.
+
+### Security
+
+- **Fixed timing side-channel in `safeEqualSecret`**: Secret comparison now hashes both values to SHA-256 before `timingSafeEqual`, preventing length-leaking timing attacks (was: early return on length mismatch).
+- **Full security audit**: 3 critical, 5 high, 6 medium findings identified and documented in `SECURITY-AUDIT.md`.
+
+### New Features
+
+- **`anima setup-token` command**: The fastest path to a working ANIMA agent. Accepts an Anthropic API key (`sk-ant-api01-...`) or Claude Code OAuth token (`sk-ant-oat01-...`), validates it against the live API, and saves it to the auth profile store. Supports auto-detection of existing Claude Code credentials, interactive and non-interactive (`--json`) modes, and `--skip-validation` for offline use.
+- **Direct Anthropic API runner**: New `anthropic-direct-runner` makes calls directly to `api.anthropic.com` without requiring the `claude` CLI binary. Automatically used when an `anthropic:default` token is present and the CLI is unavailable. Supports multi-turn conversation history per session, model alias resolution (e.g., `opus`, `sonnet`, `haiku`), timeout handling, and rate-limit awareness.
+- **Onboarding gate improvements**: `setup-token` auto-detects credentials from `ANTHROPIC_API_KEY`, `CLAUDE_API_KEY` environment variables, Claude Code CLI keychain, and legacy auth profiles. The onboarding wizard now detects an existing Claude Code sign-in and can skip the token prompt entirely.
+
+### Control UI
+
+- **Fixed blank dashboard**: Added loading state, error state, and gateway connection status indicator. Dashboard no longer renders blank when gateway is unreachable — shows clear "Connecting to gateway..." and "Unable to reach gateway" states with actionable instructions.
+
+### Documentation
+
+- **README rewrite**: Quick-start flow now leads with `setup-token` — no CLI login required. Simplified setup from 5+ steps to 3.
+- **Auth flow documentation**: New `docs/security/auth-flow.md` documenting the three-layer auth system (API key, Ed25519 device pairing, NoxSoft agent registration).
+- **API reference**: New `docs/reference/api.md` covering WebSocket RPC protocol and gateway endpoints.
+- **Reference templates included in npm package**: `docs/reference/templates/` are now shipped in the npm tarball.
+
+### Infrastructure
+
+- Bumped version to 5.0.0
+- Updated pnpm-lock.yaml
+- Codebase cleanup report generated (`CLEANUP-REPORT.md`)
+
 ## 3.0.0 (2026-03-03)
 
 ### Breaking Changes

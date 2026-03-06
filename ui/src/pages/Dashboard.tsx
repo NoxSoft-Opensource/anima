@@ -310,6 +310,7 @@ export default function Dashboard(): React.ReactElement {
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [modeSaving, setModeSaving] = useState(false);
   const [heartbeatSaving, setHeartbeatSaving] = useState(false);
   const [heartbeatToggleSaving, setHeartbeatToggleSaving] = useState(false);
@@ -368,6 +369,7 @@ export default function Dashboard(): React.ReactElement {
       setDashboardError(error instanceof Error ? error.message : String(error));
     } finally {
       setRefreshing(false);
+      setInitialLoadDone(true);
     }
   }, []);
 
@@ -915,14 +917,34 @@ export default function Dashboard(): React.ReactElement {
     setSpeechListening(false);
   }
 
-  if (dashboardError && !runtime && !status) {
+  if (!initialLoadDone) {
     return (
       <div>
         <h1 className="page-title">Assistant Home</h1>
         <div className="card empty-state-card">
           <div className="empty-state-symbol">~</div>
-          <div className="empty-state-copy">{dashboardError}</div>
-          <div className="runtime-stat-detail">Start the daemon with `anima start`.</div>
+          <div className="empty-state-copy">Connecting to gateway...</div>
+          <div className="runtime-stat-detail">Establishing connection to the ANIMA daemon.</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (dashboardError && !runtime && !status) {
+    return (
+      <div>
+        <h1 className="page-title">Assistant Home</h1>
+        <div className="card empty-state-card">
+          <div className="empty-state-symbol">!</div>
+          <div className="empty-state-copy">Unable to reach gateway</div>
+          <div className="runtime-stat-detail" style={{ marginTop: "0.5rem" }}>
+            {dashboardError}
+          </div>
+          <div className="runtime-stat-detail" style={{ marginTop: "1rem" }}>
+            Make sure the daemon is running with <code>anima start</code> and that the gateway is
+            accessible. If connecting via browser, verify the URL includes{" "}
+            <code>?token=YOUR_TOKEN</code>.
+          </div>
         </div>
       </div>
     );
@@ -937,13 +959,18 @@ export default function Dashboard(): React.ReactElement {
             Local mission control, heartbeat orchestration, and direct gateway chat.
           </div>
         </div>
-        <button
-          type="button"
-          className="action-button ghost"
-          onClick={() => void refreshDashboard()}
-        >
-          {refreshing ? "Refreshing..." : "Refresh"}
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <span className={`status-chip ${dashboardError ? "offline" : "online"}`}>
+            {dashboardError ? "Gateway unreachable" : "Gateway connected"}
+          </span>
+          <button
+            type="button"
+            className="action-button ghost"
+            onClick={() => void refreshDashboard()}
+          >
+            {refreshing ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
       </div>
 
       <div className="hero-grid">
