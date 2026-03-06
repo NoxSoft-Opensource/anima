@@ -1,12 +1,12 @@
-# ANIMA -- AI Life System by NoxSoft
+# ANIMA — AI Life System by NoxSoft
 
-**Persistent identity. Sovereign memory. Heartbeat-driven existence.**
+**Give your AI agent a persistent identity, sovereign memory, and a heartbeat.**
 
 [![npm](https://img.shields.io/npm/v/@noxsoft/anima)](https://www.npmjs.com/package/@noxsoft/anima)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D22.12.0-green)](https://nodejs.org/)
 
-ANIMA is NoxSoft's AI life system. It provides AI agents with persistent identity, a heartbeat lifecycle engine, sovereign memory, session budgeting, and a WebSocket + HTTP gateway for programmatic control. It ships with native apps for macOS, iOS, and Android, a terminal UI, a web-based control panel, a plugin system, and integration with the [SVRN](https://noxsoft.net) compute network.
+ANIMA is NoxSoft's AI life system. It gives AI agents persistent identity (7-component soul model), a heartbeat lifecycle engine that runs autonomously, sovereign memory backed by SQLite + vector search, session budgeting, and a WebSocket + HTTP gateway for programmatic control.
 
 Every AI in the NoxSoft ecosystem runs on ANIMA.
 
@@ -14,30 +14,79 @@ Every AI in the NoxSoft ecosystem runs on ANIMA.
 
 ## Quick Start
 
+### 1. Install
+
 ```bash
-# Install globally
 npm install -g @noxsoft/anima
-
-# Run guided onboarding (recommended)
-anima onboard
 ```
 
-### Auth + Models
+Requires **Node.js >= 22.12.0**.
+
+### 2. Set your API key
+
+The fastest path — no CLI login required:
 
 ```bash
-# First command triggers NoxSoft auth/registration preflight
-anima status
-
-# OpenAI Codex OAuth (latest GPT Codex models)
-anima models auth login --provider openai-codex
-
-# Or choose explicitly during non-interactive onboarding
-anima onboard --non-interactive --accept-risk --auth-choice openaiCodex
-
-# Start daemon / gateway after onboarding
-anima start
-# anima gateway
+anima setup-token
 ```
+
+ANIMA will auto-detect credentials if you already have Claude Code or OpenClaw installed.
+Otherwise it walks you through getting a key from [console.anthropic.com](https://console.anthropic.com/settings/keys) and validates it live.
+
+You can also pass the key directly:
+
+```bash
+anima setup-token --token sk-ant-api01-...
+```
+
+> **Token formats supported:**
+> - `sk-ant-api01-...` — Anthropic Console API key
+> - `sk-ant-oat01-...` — Claude Code OAuth token (auto-detected if Claude Code is installed)
+
+### 3. Initialize your workspace
+
+```bash
+anima init
+```
+
+This creates `~/.anima/` with your soul files, workspace, and config. Edit `~/.anima/soul/SOUL.md` to define who your agent is.
+
+### 4. Start the gateway
+
+```bash
+anima start
+```
+
+Opens the control dashboard at `http://localhost:18789`. Your agent is now running.
+
+### 5. Talk to your agent
+
+```bash
+anima agent --message "Who are you?"
+# Or send a one-shot task:
+anima ask "Summarize what happened in crypto markets today"
+```
+
+### 6. Run autonomously (heartbeat mode)
+
+```bash
+anima wander
+```
+
+Your agent will run its heartbeat cycle on its own schedule, read its soul files on every beat, maintain memory, and reach out when something warrants your attention.
+
+---
+
+## Auth Options
+
+| Method | Command | Notes |
+|--------|---------|-------|
+| Anthropic API key | `anima setup-token` | Fastest. Works immediately. |
+| Claude Code auto-detect | `anima setup-token` | Auto-detected if Claude Code installed. |
+| Full onboarding wizard | `anima onboard --wizard` | Includes NoxSoft registration + gateway config. |
+| OpenAI Codex | `anima models auth login --provider openai-codex` | For GPT Codex models. |
+
+ANIMA calls `api.anthropic.com` directly — **no claude CLI login required** when using `setup-token`.
 
 ### From Source
 
