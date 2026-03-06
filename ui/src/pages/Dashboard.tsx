@@ -69,11 +69,26 @@ type SpeechRecognitionLike = {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  onerror: ((event: { error?: string }) => void) | null;
-  onend: (() => void) | null;
+  addEventListener: (
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions,
+  ) => void;
+  removeEventListener: (
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions,
+  ) => void;
   start: () => void;
   stop: () => void;
+};
+
+type SpeechRecognitionResultEventLike = Event & {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionErrorEventLike = Event & {
+  error?: string;
 };
 
 function makeId(): string {
@@ -435,7 +450,8 @@ export default function Dashboard(): React.ReactElement {
     recognition.continuous = speechState?.continuous ?? true;
     recognition.interimResults = true;
     recognition.lang = speechState?.lang || "en-US";
-    recognition.onresult = (event) => {
+    const handleResult = (rawEvent: Event) => {
+      const event = rawEvent as SpeechRecognitionResultEventLike;
       let transcript = "";
       for (let i = 0; i < event.results.length; i += 1) {
         const result = event.results[i];
@@ -448,16 +464,23 @@ export default function Dashboard(): React.ReactElement {
         setChatInput(transcript.trim());
       }
     };
-    recognition.onerror = (event) => {
+    const handleError = (rawEvent: Event) => {
+      const event = rawEvent as SpeechRecognitionErrorEventLike;
       setSpeechError(event.error || "Voice capture failed.");
       setSpeechListening(false);
     };
-    recognition.onend = () => {
+    const handleEnd = () => {
       setSpeechListening(false);
     };
+    recognition.addEventListener("result", handleResult);
+    recognition.addEventListener("error", handleError);
+    recognition.addEventListener("end", handleEnd);
     speechRecognitionRef.current = recognition;
 
     return () => {
+      recognition.removeEventListener("result", handleResult);
+      recognition.removeEventListener("error", handleError);
+      recognition.removeEventListener("end", handleEnd);
       recognition.stop();
       speechRecognitionRef.current = null;
     };
@@ -467,7 +490,7 @@ export default function Dashboard(): React.ReactElement {
     if (!speechState?.autoSpeak || typeof window === "undefined" || !window.speechSynthesis) {
       return;
     }
-    const latest = [...chatMessages].toReversed().find((message) => message.role === "assistant");
+    const latest = chatMessages.toReversed().find((message) => message.role === "assistant");
     if (!latest || spokenMessageIdsRef.current.has(latest.id)) {
       return;
     }
@@ -670,7 +693,7 @@ export default function Dashboard(): React.ReactElement {
       wsRef.current = ws;
       setChatConnected(false);
 
-      ws.onopen = () => {
+      ws.addEventListener("open", () => {
         if (connectTimerRef.current) {
           window.clearTimeout(connectTimerRef.current);
         }
@@ -678,9 +701,9 @@ export default function Dashboard(): React.ReactElement {
           connectTimerRef.current = null;
           void sendConnect();
         }, 300);
-      };
+      });
 
-      ws.onmessage = (event) => {
+      ws.addEventListener("message", (event) => {
         let parsed: unknown;
         try {
           parsed = JSON.parse(String(event.data));
@@ -714,19 +737,19 @@ export default function Dashboard(): React.ReactElement {
             handleChatEvent((frame.payload || {}) as ChatEventPayload);
           }
         }
-      };
+      });
 
-      ws.onerror = () => {
+      ws.addEventListener("error", () => {
         setChatError("Websocket error while connecting to ANIMA gateway");
-      };
+      });
 
-      ws.onclose = () => {
+      ws.addEventListener("close", () => {
         connectInFlight = false;
         didConnect = false;
         setChatConnected(false);
         clearPendingWithError("Gateway websocket closed");
         scheduleReconnect();
-      };
+      });
     }
 
     connect();
