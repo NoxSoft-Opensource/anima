@@ -6,6 +6,7 @@ export function computeEmbeddingProviderKey(params: {
   providerModel: string;
   openAi?: { baseUrl: string; model: string; headers: Record<string, string> };
   gemini?: { baseUrl: string; model: string; headers: Record<string, string> };
+  voyage?: { baseUrl: string; model: string; headers: Record<string, string> };
 }): string {
   if (params.openAi) {
     const headerNames = fingerprintHeaderNames(params.openAi.headers);
@@ -25,6 +26,17 @@ export function computeEmbeddingProviderKey(params: {
         provider: "gemini",
         baseUrl: params.gemini.baseUrl,
         model: params.gemini.model,
+        headerNames,
+      }),
+    );
+  }
+  if (params.voyage) {
+    const headerNames = fingerprintHeaderNames(params.voyage.headers);
+    return hashText(
+      JSON.stringify({
+        provider: "voyage",
+        baseUrl: params.voyage.baseUrl,
+        model: params.voyage.model,
         headerNames,
       }),
     );

@@ -1027,6 +1027,45 @@ export async function setVoiceWakeConfig(triggers: string[]): Promise<VoiceWakeC
   return await callGatewayMethod<VoiceWakeConfig>("voicewake.set", { triggers });
 }
 
+// --- Provider / API Key Rotation ---
+
+export interface ProviderEntry {
+  id: string;
+  name: string;
+  apiKeyMasked: string;
+  enabled: boolean;
+  priority: number;
+  rateLimited?: boolean;
+  rateLimitResetsAt?: number;
+}
+
+export interface ProviderConfig {
+  providers: ProviderEntry[];
+  activeProvider: string;
+  autoRotation: boolean;
+  rotationStrategy: string;
+}
+
+export async function getProviderConfig(): Promise<ProviderConfig> {
+  return await callGatewayMethod<ProviderConfig>("anima.providers.get", {});
+}
+
+export async function setProviderConfig(
+  providers: Array<{
+    id: string;
+    name: string;
+    apiKey?: string;
+    enabled: boolean;
+    priority: number;
+  }>,
+): Promise<void> {
+  await callGatewayMethod("anima.providers.set", { providers });
+}
+
+export async function toggleProviderRotation(enabled: boolean): Promise<void> {
+  await callGatewayMethod("anima.providers.rotate", { enabled });
+}
+
 export async function setSVRNEnabled(enabled: boolean): Promise<{ success: boolean }> {
   return request<{ success: boolean }>("/api/svrn/toggle", {
     method: "POST",

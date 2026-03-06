@@ -11,8 +11,8 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { Channel, IncomingMessage, MessagePriority, OutgoingMessage } from "./bridge.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("webhook-channel");
 
@@ -105,19 +105,18 @@ export class WebhookChannel implements Channel {
     }
 
     // Auth check
-    const authHeader = typeof req.headers.authorization === "string"
-      ? req.headers.authorization
-      : Array.isArray(req.headers.authorization)
-        ? req.headers.authorization[0]
-        : undefined;
+    const authHeader =
+      typeof req.headers.authorization === "string"
+        ? req.headers.authorization
+        : Array.isArray(req.headers.authorization)
+          ? req.headers.authorization[0]
+          : undefined;
 
     if (!authHeader) {
       return { status: 401, body: { error: "authorization header required" } };
     }
 
-    const token = authHeader.startsWith("Bearer ")
-      ? authHeader.slice(7).trim()
-      : authHeader.trim();
+    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : authHeader.trim();
 
     if (!constantTimeEqual(token, this.authToken)) {
       return { status: 403, body: { error: "invalid token" } };
@@ -188,12 +187,10 @@ export class WebhookChannel implements Channel {
 // ---------------------------------------------------------------------------
 
 function constantTimeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  const maxLen = Math.max(a.length, b.length);
+  let result = a.length ^ b.length;
+  for (let i = 0; i < maxLen; i++) {
+    result |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
   }
   return result === 0;
 }

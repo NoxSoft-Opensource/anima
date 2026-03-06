@@ -94,13 +94,14 @@ export default function Memory(): React.ReactElement {
 
       <div className="tabs top-gap">
         {memoryKinds.map((kind) => (
-          <div
+          <button
+            type="button"
             key={kind.key}
             className={`tab ${activeKind === kind.key ? "active" : ""}`}
             onClick={() => setActiveKind(kind.key)}
           >
             {kind.label}
-          </div>
+          </button>
         ))}
       </div>
 

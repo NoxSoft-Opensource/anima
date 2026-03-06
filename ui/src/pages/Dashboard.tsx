@@ -371,9 +371,14 @@ export default function Dashboard(): React.ReactElement {
     }
   }, []);
 
+  const logsCursorRef = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    logsCursorRef.current = logsState?.cursor;
+  }, [logsState?.cursor]);
+
   const refreshLogs = useCallback(async () => {
     try {
-      const next = await tailLogs(logsState?.cursor);
+      const next = await tailLogs(logsCursorRef.current);
       setLogsState((current) => {
         if (!current || next.reset) {
           return next;
@@ -386,7 +391,7 @@ export default function Dashboard(): React.ReactElement {
     } catch {
       // Keep the dashboard usable even when logs are unavailable.
     }
-  }, [logsState?.cursor]);
+  }, []);
 
   useEffect(() => {
     void refreshDashboard();

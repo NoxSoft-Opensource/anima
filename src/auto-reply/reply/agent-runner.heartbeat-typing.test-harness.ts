@@ -99,7 +99,7 @@ export function createMinimalRun(params?: {
       workspaceDir: "/tmp",
       config: {},
       skillsSnapshot: {},
-      provider: "anthropic",
+      provider: "groq",
       model: "claude",
       thinkLevel: "low",
       verboseLevel: params?.resolvedVerboseLevel ?? "off",

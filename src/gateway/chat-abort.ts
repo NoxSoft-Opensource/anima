@@ -106,10 +106,11 @@ export function abortChatRunsForSessionKey(
 ): { aborted: boolean; runIds: string[] } {
   const { sessionKey, stopReason } = params;
   const runIds: string[] = [];
-  for (const [runId, active] of ops.chatAbortControllers) {
-    if (active.sessionKey !== sessionKey) {
-      continue;
-    }
+  // Snapshot keys before iterating — abortChatRunById deletes from the map.
+  const candidates = [...ops.chatAbortControllers.entries()]
+    .filter(([, active]) => active.sessionKey === sessionKey)
+    .map(([runId]) => runId);
+  for (const runId of candidates) {
     const res = abortChatRunById(ops, { runId, sessionKey, stopReason });
     if (res.aborted) {
       runIds.push(runId);

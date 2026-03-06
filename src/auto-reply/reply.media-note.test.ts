@@ -42,7 +42,7 @@ function makeCfg(home: string) {
   return {
     agents: {
       defaults: {
-        model: "anthropic/claude-opus-4-5",
+        model: "groq/llama-4-maverick",
         workspace: path.join(home, "anima"),
       },
     },

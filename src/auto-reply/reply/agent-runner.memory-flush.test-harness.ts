@@ -105,7 +105,7 @@ export function createBaseRun(params: {
       workspaceDir: "/tmp",
       config: params.config ?? {},
       skillsSnapshot: {},
-      provider: "anthropic",
+      provider: "groq",
       model: "claude",
       thinkLevel: "low",
       verboseLevel: "off",

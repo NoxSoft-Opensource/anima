@@ -11,6 +11,7 @@ import {
 import { getCustomProviderApiKey, resolveEnvApiKey } from "../agents/model-auth.js";
 import { normalizeProviderId } from "../agents/model-selection.js";
 import { loadConfig } from "../config/config.js";
+import { getActiveProvider } from "../providers/provider-store.js";
 import { normalizeSecretInput } from "../utils/normalize-secret-input.js";
 
 export type ProviderAuth = {
@@ -248,6 +249,22 @@ export async function resolveProviderAuths(params: {
 }): Promise<ProviderAuth[]> {
   if (params.auth) {
     return params.auth;
+  }
+
+  // Check provider store first (user-configured API keys via UI)
+  const activeStoreProvider = getActiveProvider();
+  if (activeStoreProvider) {
+    const matchesRequested = params.providers.some(
+      (p) => p === activeStoreProvider.id || activeStoreProvider.id.startsWith(p),
+    );
+    if (matchesRequested) {
+      return [
+        {
+          provider: activeStoreProvider.id as UsageProviderId,
+          token: activeStoreProvider.apiKey,
+        },
+      ];
+    }
   }
 
   const oauthProviders = resolveOAuthProviders(params.agentDir);

@@ -245,6 +245,20 @@ class MemoryManagerEmbeddingOps {
         }),
       );
     }
+    if (this.provider.id === "voyage" && this.voyage) {
+      const entries = Object.entries(this.voyage.headers)
+        .filter(([key]) => key.toLowerCase() !== "authorization")
+        .toSorted(([a], [b]) => a.localeCompare(b))
+        .map(([key, value]) => [key, value]);
+      return hashText(
+        JSON.stringify({
+          provider: "voyage",
+          baseUrl: this.voyage.baseUrl,
+          model: this.voyage.model,
+          headers: entries,
+        }),
+      );
+    }
     return hashText(JSON.stringify({ provider: this.provider.id, model: this.provider.model }));
   }
 

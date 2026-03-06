@@ -78,6 +78,13 @@ vi.mock("./onboarding.completion.js", () => ({
   setupOnboardingShellCompletion,
 }));
 
+vi.mock("../auth/noxsoft-auth.js", () => ({
+  ensureAuthenticated: vi.fn(async () => ({
+    registered: false,
+    agent: { display_name: "Test Agent", name: "test-agent" },
+  })),
+}));
+
 describe("runOnboardingWizard", () => {
   it("exits when config is invalid", async () => {
     readConfigFileSnapshot.mockResolvedValueOnce({

@@ -113,6 +113,7 @@ describe("block streaming", () => {
     vi.mocked(loadModelCatalog).mockResolvedValue([
       { id: "claude-opus-4-5", name: "Opus 4.5", provider: "anthropic" },
       { id: "gpt-4.1-mini", name: "GPT-4.1 Mini", provider: "openai" },
+      { id: "llama-4-maverick", name: "Llama 4 Maverick", provider: "groq" },
     ]);
   });
 
@@ -164,7 +165,7 @@ describe("block streaming", () => {
         {
           agents: {
             defaults: {
-              model: "anthropic/claude-opus-4-5",
+              model: "groq/llama-4-maverick",
               workspace: path.join(home, "anima"),
             },
           },
@@ -203,7 +204,7 @@ describe("block streaming", () => {
         {
           agents: {
             defaults: {
-              model: "anthropic/claude-opus-4-5",
+              model: "groq/llama-4-maverick",
               workspace: path.join(home, "anima"),
             },
           },
@@ -252,7 +253,7 @@ describe("block streaming", () => {
         {
           agents: {
             defaults: {
-              model: "anthropic/claude-opus-4-5",
+              model: "groq/llama-4-maverick",
               workspace: path.join(home, "anima"),
             },
           },
@@ -299,7 +300,7 @@ describe("block streaming", () => {
         {
           agents: {
             defaults: {
-              model: "anthropic/claude-opus-4-5",
+              model: "groq/llama-4-maverick",
               workspace: path.join(home, "anima"),
             },
           },

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   getConfigSchemaSnapshot,
   getConfigSnapshot,
+  getProviderConfig,
   getRegistrationStatus,
   getRuntimeInspect,
   getVoiceWakeConfig,
@@ -10,11 +11,14 @@ import {
   registerInviteCode,
   saveRawConfig,
   setHeartbeatsEnabled,
+  setProviderConfig,
   setRegistrationToken,
   setVoiceWakeConfig,
+  toggleProviderRotation,
   wakeHeartbeat,
   type ConfigIssue,
   type ConfigSnapshot,
+  type ProviderConfig,
   type RegistrationStatus,
   type RuntimeInspectResponse,
 } from "../api";
@@ -62,6 +66,12 @@ export default function Settings(): React.ReactElement {
   const [displayName, setDisplayName] = useState("");
   const [description, setDescription] = useState(DEFAULT_DESCRIPTION);
   const [voiceWakeInput, setVoiceWakeInput] = useState("");
+  const [providerConfig, setProviderConfig] = useState<ProviderConfig | null>(null);
+  const [addProviderOpen, setAddProviderOpen] = useState(false);
+  const [newProviderType, setNewProviderType] = useState("Anthropic");
+  const [newProviderKey, setNewProviderKey] = useState("");
+  const [newProviderKeyVisible, setNewProviderKeyVisible] = useState(false);
+  const [newProviderEndpoint, setNewProviderEndpoint] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -71,13 +81,14 @@ export default function Settings(): React.ReactElement {
   async function refresh() {
     setLoading(true);
     try {
-      const [nextRuntime, nextConfig, nextSchema, nextRegistration, nextVoiceWake] =
+      const [nextRuntime, nextConfig, nextSchema, nextRegistration, nextVoiceWake, nextProviders] =
         await Promise.all([
           getRuntimeInspect(),
           getConfigSnapshot(),
           getConfigSchemaSnapshot(),
           getRegistrationStatus(),
           getVoiceWakeConfig(),
+          getProviderConfig().catch(() => null),
         ]);
       setRuntime(nextRuntime);
       setConfigSnapshot(nextConfig);
@@ -89,6 +100,7 @@ export default function Settings(): React.ReactElement {
       setAgentName(nextRegistration.suggestedIdentity.name);
       setDisplayName(nextRegistration.suggestedIdentity.displayName);
       setVoiceWakeInput(nextVoiceWake.triggers.join(", "));
+      setProviderConfig(nextProviders);
       setHeartbeatForm(readHeartbeatFormState(nextConfig));
       setSpeechDraft({
         recognition: nextRuntime.mission.state.speech.recognition,
@@ -218,6 +230,113 @@ export default function Settings(): React.ReactElement {
     }
   }
 
+  async function saveProviders() {
+    if (!providerConfig) {
+      return;
+    }
+    setSaving(true);
+    setStatusMessage(null);
+    try {
+      await setProviderConfig(
+        providerConfig.providers.map((p) => ({
+          id: p.id,
+          name: p.name,
+          enabled: p.enabled,
+          priority: p.priority,
+        })),
+      );
+      await refresh();
+      setStatusMessage("Provider config saved.");
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function removeProvider(id: string) {
+    setProviderConfig((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return {
+        ...prev,
+        providers: prev.providers.filter((p) => p.id !== id),
+      };
+    });
+  }
+
+  function toggleProvider(id: string) {
+    setProviderConfig((prev) => {
+      if (!prev) {
+        return prev;
+      }
+      return {
+        ...prev,
+        providers: prev.providers.map((p) => (p.id === id ? { ...p, enabled: !p.enabled } : p)),
+      };
+    });
+  }
+
+  async function addProvider() {
+    if (!newProviderKey.trim()) {
+      setErrorMessage("API key is required.");
+      return;
+    }
+    setSaving(true);
+    setStatusMessage(null);
+    try {
+      const existing = providerConfig?.providers ?? [];
+      const newEntry = {
+        id: `provider-${Date.now()}`,
+        name: newProviderType,
+        apiKey: newProviderKey.trim(),
+        enabled: true,
+        priority: existing.length + 1,
+      };
+      await setProviderConfig([
+        ...existing.map((p) => ({
+          id: p.id,
+          name: p.name,
+          enabled: p.enabled,
+          priority: p.priority,
+        })),
+        newEntry,
+      ]);
+      setNewProviderKey("");
+      setNewProviderEndpoint("");
+      setAddProviderOpen(false);
+      await refresh();
+      setStatusMessage(`Added ${newProviderType} provider.`);
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleToggleAutoRotation() {
+    if (!providerConfig) {
+      return;
+    }
+    setSaving(true);
+    setStatusMessage(null);
+    try {
+      await toggleProviderRotation(!providerConfig.autoRotation);
+      await refresh();
+      setStatusMessage(
+        providerConfig.autoRotation ? "Auto-rotation disabled." : "Auto-rotation enabled.",
+      );
+      setErrorMessage(null);
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function applyRawConfig(apply: boolean) {
     if (!configSnapshot?.hash) {
       setErrorMessage("Config hash missing. Refresh settings and try again.");
@@ -322,6 +441,209 @@ export default function Settings(): React.ReactElement {
             </div>
           )}
         </details>
+
+        <div className="card">
+          <div className="card-header">
+            <div>
+              <div className="card-title">API Providers</div>
+              <div className="card-subtitle">
+                Manage Anthropic, OpenAI, and custom provider keys with automatic rotation on rate
+                limits.
+              </div>
+            </div>
+          </div>
+          {providerConfig ? (
+            <>
+              {providerConfig.providers.length > 0 ? (
+                <div className="activity-list">
+                  {providerConfig.providers.map((provider) => (
+                    <div key={provider.id} className="activity-row">
+                      <div
+                        style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: 1 }}
+                      >
+                        <span
+                          style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background: provider.enabled ? "#4caf50" : "#f44336",
+                            flexShrink: 0,
+                          }}
+                        />
+                        <div>
+                          <div className="card-title small">
+                            {provider.name}
+                            {providerConfig.activeProvider === provider.id ? (
+                              <span
+                                style={{
+                                  marginLeft: "0.5rem",
+                                  fontSize: "0.7rem",
+                                  color: "var(--accent)",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                ACTIVE
+                              </span>
+                            ) : null}
+                            {provider.rateLimited ? (
+                              <span
+                                style={{
+                                  marginLeft: "0.5rem",
+                                  fontSize: "0.7rem",
+                                  color: "#ff9800",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                RATE LIMITED
+                              </span>
+                            ) : null}
+                          </div>
+                          <div className="runtime-stat-detail mono">{provider.apiKeyMasked}</div>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span className="runtime-stat-detail">P{provider.priority}</span>
+                        <button
+                          type="button"
+                          className="action-button ghost"
+                          onClick={() => toggleProvider(provider.id)}
+                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
+                        >
+                          {provider.enabled ? "Disable" : "Enable"}
+                        </button>
+                        <button
+                          type="button"
+                          className="action-button ghost"
+                          onClick={() => removeProvider(provider.id)}
+                          style={{ padding: "0.2rem 0.5rem", fontSize: "0.75rem" }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-note">No providers configured.</div>
+              )}
+
+              <div className="toggle-row top-gap">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={providerConfig.autoRotation}
+                    onChange={() => void handleToggleAutoRotation()}
+                  />
+                  Auto-rotate on rate limit
+                </label>
+                <span className="runtime-stat-detail">
+                  Strategy: {providerConfig.rotationStrategy || "priority"}
+                </span>
+              </div>
+
+              {addProviderOpen ? (
+                <div className="form-grid two-col top-gap">
+                  <label className="field-block">
+                    <span>Provider type</span>
+                    <select
+                      className="search-bar"
+                      value={newProviderType}
+                      onChange={(event) => setNewProviderType(event.target.value)}
+                    >
+                      <option value="Anthropic">Anthropic</option>
+                      <option value="OpenAI">OpenAI</option>
+                      <option value="Custom">Custom</option>
+                    </select>
+                  </label>
+                  <label className="field-block">
+                    <span>API key</span>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        className="search-bar mono"
+                        type={newProviderKeyVisible ? "text" : "password"}
+                        value={newProviderKey}
+                        onChange={(event) => setNewProviderKey(event.target.value)}
+                        placeholder="sk-..."
+                        spellCheck={false}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setNewProviderKeyVisible((prev) => !prev)}
+                        style={{
+                          position: "absolute",
+                          right: "0.5rem",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          color: "var(--text-muted)",
+                          cursor: "pointer",
+                          fontSize: "0.75rem",
+                        }}
+                      >
+                        {newProviderKeyVisible ? "Hide" : "Show"}
+                      </button>
+                    </div>
+                  </label>
+                  {newProviderType === "Custom" ? (
+                    <label className="field-block field-span-2">
+                      <span>Endpoint URL</span>
+                      <input
+                        className="search-bar mono"
+                        value={newProviderEndpoint}
+                        onChange={(event) => setNewProviderEndpoint(event.target.value)}
+                        placeholder="https://api.example.com/v1"
+                        spellCheck={false}
+                      />
+                    </label>
+                  ) : null}
+                  <div className="button-row field-span-2">
+                    <button
+                      type="button"
+                      className="action-button"
+                      onClick={() => void addProvider()}
+                      disabled={saving}
+                    >
+                      Add Provider
+                    </button>
+                    <button
+                      type="button"
+                      className="action-button ghost"
+                      onClick={() => setAddProviderOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="button-row top-gap">
+                  <button
+                    type="button"
+                    className="action-button ghost"
+                    onClick={() => setAddProviderOpen(true)}
+                  >
+                    Add Provider
+                  </button>
+                </div>
+              )}
+
+              <div className="button-row top-gap">
+                <button
+                  type="button"
+                  className="action-button"
+                  onClick={() => void saveProviders()}
+                  disabled={saving}
+                >
+                  Save Provider Config
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="empty-note">
+              Provider configuration unavailable. The backend may not support this feature yet.
+            </div>
+          )}
+        </div>
 
         <div className="card">
           <div className="card-header">

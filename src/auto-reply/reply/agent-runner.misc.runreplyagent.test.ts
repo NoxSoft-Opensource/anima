@@ -99,9 +99,9 @@ describe("runReplyAgent authProfileId fallback scoping", () => {
   it("drops authProfileId when provider changes during fallback", async () => {
     runWithModelFallbackMock.mockImplementationOnce(
       async ({ run }: RunWithModelFallbackParams) => ({
-        result: await run("openai-codex", "gpt-5.2"),
-        provider: "openai-codex",
-        model: "gpt-5.2",
+        result: await run("deepseek", "deepseek-r1"),
+        provider: "deepseek",
+        model: "deepseek-r1",
       }),
     );
 
@@ -131,7 +131,7 @@ describe("runReplyAgent authProfileId fallback scoping", () => {
         workspaceDir: "/tmp",
         config: {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude-opus",
         authProfileId: "anthropic:anima",
         authProfileIdSource: "manual",
@@ -188,7 +188,7 @@ describe("runReplyAgent authProfileId fallback scoping", () => {
       provider?: unknown;
     };
 
-    expect(call.provider).toBe("openai-codex");
+    expect(call.provider).toBe("deepseek");
     expect(call.authProfileId).toBeUndefined();
     expect(call.authProfileIdSource).toBeUndefined();
   });
@@ -244,7 +244,7 @@ describe("runReplyAgent auto-compaction token update", () => {
         workspaceDir: "/tmp",
         config: params.config ?? {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -433,7 +433,7 @@ describe("runReplyAgent block streaming", () => {
           },
         },
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -535,7 +535,7 @@ describe("runReplyAgent block streaming", () => {
           },
         },
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -704,7 +704,7 @@ describe("runReplyAgent messaging tool suppression", () => {
         workspaceDir: "/tmp",
         config: {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -888,7 +888,7 @@ describe("runReplyAgent fallback reasoning tags", () => {
         workspaceDir: "/tmp",
         config: {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -1008,7 +1008,7 @@ describe("runReplyAgent response usage footer", () => {
         workspaceDir: "/tmp",
         config: {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
@@ -1117,7 +1117,7 @@ describe("runReplyAgent transient HTTP retry", () => {
         workspaceDir: "/tmp",
         config: {},
         skillsSnapshot: {},
-        provider: "anthropic",
+        provider: "groq",
         model: "claude",
         thinkLevel: "low",
         verboseLevel: "off",
