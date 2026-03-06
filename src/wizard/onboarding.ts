@@ -3,6 +3,7 @@ import type { AnimaConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { QuickstartGatewayDefaults, WizardFlow } from "./onboarding.types.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
+import { readClaudeCliCredentials } from "../agents/cli-credentials.js";
 import { ensureAuthenticated } from "../auth/noxsoft-auth.js";
 import { formatCliCommand } from "../cli/command-format.js";
 import { promptAuthChoiceGrouped } from "../commands/auth-choice-prompt.js";
@@ -130,18 +131,59 @@ export async function runOnboardingWizard(
     return;
   }
 
+  // --- Step 2.5: Auto-detect Claude Code credentials ---
+  // Try to read Claude Code OAuth credentials from the system automatically.
+  // Sources (in priority order):
+  //   1. macOS Keychain (darwin)
+  //   2. Windows Credential Manager (win32)
+  //   3. ~/.claude/.credentials.json (cross-platform)
+  //   4. OpenClaw auth-profiles.json (same infrastructure, best Windows fallback)
+  //
+  // If found, we skip the auth prompt entirely and configure ANIMA silently.
+  // The user can always re-run `anima configure` to change the provider.
+  let autoDetectedAuth: { profileId: string; token: string } | null = null;
+  {
+    const detected = readClaudeCliCredentials({ allowKeychainPrompt: false });
+    if (detected) {
+      const token =
+        detected.type === "token" ? detected.token : detected.type === "oauth" ? detected.access : null;
+      if (token) {
+        autoDetectedAuth = { profileId: "anthropic:default", token };
+        await prompter.note(
+          `Found Claude Code sign-in credentials on this machine.\nANIMA will use these automatically — no separate login needed.\n\nTo use a different provider, run \`anima configure\` after setup.`,
+          "Claude Code detected ✓",
+        );
+      }
+    }
+  }
+
   // --- Step 3: Model/auth provider selection ---
   const authStore = ensureAuthProfileStore(undefined, {
     allowKeychainPrompt: false,
   });
-  const authChoiceFromPrompt = opts.authChoice === undefined;
+
+  // If we auto-detected Claude Code credentials, pre-populate the auth store
+  // and skip the interactive prompt.
+  if (autoDetectedAuth) {
+    authStore.profiles[autoDetectedAuth.profileId] = {
+      type: "token",
+      provider: "anthropic",
+      token: autoDetectedAuth.token,
+    } as never;
+    authStore.lastGood ??= {};
+    authStore.lastGood.anthropic = autoDetectedAuth.profileId;
+  }
+
+  const authChoiceFromPrompt = opts.authChoice === undefined && !autoDetectedAuth;
   const authChoice =
     opts.authChoice ??
-    (await promptAuthChoiceGrouped({
-      prompter,
-      store: authStore,
-      includeSkip: false,
-    }));
+    (autoDetectedAuth
+      ? ("anthropic-claude-code" as GatewayAuthChoice)
+      : await promptAuthChoiceGrouped({
+          prompter,
+          store: authStore,
+          includeSkip: false,
+        }));
 
   {
     const authResult = await applyAuthChoice({

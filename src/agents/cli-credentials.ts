@@ -14,8 +14,14 @@ const CODEX_CLI_AUTH_FILENAME = "auth.json";
 const QWEN_CLI_CREDENTIALS_RELATIVE_PATH = ".qwen/oauth_creds.json";
 const MINIMAX_CLI_CREDENTIALS_RELATIVE_PATH = ".minimax/oauth_creds.json";
 
+// OpenClaw stores Claude Code OAuth in its own auth-profiles.json
+const OPENCLAW_AUTH_PROFILES_PATH = ".openclaw/agents/main/agent/auth-profiles.json";
+
 const CLAUDE_CLI_KEYCHAIN_SERVICE = "Claude Code-credentials";
 const CLAUDE_CLI_KEYCHAIN_ACCOUNT = "Claude Code";
+
+// Windows Credential Manager target name for Claude Code (claude.exe stores here)
+const WINDOWS_CREDENTIAL_TARGET = "Claude Code-credentials";
 
 type CachedValue<T> = {
   value: T | null;
@@ -258,6 +264,106 @@ function readMiniMaxCliCredentials(options?: { homeDir?: string }): MiniMaxCliCr
   return readPortalCliOauthCredentials(credPath, "minimax-portal");
 }
 
+/**
+ * Read Claude Code credentials from the OpenClaw auth-profiles.json store.
+ *
+ * OpenClaw (which shares the same auth infrastructure) stores the Claude Code
+ * OAuth token in ~/.openclaw/agents/main/agent/auth-profiles.json.
+ * This is the most reliable source on Windows where the Keychain is unavailable.
+ */
+export function readOpenClawCredentials(options?: { homeDir?: string }): ClaudeCliCredential | null {
+  const baseDir = options?.homeDir ?? resolveUserPath("~");
+  const authPath = path.join(baseDir, OPENCLAW_AUTH_PROFILES_PATH);
+  const raw = loadJsonFile(authPath);
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+
+  const data = raw as Record<string, unknown>;
+  const profiles = data.profiles as Record<string, unknown> | undefined;
+  if (!profiles) {
+    return null;
+  }
+
+  // Look for anthropic:default profile
+  const anthropicProfile = profiles["anthropic:default"] as Record<string, unknown> | undefined;
+  if (!anthropicProfile || anthropicProfile.provider !== "anthropic") {
+    return null;
+  }
+
+  // Token-based credential (sk-ant-oat01-... or sk-ant-api01-...)
+  if (anthropicProfile.type === "token" && typeof anthropicProfile.token === "string") {
+    const token = anthropicProfile.token as string;
+    log.info("read anthropic credentials from openclaw auth-profiles", { type: "token" });
+    return {
+      type: "token",
+      provider: "anthropic",
+      token,
+      expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // Treat as long-lived
+    };
+  }
+
+  // OAuth credential
+  if (
+    anthropicProfile.type === "oauth" &&
+    typeof anthropicProfile.access === "string" &&
+    typeof anthropicProfile.refresh === "string" &&
+    typeof anthropicProfile.expires === "number"
+  ) {
+    log.info("read anthropic oauth credentials from openclaw auth-profiles");
+    return {
+      type: "oauth",
+      provider: "anthropic",
+      access: anthropicProfile.access as string,
+      refresh: anthropicProfile.refresh as string,
+      expires: anthropicProfile.expires as number,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Read Claude Code credentials from Windows Credential Manager.
+ *
+ * On Windows, the Claude CLI stores its OAuth token via the Windows
+ * Data Protection API (DPAPI) / Credential Manager rather than the
+ * macOS Keychain. We use `cmdkey /list` to detect and `powershell
+ * [Security.Cryptography.ProtectedData]::Unprotect` to read it.
+ *
+ * Falls back gracefully if PowerShell or cmdkey is unavailable.
+ */
+function readClaudeCliWindowsCredentials(
+  execSyncImpl: ExecSyncFn = execSync,
+): ClaudeCliCredential | null {
+  if (process.platform !== "win32") {
+    return null;
+  }
+
+  try {
+    // Use PowerShell to read from Windows Credential Manager
+    const psScript = `
+$cred = Get-StoredCredential -Target '${WINDOWS_CREDENTIAL_TARGET}' -ErrorAction SilentlyContinue
+if ($cred) { $cred.GetNetworkCredential().Password }
+`.trim();
+
+    const result = execSyncImpl(
+      `powershell -NoProfile -NonInteractive -Command "${psScript.replace(/"/g, '\\"')}"`,
+      { encoding: "utf8", timeout: 5000, stdio: ["pipe", "pipe", "pipe"] },
+    ).trim();
+
+    if (!result) {
+      return null;
+    }
+
+    const data = JSON.parse(result);
+    return parseClaudeCliOauthCredential(data?.claudeAiOauth);
+  } catch {
+    // Windows Credential Manager not available or credential not found — that's fine
+    return null;
+  }
+}
+
 function readClaudeCliKeychainCredentials(
   execSyncImpl: ExecSyncFn = execSync,
 ): ClaudeCliCredential | null {
@@ -281,6 +387,8 @@ export function readClaudeCliCredentials(options?: {
   execSync?: ExecSyncFn;
 }): ClaudeCliCredential | null {
   const platform = options?.platform ?? process.platform;
+
+  // 1. macOS Keychain (most reliable on macOS)
   if (platform === "darwin" && options?.allowKeychainPrompt !== false) {
     const keychainCreds = readClaudeCliKeychainCredentials(options?.execSync);
     if (keychainCreds) {
@@ -291,14 +399,38 @@ export function readClaudeCliCredentials(options?: {
     }
   }
 
-  const credPath = resolveClaudeCliCredentialsPath(options?.homeDir);
-  const raw = loadJsonFile(credPath);
-  if (!raw || typeof raw !== "object") {
-    return null;
+  // 2. Windows Credential Manager (most reliable on Windows)
+  if (platform === "win32") {
+    const windowsCreds = readClaudeCliWindowsCredentials(options?.execSync);
+    if (windowsCreds) {
+      log.info("read anthropic credentials from windows credential manager", {
+        type: windowsCreds.type,
+      });
+      return windowsCreds;
+    }
   }
 
-  const data = raw as Record<string, unknown>;
-  return parseClaudeCliOauthCredential(data.claudeAiOauth);
+  // 3. ~/.claude/.credentials.json (cross-platform file fallback)
+  const credPath = resolveClaudeCliCredentialsPath(options?.homeDir);
+  const raw = loadJsonFile(credPath);
+  if (raw && typeof raw === "object") {
+    const data = raw as Record<string, unknown>;
+    const parsed = parseClaudeCliOauthCredential(data.claudeAiOauth);
+    if (parsed) {
+      log.info("read anthropic credentials from claude cli credentials file", {
+        type: parsed.type,
+      });
+      return parsed;
+    }
+  }
+
+  // 4. OpenClaw auth-profiles.json (best fallback — same auth infrastructure)
+  const openClawCreds = readOpenClawCredentials({ homeDir: options?.homeDir });
+  if (openClawCreds) {
+    return openClawCreds;
+  }
+
+  return null;
 }
 
 export function readClaudeCliCredentialsCached(options?: {
