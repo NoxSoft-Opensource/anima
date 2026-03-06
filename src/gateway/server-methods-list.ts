@@ -1,6 +1,17 @@
 import { listChannelPlugins } from "../channels/plugins/index.js";
 
 const BASE_METHODS = [
+  "anima.runtime.get",
+  "anima.runtime.set-working-mode",
+  "anima.memory.list",
+  "anima.mission.get",
+  "anima.mission.set",
+  "anima.mission.patch",
+  "anima.mission.connect-repo",
+  "anima.mission.import",
+  "anima.registration.status",
+  "anima.registration.set-token",
+  "anima.registration.register-invite",
   "health",
   "logs.tail",
   "channels.status",

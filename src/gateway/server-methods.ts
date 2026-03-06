@@ -2,6 +2,7 @@ import type { GatewayRequestHandlers, GatewayRequestOptions } from "./server-met
 import { ErrorCodes, errorShape } from "./protocol/index.js";
 import { agentHandlers } from "./server-methods/agent.js";
 import { agentsHandlers } from "./server-methods/agents.js";
+import { animaHandlers } from "./server-methods/anima.js";
 import { browserHandlers } from "./server-methods/browser.js";
 import { channelsHandlers } from "./server-methods/channels.js";
 import { chatHandlers } from "./server-methods/chat.js";
@@ -53,6 +54,10 @@ const PAIRING_METHODS = new Set([
 ]);
 const ADMIN_METHOD_PREFIXES = ["exec.approvals."];
 const READ_METHODS = new Set([
+  "anima.runtime.get",
+  "anima.memory.list",
+  "anima.mission.get",
+  "anima.registration.status",
   "health",
   "logs.tail",
   "channels.status",
@@ -80,6 +85,13 @@ const READ_METHODS = new Set([
   "talk.config",
 ]);
 const WRITE_METHODS = new Set([
+  "anima.runtime.set-working-mode",
+  "anima.mission.set",
+  "anima.mission.patch",
+  "anima.mission.connect-repo",
+  "anima.mission.import",
+  "anima.registration.set-token",
+  "anima.registration.register-invite",
   "send",
   "agent",
   "agent.wait",
@@ -170,6 +182,7 @@ function authorizeGatewayMethod(method: string, client: GatewayRequestOptions["c
 
 export const coreGatewayHandlers: GatewayRequestHandlers = {
   ...connectHandlers,
+  ...animaHandlers,
   ...logsHandlers,
   ...voicewakeHandlers,
   ...healthHandlers,

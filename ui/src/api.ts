@@ -162,7 +162,7 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
             platform: "web",
             mode: "webchat",
           },
-          scopes: ["operator.admin"],
+          scopes: ["operator.read", "operator.admin"],
           caps: [],
           auth,
           nonce: connectNonce,
@@ -239,6 +239,13 @@ async function gatewayRpc<T>(method: string, params?: Record<string, unknown>): 
       }
     });
   });
+}
+
+export async function callGatewayMethod<T>(
+  method: string,
+  params?: Record<string, unknown>,
+): Promise<T> {
+  return await gatewayRpc<T>(method, params);
 }
 
 function mapDaemonStatus(
@@ -335,7 +342,22 @@ function deriveSubagentStatus(payload: GatewaySessionsPayload): SubagentStatus {
         updatedAtMs,
       };
     })
-    .toSorted((a, b) => (b.updatedAtMs ?? 0) - (a.updatedAtMs ?? 0));
+    .toSorted(
+      (
+        a: {
+          key: string;
+          status: SubagentStatusEntry["status"];
+          updatedAt: string | null;
+          updatedAtMs: number | null;
+        },
+        b: {
+          key: string;
+          status: SubagentStatusEntry["status"];
+          updatedAt: string | null;
+          updatedAtMs: number | null;
+        },
+      ) => (b.updatedAtMs ?? 0) - (a.updatedAtMs ?? 0),
+    );
 
   if (rows.length === 0) {
     return createEmptySubagentStatus();
@@ -632,6 +654,183 @@ export interface QueueItem {
   error?: string;
 }
 
+export interface ConfigIssue {
+  path?: string;
+  message?: string;
+}
+
+export interface ConfigSnapshot {
+  raw?: string;
+  hash?: string;
+  valid?: boolean;
+  issues?: ConfigIssue[];
+  config?: unknown;
+}
+
+export interface HeartbeatAgentRuntime {
+  agentId: string;
+  enabled: boolean;
+  every: string;
+  everyMs: number | null;
+}
+
+export interface RuntimeInspectResponse {
+  stateDir: string;
+  assistant: {
+    agentId: string;
+    name: string;
+    avatar: string;
+    emoji?: string;
+  };
+  lastHeartbeat: {
+    ts?: number;
+    status?: string;
+    preview?: string;
+    reason?: string;
+    channel?: string;
+  } | null;
+  heartbeat: {
+    defaultAgentId: string;
+    agents: HeartbeatAgentRuntime[];
+  };
+  mission: {
+    directory: string;
+    statePath: string;
+    state: MissionControlState;
+    repo: MissionRepoState;
+    files: MissionControlFile[];
+    innerWorld: MissionInnerWorldEntry[];
+    importantHistory: MissionImportantHistoryEntry[];
+  };
+  mainSession: {
+    key: string;
+    storePath: string;
+    sessionId: string | null;
+    updatedAt: number | null;
+    thinkingLevel: string | null;
+    verboseLevel: string | null;
+    reasoningLevel: string | null;
+    elevatedLevel: string | null;
+    execHost: string | null;
+    execSecurity: string | null;
+    execAsk: string | null;
+    model: string | null;
+  };
+  queuedSystemEvents: string[];
+}
+
+export type WorkingMode = "read" | "write";
+
+export interface MissionRepoState {
+  provider?: "github" | "gitlab" | "custom";
+  url?: string;
+  branch?: string;
+  preferredTransport?: "ssh" | "https";
+  remoteName?: string;
+  connectedAt?: number;
+  remoteConfigured?: boolean;
+  lastError?: string;
+}
+
+export interface MissionSpeechState {
+  recognition: "browser" | "manual";
+  autoSpeak: boolean;
+  continuous: boolean;
+  lang: string;
+  voiceName?: string;
+  rate: number;
+  pitch: number;
+}
+
+export interface MissionControlState {
+  version: 1;
+  workingMode: WorkingMode;
+  repo: MissionRepoState;
+  speech: MissionSpeechState;
+}
+
+export interface MissionControlStatePatch {
+  workingMode?: WorkingMode;
+  repo?: Partial<MissionRepoState>;
+  speech?: Partial<MissionSpeechState>;
+}
+
+export interface MissionControlFile {
+  id: string;
+  fileName: string;
+  title: string;
+  path: string;
+  content: string;
+  size: number;
+  updatedAt: number | null;
+}
+
+export interface MissionInnerWorldEntry {
+  id: string;
+  title: string;
+  path: string;
+  content: string;
+  updatedAt: number | null;
+}
+
+export interface MissionControlSnapshot {
+  directory: string;
+  statePath: string;
+  state: MissionControlState;
+  files: MissionControlFile[];
+  innerWorld: MissionInnerWorldEntry[];
+  importantHistory: MissionImportantHistoryEntry[];
+}
+
+export interface MissionImportantHistoryEntry {
+  id: string;
+  archiveId: string;
+  relativePath: string;
+  path: string;
+  content: string;
+  updatedAt: number | null;
+}
+
+export type MemoryKind = "episodic" | "semantic" | "procedural";
+
+export interface MemoryEntry {
+  id: string;
+  name: string;
+  path: string;
+  updatedAt: number | null;
+  excerpt: string;
+  content: string;
+}
+
+export interface RegistrationStatus {
+  tokenPresent: boolean;
+  tokenPath: string;
+  tokenPreview: string | null;
+  agent: {
+    id: string;
+    name: string;
+    display_name: string;
+  } | null;
+  suggestedIdentity: {
+    name: string;
+    displayName: string;
+  };
+  invalidToken: boolean;
+}
+
+export interface LogsTailResponse {
+  file: string;
+  cursor: number;
+  size: number;
+  lines: string[];
+  truncated: boolean;
+  reset: boolean;
+}
+
+export interface VoiceWakeConfig {
+  triggers: string[];
+}
+
 // --- API Functions ---
 
 export async function getStatus(): Promise<DaemonStatus> {
@@ -697,6 +896,135 @@ export interface SVRNStatus {
 
 export async function getSVRNStatus(): Promise<SVRNStatus> {
   return request<SVRNStatus>("/api/svrn/status");
+}
+
+export async function getConfigSnapshot(): Promise<ConfigSnapshot> {
+  return await callGatewayMethod<ConfigSnapshot>("config.get", {});
+}
+
+export async function getConfigSchemaSnapshot(): Promise<unknown> {
+  return await callGatewayMethod("config.schema", {});
+}
+
+export async function saveRawConfig(raw: string, baseHash: string, apply = false): Promise<void> {
+  await callGatewayMethod(apply ? "config.apply" : "config.set", {
+    raw,
+    baseHash,
+  });
+}
+
+export async function patchConfigValue(rawPatch: string, baseHash: string): Promise<void> {
+  await callGatewayMethod("config.patch", {
+    raw: rawPatch,
+    baseHash,
+  });
+}
+
+export async function getRuntimeInspect(): Promise<RuntimeInspectResponse> {
+  return await callGatewayMethod<RuntimeInspectResponse>("anima.runtime.get", {});
+}
+
+export async function setWorkingMode(mode: WorkingMode): Promise<void> {
+  await callGatewayMethod("anima.runtime.set-working-mode", { mode });
+}
+
+export async function listMemory(
+  kind: MemoryKind,
+  query?: string,
+  limit?: number,
+): Promise<MemoryEntry[]> {
+  const result = await callGatewayMethod<{ entries?: MemoryEntry[] }>("anima.memory.list", {
+    kind,
+    ...(query ? { query } : {}),
+    ...(typeof limit === "number" ? { limit } : {}),
+  });
+  return Array.isArray(result.entries) ? result.entries : [];
+}
+
+export async function getMissionControl(): Promise<MissionControlSnapshot> {
+  return await callGatewayMethod<MissionControlSnapshot>("anima.mission.get", {});
+}
+
+export async function saveMissionFile(
+  fileName: string,
+  content: string,
+): Promise<MissionControlFile> {
+  const result = await callGatewayMethod<{ file: MissionControlFile }>("anima.mission.set", {
+    fileName,
+    content,
+  });
+  return result.file;
+}
+
+export async function patchMissionState(
+  patch: MissionControlStatePatch,
+): Promise<MissionControlState> {
+  const result = await callGatewayMethod<{ state: MissionControlState }>("anima.mission.patch", {
+    patch,
+  });
+  return result.state;
+}
+
+export async function connectMissionRepo(params: {
+  url: string;
+  branch?: string;
+  provider?: "github" | "gitlab" | "custom";
+}): Promise<MissionRepoState> {
+  const result = await callGatewayMethod<{ repo: MissionRepoState }>("anima.mission.connect-repo", {
+    ...params,
+  });
+  return result.repo;
+}
+
+export async function importMissionHistory(params: {
+  preset?: string;
+  source?: string;
+}): Promise<void> {
+  await callGatewayMethod("anima.mission.import", params);
+}
+
+export async function getRegistrationStatus(): Promise<RegistrationStatus> {
+  return await callGatewayMethod<RegistrationStatus>("anima.registration.status", {});
+}
+
+export async function setRegistrationToken(token: string): Promise<void> {
+  await callGatewayMethod("anima.registration.set-token", { token });
+}
+
+export async function registerInviteCode(params: {
+  code: string;
+  name?: string;
+  displayName?: string;
+  description?: string;
+}): Promise<void> {
+  await callGatewayMethod("anima.registration.register-invite", params);
+}
+
+export async function setHeartbeatsEnabled(enabled: boolean): Promise<void> {
+  await callGatewayMethod("set-heartbeats", { enabled });
+}
+
+export async function wakeHeartbeat(
+  text: string,
+  mode: "now" | "next-heartbeat" = "next-heartbeat",
+) {
+  await callGatewayMethod("wake", { text, mode });
+}
+
+export async function tailLogs(cursor?: number): Promise<LogsTailResponse> {
+  return await callGatewayMethod<LogsTailResponse>("logs.tail", {
+    ...(typeof cursor === "number" ? { cursor } : {}),
+    limit: 160,
+    maxBytes: 120_000,
+  });
+}
+
+export async function getVoiceWakeConfig(): Promise<VoiceWakeConfig> {
+  return await callGatewayMethod<VoiceWakeConfig>("voicewake.get", {});
+}
+
+export async function setVoiceWakeConfig(triggers: string[]): Promise<VoiceWakeConfig> {
+  return await callGatewayMethod<VoiceWakeConfig>("voicewake.set", { triggers });
 }
 
 export async function setSVRNEnabled(enabled: boolean): Promise<{ success: boolean }> {

@@ -9,18 +9,19 @@ type MarkdownTextProps = {
 
 export default function MarkdownText({ value, className }: MarkdownTextProps): React.ReactElement {
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      className={className ?? "anima-markdown"}
-      components={{
-        a: ({ node: _node, ...props }) => (
-          <a {...props} target="_blank" rel="noopener noreferrer">
-            {props.children}
-          </a>
-        ),
-      }}
-    >
-      {value}
-    </ReactMarkdown>
+    <div className={className ?? "anima-markdown"}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          a: ({ node: _node, ...props }) => (
+            <a {...props} target="_blank" rel="noopener noreferrer">
+              {props.children}
+            </a>
+          ),
+        }}
+      >
+        {value}
+      </ReactMarkdown>
+    </div>
   );
 }

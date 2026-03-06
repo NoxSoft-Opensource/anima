@@ -5,12 +5,14 @@ import Freedom from "./pages/Freedom";
 import Journal from "./pages/Journal";
 import MCP from "./pages/MCP";
 import Memory from "./pages/Memory";
+import MissionControl from "./pages/MissionControl";
 import Sessions from "./pages/Sessions";
 import Settings from "./pages/Settings";
 import Soul from "./pages/Soul";
 
 const navItems = [
   { path: "/dashboard", label: "Home", icon: "~" },
+  { path: "/mission", label: "Mission", icon: "%" },
   { path: "/soul", label: "Soul", icon: "@" },
   { path: "/memory", label: "Memory", icon: "#" },
   { path: "/sessions", label: "Sessions", icon: ">" },
@@ -42,14 +44,16 @@ export default function App(): React.ReactElement {
           ))}
         </nav>
 
-        <div style={{ padding: "16px 24px", borderTop: "1px solid var(--color-border)" }}>
-          <div style={{ fontSize: "11px", color: "var(--color-muted)" }}>NoxSoft DAO LLC</div>
+        <div className="sidebar-footer">
+          <div className="sidebar-footer-title">NoxSoft PBC</div>
+          <div className="sidebar-footer-copy">Local-first agent continuity and orchestration.</div>
         </div>
       </aside>
 
       <main className="main-content">
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/mission" element={<MissionControl />} />
           <Route path="/soul" element={<Soul />} />
           <Route path="/memory" element={<Memory />} />
           <Route path="/sessions" element={<Sessions />} />

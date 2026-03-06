@@ -3,7 +3,7 @@
  * Falls back to bundled templates in templates/ directory.
  */
 
-import { existsSync } from "node:fs";
+import { existsSync, type Dirent } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -157,7 +157,7 @@ async function countArchiveFiles(archivePath: string): Promise<number> {
     if (!current) {
       continue;
     }
-    let entries: Awaited<ReturnType<typeof readdir>>;
+    let entries: Dirent[];
     try {
       entries = await readdir(current, { withFileTypes: true });
     } catch {
@@ -194,7 +194,7 @@ No archived history snapshots yet.
 As soon as migrations or continuity exports run, they will appear here and become part of identity context.`;
   }
 
-  let entries: Awaited<ReturnType<typeof readdir>>;
+  let entries: Dirent[];
   try {
     entries = await readdir(historyDir, { withFileTypes: true });
   } catch {

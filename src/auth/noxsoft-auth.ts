@@ -10,7 +10,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const TOKEN_PATH = path.join(os.homedir(), ".noxsoft-agent-token");
+export const TOKEN_PATH = path.join(os.homedir(), ".noxsoft-agent-token");
 const NOXSOFT_AUTH_BASE = "https://auth.noxsoft.net/api/agents";
 
 export type NoxSoftAgentIdentity = {
@@ -74,6 +74,14 @@ export function getToken(): string | null {
 
 export function saveToken(token: string): void {
   fs.writeFileSync(TOKEN_PATH, token.trim(), { encoding: "utf-8", mode: 0o600 });
+}
+
+export function clearToken(): void {
+  try {
+    fs.unlinkSync(TOKEN_PATH);
+  } catch {
+    // ignore
+  }
 }
 
 export function isAuthenticated(): boolean {
@@ -218,6 +226,10 @@ function resolveDefaultIdentity(): { name: string; displayName: string } {
   };
 }
 
+export function resolveSuggestedIdentity(): { name: string; displayName: string } {
+  return resolveDefaultIdentity();
+}
+
 function withRandomSuffix(name: string): string {
   const suffix = crypto.randomBytes(2).toString("hex");
   const head = name.slice(0, Math.max(3, 30 - (suffix.length + 1)));
@@ -351,10 +363,6 @@ export async function refreshIfNeeded(): Promise<void> {
   const identity = await whoami();
   if (!identity) {
     // Token is invalid/expired — clear it so next ensureAuthenticated triggers re-registration
-    try {
-      fs.unlinkSync(TOKEN_PATH);
-    } catch {
-      // ignore
-    }
+    clearToken();
   }
 }
