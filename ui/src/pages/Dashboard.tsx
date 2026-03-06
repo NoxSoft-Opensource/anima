@@ -579,6 +579,12 @@ export default function Dashboard(): React.ReactElement {
       if (disposed || connectInFlight || didConnect) {
         return;
       }
+      const ws = wsRef.current;
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        // WebSocket closed before we could send connect — the close handler
+        // will schedule a reconnect, so silently bail out.
+        return;
+      }
       connectInFlight = true;
       try {
         const auth = resolveGatewayConnectAuth();
@@ -612,7 +618,12 @@ export default function Dashboard(): React.ReactElement {
       } catch (error) {
         if (!disposed) {
           setChatConnected(false);
-          setChatError(error instanceof Error ? error.message : String(error));
+          const msg = error instanceof Error ? error.message : String(error);
+          // Don't surface transient websocket disconnects as errors — the
+          // reconnect loop will handle it.
+          if (msg !== "Gateway websocket is not connected") {
+            setChatError(msg);
+          }
         }
       } finally {
         connectInFlight = false;
