@@ -597,7 +597,7 @@ export default function Dashboard(): React.ReactElement {
           minProtocol: GATEWAY_PROTOCOL_VERSION,
           maxProtocol: GATEWAY_PROTOCOL_VERSION,
           client: {
-            id: "anima-dashboard",
+            id: "anima-control-ui",
             version: "1.0.0",
             platform: "web",
             mode: "webchat",

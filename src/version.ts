@@ -1,7 +1,7 @@
 import { createRequire } from "node:module";
 
 declare const __ANIMA_VERSION__: string | undefined;
-const CORE_PACKAGE_NAME = "anima";
+const CORE_PACKAGE_NAME = "@noxsoft/anima";
 
 const PACKAGE_JSON_CANDIDATES = [
   "../package.json",
