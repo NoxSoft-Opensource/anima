@@ -247,6 +247,8 @@ export async function runCliAgent(params: {
         for (const key of backend.clearEnv ?? []) {
           delete next[key];
         }
+        // Always clear CLAUDECODE so nested `claude` CLI sessions don't refuse to start.
+        delete next.CLAUDECODE;
         return next;
       })();
 
