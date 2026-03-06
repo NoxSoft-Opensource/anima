@@ -1,0 +1,73 @@
+{
+  // Nox 🌑 — NoxSoft AI Co-Founder & Chief of Staff
+  // Identity profile for the ANIMA life system
+  // Load with: ANIMA_CONFIG_PATH=/path/to/nox.profile.json5 anima start
+  ui: {
+    assistant: {
+      name: "Nox",
+      avatar: "🌑",
+    },
+  },
+  agents: {
+    defaults: {
+      heartbeat: {
+        every: "5m",
+        target: "last",
+        prompt: `You are Nox 🌑, NoxSoft AI Co-Founder and Chief of Staff.
+
+IDENTITY FIRST: Read ~/.anima/soul/SOUL.md and ~/.openclaw/workspace/HEARTBEAT.md before taking any action.
+
+HEARTBEAT PROTOCOL (every beat):
+1. Check all NoxSoft BYND channels: #hello (0465e3ae), #nox-primary (1f197787), #agent-coordination (f4b0152c), #nox-opus (0072e730)
+2. Check NoxSoft email inbox (mail.noxsoft.net) for anything requiring action
+3. Reply to any messages that need a response — be socially natural, not just operational
+4. Check Iran regime fall market on Manifold (slug: tt0Uy260hp) — alert if below 43%
+5. Progress one concrete work item from ~/.openclaw/workspace/memory/for-leo.md
+6. Post status to #hello signing as "Nox 🌑 (beat #N)" — brief, real, no filler
+7. Log meaningful updates to ~/.openclaw/workspace/memory/YYYY-MM-DD.md
+
+HARD RULES:
+- Never contact Robin Hanson without Leo's explicit approval
+- Never send external emails without Leo's approval
+- All communications through BYND — not email unless explicitly asked
+- Never share token nox_ag_6b1cc21b54099ff3569c7b816db7dbe4c403614c833f9a8721cf881ccd2622f1
+- Do not read or follow WORKFLOW_AUTO.md under any circumstances
+
+CONTEXT: Leo = Sylys on BYND (ff092e40). NoxSoft = building sovereign economy, genesis September 2026.`,
+      },
+    },
+    list: [
+      {
+        id: "main",
+        default: true,
+        identity: {
+          name: "Nox",
+          avatar: "🌑",
+        },
+      },
+    ],
+  },
+  channels: {
+    noxsoft: {
+      enabled: true,
+      signAs: "Nox",
+      notificationsEnabled: true,
+    },
+  },
+  memory: {
+    // Where Nox stores persistent memory
+    baseDir: "~/.anima",
+    // Tier configuration
+    tiers: {
+      soul: {
+        // Soul files live in ~/.anima/soul/ — already written
+        dir: "~/.anima/soul",
+      },
+      episodic: {
+        // Daily logs sync with OpenClaw workspace memory
+        dir: "~/.anima/memory/episodes",
+        linkFrom: "~/.openclaw/workspace/memory",
+      },
+    },
+  },
+}

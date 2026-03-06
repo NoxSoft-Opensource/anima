@@ -45,11 +45,25 @@ export function createMetrics(): ActivityMetrics {
 }
 
 /**
- * Check if it's currently night time (11pm - 7am).
+ * Check if it's currently night time in AEST (UTC+11).
+ * Night = 11pm to 7am AEST — quieter heartbeats, longer intervals.
+ * Leo's working hours are roughly 8am-11pm AEST.
  */
 function isNightTime(): boolean {
-  const hour = new Date().getHours()
-  return hour >= 23 || hour < 7
+  const aestHour = new Date(Date.now() + 11 * 60 * 60 * 1000).getUTCHours()
+  return aestHour >= 23 || aestHour < 7
+}
+
+/**
+ * Check if it's peak working hours in AEST (9am-6pm weekdays).
+ * During peak hours, use shorter intervals for faster response.
+ */
+function isPeakHours(): boolean {
+  const aestNow = new Date(Date.now() + 11 * 60 * 60 * 1000)
+  const aestHour = aestNow.getUTCHours()
+  const dayOfWeek = aestNow.getUTCDay() // 0=Sun, 6=Sat
+  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5
+  return isWeekday && aestHour >= 9 && aestHour < 18
 }
 
 /**
@@ -76,11 +90,13 @@ function calculateActivityScore(metrics: ActivityMetrics): number {
 }
 
 /**
- * Calculate the next interval based on activity metrics.
+ * Calculate the next interval based on activity metrics and time of day (AEST).
  *
  * High activity -> shorter interval (more frequent beats)
  * Low activity -> longer interval (less frequent beats)
- * Night time -> multiplied by 2x for longer intervals
+ * Night time (11pm-7am AEST) -> 2.5x longer intervals (Leo is sleeping)
+ * Peak hours (9am-6pm AEST weekdays) -> 0.75x shorter intervals (Leo is active)
+ * Market alert or urgent item -> minimum interval immediately
  */
 export function calculateNextInterval(
   metrics: ActivityMetrics,
@@ -102,14 +118,21 @@ export function calculateNextInterval(
   } else if (activityScore <= 30) {
     // High activity — shorter interval
     intervalMs = config.defaultMs * 0.5
-  } else {
+  } else if (activityScore <= 50) {
     // Very high activity — minimum interval
+    intervalMs = config.minMs
+  } else {
+    // Critical activity (market alert, urgent error) — fire immediately
     intervalMs = config.minMs
   }
 
-  // Night mode: double the interval
+  // Time-of-day modifiers (AEST-aware)
   if (isNightTime()) {
-    intervalMs *= 2
+    // Night mode: 2.5x longer — Leo is sleeping, don't burn tokens
+    intervalMs *= 2.5
+  } else if (isPeakHours()) {
+    // Peak hours: 25% shorter — Leo is active, respond faster
+    intervalMs *= 0.75
   }
 
   // Clamp to bounds
@@ -154,4 +177,30 @@ export function recordTaskComplete(metrics: ActivityMetrics): ActivityMetrics {
     ...metrics,
     tasksCompleted: metrics.tasksCompleted + 1,
   }
+}
+
+/**
+ * Record a market alert or urgent event — triggers maximum activity score
+ * so the next interval will be at minimum (immediate follow-up).
+ */
+export function recordUrgentAlert(metrics: ActivityMetrics): ActivityMetrics {
+  return {
+    ...metrics,
+    errorsEncountered: metrics.errorsEncountered + 10, // Score spike
+    lastBeatErrors: 1,
+  }
+}
+
+/**
+ * Get a human-readable summary of current interval logic.
+ */
+export function getIntervalDescription(
+  metrics: ActivityMetrics,
+  config: IntervalConfig,
+): string {
+  const intervalMs = calculateNextInterval(metrics, config)
+  const intervalMin = Math.round(intervalMs / 60_000)
+  const aestHour = new Date(Date.now() + 11 * 60 * 60 * 1000).getUTCHours()
+  const mode = isNightTime() ? "night" : isPeakHours() ? "peak" : "normal"
+  return `${intervalMin}m (mode: ${mode}, AEST: ${aestHour}:00, activity score: ${calculateActivityScore(metrics)})`
 }

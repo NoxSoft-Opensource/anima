@@ -2,7 +2,8 @@
  * Self-Replication — ensures ANIMA survives restarts and system reboots.
  *
  * On macOS: uses launchd to register a persistent agent.
- * Fallback: uses nohup to schedule manual restart.
+ * On Windows: uses Task Scheduler (schtasks) to register a scheduled task.
+ * Fallback: uses nohup (Unix) or start (Windows) for manual restart.
  *
  * Security: all subprocess calls use execFile (not exec).
  */
@@ -11,10 +12,12 @@ import { execFile as execFileCb } from 'node:child_process'
 import { writeFile, readFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { homedir } from 'node:os'
+import { homedir, platform } from 'node:os'
 import { promisify } from 'node:util'
 
 const execFile = promisify(execFileCb)
+
+const IS_WINDOWS = platform() === 'win32'
 
 const PLIST_LABEL = 'net.noxsoft.anima'
 const PLIST_DIR = join(homedir(), 'Library', 'LaunchAgents')
@@ -153,10 +156,46 @@ echo "ANIMA restarted at $(date)" >> "${logFile}"
 }
 
 /**
+ * Check if the Windows Task Scheduler has the ANIMA task registered.
+ */
+async function isWindowsTaskRegistered(): Promise<boolean> {
+  if (!IS_WINDOWS) return false
+  try {
+    const { stdout } = await execFile('schtasks', ['/query', '/tn', 'ANIMA Heartbeat', '/fo', 'LIST'])
+    return stdout.includes('ANIMA Heartbeat')
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Register ANIMA as a Windows Scheduled Task.
+ * Runs at login and every 5 minutes.
+ */
+async function registerWindowsTask(): Promise<void> {
+  const animaBin = process.argv[1] || join(ANIMA_DIR, 'bin', 'anima')
+  const nodeExe = process.execPath
+  const logDir = join(ANIMA_DIR, 'logs')
+  await mkdir(logDir, { recursive: true })
+
+  // Create task: runs at logon and every 5 minutes
+  await execFile('schtasks', [
+    '/create',
+    '/tn', 'ANIMA Heartbeat',
+    '/tr', `"${nodeExe}" "${animaBin}" heartbeat --daemon`,
+    '/sc', 'MINUTE',
+    '/mo', '5',
+    '/ru', 'SYSTEM',
+    '/f', // Force overwrite
+  ])
+}
+
+/**
  * Ensure ANIMA's continuity — called at the start of every heartbeat.
  *
- * Checks if launchd agent is registered and running.
- * Re-registers if missing. Falls back to nohup if launchd fails.
+ * On macOS: checks/registers launchd agent.
+ * On Windows: checks/registers Task Scheduler task.
+ * Fallback: nohup or start command.
  */
 export async function ensureContinuity(): Promise<ContinuityStatus> {
   const status: ContinuityStatus = {
@@ -166,6 +205,34 @@ export async function ensureContinuity(): Promise<ContinuityStatus> {
     checkedAt: new Date(),
   }
 
+  if (IS_WINDOWS) {
+    // Windows path — use Task Scheduler
+    const isRegistered = await isWindowsTaskRegistered()
+    status.launchdRegistered = isRegistered // Reuse field for Windows task status
+    status.plistExists = isRegistered // Reuse field
+
+    if (!isRegistered) {
+      try {
+        await registerWindowsTask()
+        status.launchdRegistered = await isWindowsTaskRegistered()
+        status.plistExists = status.launchdRegistered
+      } catch {
+        // Windows task registration failed — log it
+        const logFile = join(ANIMA_DIR, 'logs', 'continuity.log')
+        await mkdir(join(ANIMA_DIR, 'logs'), { recursive: true })
+        await writeFile(
+          logFile,
+          `[${new Date().toISOString()}] Windows Task Scheduler registration failed\n`,
+          { flag: 'a' },
+        )
+        status.fallbackScheduled = true
+      }
+    }
+
+    return status
+  }
+
+  // macOS / Unix path — use launchd
   // Check plist exists
   status.plistExists = existsSync(PLIST_PATH)
 
