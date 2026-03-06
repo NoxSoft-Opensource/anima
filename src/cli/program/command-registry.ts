@@ -115,22 +115,29 @@ const coreEntries: CoreCliEntry[] = [
   },
   {
     commands: [
-      { name: "setup-token", description: "Set your Anthropic API key — the fastest way to get started" },
+      {
+        name: "setup-token",
+        description: "Set your Anthropic API key — the fastest way to get started",
+      },
     ],
     register: async ({ program }) => {
-      const { setupTokenCommand, hasAnthropicToken, autoDetectToken } = await import("../../commands/setup-token.js");
+      const { setupTokenCommand, hasAnthropicToken, autoDetectToken } =
+        await import("../../commands/setup-token.js");
       program
         .command("setup-token")
         .description("Set your Anthropic API key — no claude CLI login needed")
         .option("--token <key>", "Anthropic API key (sk-ant-api01-... or sk-ant-oat01-...)")
         .option("--skip-validation", "Skip live API check (use if offline)")
         .option("--json", "Output JSON result", false)
-        .addHelpText("after", `
+        .addHelpText(
+          "after",
+          `
 Examples:
   anima setup-token                      # Interactive — prompts for key + validates
   anima setup-token --token sk-ant-...   # Non-interactive — set key directly
   anima setup-token --json               # JSON output for scripts/CI
-        `)
+        `,
+        )
         .action(async (opts) => {
           await setupTokenCommand({
             token: opts.token as string | undefined,
@@ -153,6 +160,7 @@ Examples:
       { name: "soul", description: "View the current persistent identity summary" },
       { name: "wander", description: "Initiate an autonomous freedom exploration session" },
       { name: "journal", description: "Read and write persistent journal entries" },
+      { name: "mcp", description: "MCP server registry and lifecycle" },
     ],
     register: async ({ program }) => {
       const mod = await import("./register.anima.js");
