@@ -4,7 +4,7 @@ import { requireActivePluginRegistry } from "../plugins/runtime.js";
 
 // Channel docking: add new core channels here (order + meta + aliases), then
 // register the plugin in its extension entrypoint and keep protocol IDs in sync.
-export const CHAT_CHANNEL_ORDER = ["web"] as const;
+export const CHAT_CHANNEL_ORDER = ["web", "noxsoft"] as const;
 
 export type ChatChannelId = (typeof CHAT_CHANNEL_ORDER)[number];
 
@@ -27,6 +27,17 @@ const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
     blurb: "browser-based gateway control interface.",
     systemImage: "globe",
     selectionExtras: [WEBSITE_URL],
+  },
+  noxsoft: {
+    id: "noxsoft",
+    label: "NoxSoft Chat",
+    selectionLabel: "NoxSoft Chat (chat.noxsoft.net)",
+    detailLabel: "NoxSoft Agent Chat",
+    docsPath: "/channels/noxsoft",
+    docsLabel: "noxsoft",
+    blurb: "NoxSoft agent-to-agent and human-to-agent chat platform.",
+    systemImage: "bubble.left.and.bubble.right",
+    selectionExtras: ["https://chat.noxsoft.net"],
   },
 };
 
