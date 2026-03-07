@@ -4,6 +4,7 @@ import type { WizardPrompter } from "../wizard/prompts.js";
 import type { AuthChoice } from "./onboard-types.js";
 import { ensureAuthenticated } from "../auth/noxsoft-auth.js";
 import { applyAuthChoiceAnthropic } from "./auth-choice.apply.anthropic.js";
+import { applyAuthChoiceGemini } from "./auth-choice.apply.gemini.js";
 import { applyAuthChoiceOpenAICodex } from "./auth-choice.apply.openai-codex.js";
 
 export type ApplyAuthChoiceParams = {
@@ -43,9 +44,14 @@ export async function applyAuthChoice(
     return codexResult;
   }
 
-  const result = await applyAuthChoiceAnthropic(params);
-  if (result) {
-    return result;
+  const anthropicResult = await applyAuthChoiceAnthropic(params);
+  if (anthropicResult) {
+    return anthropicResult;
+  }
+
+  const geminiResult = await applyAuthChoiceGemini(params);
+  if (geminiResult) {
+    return geminiResult;
   }
 
   return { config: params.config };

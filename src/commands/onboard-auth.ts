@@ -9,6 +9,7 @@ export {
 export {
   CLOUDFLARE_AI_GATEWAY_DEFAULT_MODEL_REF,
   setAnthropicApiKey,
+  setGeminiApiKey,
   setCloudflareAiGatewayConfig,
   setVercelAiGatewayApiKey,
   writeOAuthCredentials,

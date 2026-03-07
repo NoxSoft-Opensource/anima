@@ -39,6 +39,12 @@ const AUTH_CHOICE_GROUP_DEFS: {
     hint: "Direct Anthropic API key for Claude",
     choices: ["apiKey"],
   },
+  {
+    value: "gemini",
+    label: "Google Gemini API Key",
+    hint: "Direct Google API key for Gemini models",
+    choices: ["geminiApiKey"],
+  },
 ];
 
 const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
@@ -53,6 +59,7 @@ const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
     hint: "Use Codex CLI credentials (gpt-5.3-codex)",
   },
   { value: "apiKey", label: "Anthropic API key" },
+  { value: "geminiApiKey", label: "Google Gemini API key", hint: "For Gemini 2.0 models" },
 ];
 
 export function formatAuthChoiceChoicesForCli(params?: {
