@@ -195,6 +195,7 @@ export async function sendChatMessage(
     return runId;
   } catch (err) {
     const error = String(err);
+    state.chatSending = false;
     state.chatRunId = null;
     state.chatStream = null;
     state.chatStreamStartedAt = null;
@@ -208,9 +209,9 @@ export async function sendChatMessage(
       },
     ];
     return null;
-  } finally {
-    state.chatSending = false;
   }
+  // Note: chatSending is NOT reset here.
+  // It's reset in handleChatEvent when a terminal state (final/error/aborted) arrives.
 }
 
 export async function abortChatRun(state: ChatState): Promise<boolean> {
@@ -254,14 +255,17 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
       state.chatStream = mergeStreamText(current, next);
     }
   } else if (payload.state === "final") {
+    state.chatSending = false;
     state.chatStream = null;
     state.chatRunId = null;
     state.chatStreamStartedAt = null;
   } else if (payload.state === "aborted") {
+    state.chatSending = false;
     state.chatStream = null;
     state.chatRunId = null;
     state.chatStreamStartedAt = null;
   } else if (payload.state === "error") {
+    state.chatSending = false;
     state.chatStream = null;
     state.chatRunId = null;
     state.chatStreamStartedAt = null;
