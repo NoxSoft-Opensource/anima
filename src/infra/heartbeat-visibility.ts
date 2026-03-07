@@ -26,11 +26,12 @@ export function resolveHeartbeatVisibility(params: {
 }): ResolvedHeartbeatVisibility {
   const { cfg, channel, accountId } = params;
 
-  // Webchat uses channel defaults only (no per-channel or per-account config)
+  // Webchat uses channel defaults only (no per-channel or per-account config).
+  // Default showOk to true for webchat so heartbeat output appears in the dashboard chat.
   if (channel === "webchat") {
     const channelDefaults = cfg.channels?.defaults?.heartbeat;
     return {
-      showOk: channelDefaults?.showOk ?? DEFAULT_VISIBILITY.showOk,
+      showOk: channelDefaults?.showOk ?? true,
       showAlerts: channelDefaults?.showAlerts ?? DEFAULT_VISIBILITY.showAlerts,
       useIndicator: channelDefaults?.useIndicator ?? DEFAULT_VISIBILITY.useIndicator,
     };
