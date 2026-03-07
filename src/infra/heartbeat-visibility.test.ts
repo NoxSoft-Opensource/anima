@@ -275,8 +275,9 @@ describe("resolveHeartbeatVisibility", () => {
 
     const result = resolveHeartbeatVisibility({ cfg, channel: "webchat" });
 
+    // Webchat defaults showOk to true so heartbeat output appears in dashboard chat
     expect(result).toEqual({
-      showOk: false,
+      showOk: true,
       showAlerts: true,
       useIndicator: true,
     });

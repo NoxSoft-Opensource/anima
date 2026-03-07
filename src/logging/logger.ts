@@ -15,6 +15,8 @@ export const DEFAULT_LOG_FILE = path.join(DEFAULT_LOG_DIR, "anima.log"); // lega
 const LOG_PREFIX = "anima";
 const LOG_SUFFIX = ".log";
 const MAX_LOG_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+const MAX_LOG_SIZE_BYTES = 50 * 1024 * 1024; // 50MB per file
+const MAX_LOG_SEGMENTS = 5; // Keep up to 5 segments per day
 
 const requireConfig = createRequire(import.meta.url);
 
@@ -100,11 +102,27 @@ function buildLogger(settings: ResolvedSettings): TsLogger<LogObj> {
     type: "hidden", // no ansi formatting
   });
 
+  // Track current file path for size-based rotation
+  let currentFile = settings.file;
+  let currentSize = getFileSize(currentFile);
+
   logger.attachTransport((logObj: LogObj) => {
     try {
       const time = logObj.date?.toISOString?.() ?? new Date().toISOString();
       const line = JSON.stringify({ ...logObj, time });
-      fs.appendFileSync(settings.file, `${line}\n`, { encoding: "utf8" });
+      const lineBytes = Buffer.byteLength(line, "utf8") + 1; // +1 for newline
+
+      // Check if we need to rotate due to size
+      if (currentSize + lineBytes > MAX_LOG_SIZE_BYTES) {
+        const rotated = rotateLogFile(currentFile);
+        if (rotated) {
+          currentFile = rotated;
+          currentSize = 0;
+        }
+      }
+
+      fs.appendFileSync(currentFile, `${line}\n`, { encoding: "utf8" });
+      currentSize += lineBytes;
     } catch {
       // never block on logging failures
     }
@@ -202,6 +220,67 @@ export function registerLogTransport(transport: LogTransport): () => void {
   return () => {
     externalTransports.delete(transport);
   };
+}
+
+function getFileSize(filePath: string): number {
+  try {
+    const stat = fs.statSync(filePath);
+    return stat.size;
+  } catch {
+    return 0;
+  }
+}
+
+function rotateLogFile(filePath: string): string | null {
+  try {
+    const dir = path.dirname(filePath);
+    const ext = path.extname(filePath);
+    const base = path.basename(filePath, ext);
+
+    // Find next available segment number
+    let segment = 1;
+    while (segment <= MAX_LOG_SEGMENTS) {
+      const segmentPath = path.join(dir, `${base}.${segment}${ext}`);
+      if (!fs.existsSync(segmentPath)) {
+        // Rotate current file to segment
+        fs.renameSync(filePath, segmentPath);
+        // Prune old segments if we exceed the limit
+        pruneExcessSegments(dir, base, ext);
+        return filePath; // Return original path for new writes
+      }
+      segment++;
+    }
+
+    // All segments full - rotate them (delete oldest, shift others)
+    const oldestPath = path.join(dir, `${base}.${MAX_LOG_SEGMENTS}${ext}`);
+    fs.rmSync(oldestPath, { force: true });
+    for (let i = MAX_LOG_SEGMENTS - 1; i >= 1; i--) {
+      const from = path.join(dir, `${base}.${i}${ext}`);
+      const to = path.join(dir, `${base}.${i + 1}${ext}`);
+      if (fs.existsSync(from)) {
+        fs.renameSync(from, to);
+      }
+    }
+    fs.renameSync(filePath, path.join(dir, `${base}.1${ext}`));
+    return filePath;
+  } catch {
+    return null;
+  }
+}
+
+function pruneExcessSegments(dir: string, base: string, ext: string): void {
+  try {
+    for (let i = MAX_LOG_SEGMENTS + 1; i <= MAX_LOG_SEGMENTS + 10; i++) {
+      const segmentPath = path.join(dir, `${base}.${i}${ext}`);
+      if (fs.existsSync(segmentPath)) {
+        fs.rmSync(segmentPath, { force: true });
+      } else {
+        break;
+      }
+    }
+  } catch {
+    // ignore errors during pruning
+  }
 }
 
 function formatLocalDate(date: Date): string {
