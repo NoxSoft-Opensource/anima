@@ -12,10 +12,12 @@ import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { AnimaConfig } from "../config/config.js";
 import type { SessionSystemPromptReport } from "../config/sessions/types.js";
 import type { NormalizedUsage } from "./usage.js";
-import { resolveCliBackendConfig } from "./cli-backends.js";
-import { runCliAgent } from "./cli-runner.js";
 import { runAnthropicDirectAgent } from "./anthropic-direct-runner.js";
 import { loadAuthProfileStore } from "./auth-profiles/store.js";
+import { resolveCliBackendConfig } from "./cli-backends.js";
+import { runCliAgent } from "./cli-runner.js";
+import { runGeminiDirectAgent } from "./gemini-direct-runner.js";
+import { resolveApiKeyForProvider } from "./model-auth.js";
 import { normalizeProviderId } from "./model-selection.js";
 
 export type EmbeddedPiAgentMeta = Record<string, unknown>;
@@ -142,9 +144,7 @@ export async function runEmbeddedPiAgent(...args: unknown[]): Promise<EmbeddedPi
       store.profiles[store.lastGood?.["anthropic"] ?? ""] ??
       null;
     const directToken =
-      profile?.type === "token" ? profile.token
-      : profile?.type === "oauth" ? profile.access
-      : null;
+      profile?.type === "token" ? profile.token : profile?.type === "oauth" ? profile.access : null;
 
     if (directToken) {
       await emitAgentEvent(params, "lifecycle", { phase: "start", startedAt });
@@ -190,15 +190,69 @@ export async function runEmbeddedPiAgent(...args: unknown[]): Promise<EmbeddedPi
     }
   }
 
+  // --- Direct Gemini API path (no CLI needed) ---
+  // If the provider is google/gemini and we have an API key,
+  // call generativelanguage.googleapis.com directly.
+  if (provider === "google" || provider === "gemini") {
+    const geminiAuth = await resolveApiKeyForProvider({
+      provider: "google",
+      cfg: params.config,
+    });
+    const geminiApiKey = geminiAuth?.apiKey;
+
+    if (geminiApiKey) {
+      await emitAgentEvent(params, "lifecycle", { phase: "start", startedAt });
+      try {
+        const result = await runGeminiDirectAgent({
+          apiKey: geminiApiKey,
+          sessionId: params.sessionId,
+          sessionKey: params.sessionKey,
+          agentId: params.agentId,
+          sessionFile: params.sessionFile,
+          workspaceDir: params.workspaceDir,
+          config: params.config,
+          prompt: params.prompt,
+          model: params.model,
+          thinkLevel: params.thinkLevel,
+          timeoutMs,
+          runId,
+          extraSystemPrompt: params.extraSystemPrompt,
+          ownerNumbers: params.ownerNumbers,
+          onPartialReply: async (payload) => {
+            if (!assistantStarted) {
+              assistantStarted = true;
+              await params.onAssistantMessageStart?.();
+            }
+            await params.onPartialReply?.(payload);
+            await emitAgentEvent(params, "assistant", { text: payload.text });
+          },
+          onAssistantMessageStart: params.onAssistantMessageStart,
+        });
+        await emitAgentEvent(params, "lifecycle", {
+          phase: "end",
+          durationMs: Date.now() - startedAt,
+          status: result.status,
+        });
+        return result;
+      } catch (err) {
+        await emitAgentEvent(params, "lifecycle", {
+          phase: "error",
+          error: String(err instanceof Error ? err.message : err),
+        });
+        throw err;
+      }
+    }
+  }
+
   // --- CLI runner path (claude / codex binary required) ---
   const cliProvider = resolveCompatCliProvider(provider, params.config);
   const backend = resolveCliBackendConfig(cliProvider, params.config);
   if (!backend) {
     throw new Error(
       `No CLI backend available for provider "${provider}" (resolved "${cliProvider}").\n` +
-      `Either:\n` +
-      `  • Run: anima setup-token  (set an Anthropic API key — no CLI needed)\n` +
-      `  • Install the matching CLI and log in`,
+        `Either:\n` +
+        `  • Run: anima setup-token  (set an Anthropic API key — no CLI needed)\n` +
+        `  • Install the matching CLI and log in`,
     );
   }
 
