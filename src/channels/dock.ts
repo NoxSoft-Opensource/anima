@@ -65,6 +65,14 @@ const DOCKS: Record<ChatChannelId, ChannelDock> = {
     },
     outbound: { textChunkLimit: 4000 },
   },
+  noxsoft: {
+    id: "noxsoft",
+    capabilities: {
+      chatTypes: ["direct", "channel"],
+      media: true,
+    },
+    outbound: { textChunkLimit: 4000 },
+  },
 };
 
 function buildDockFromPlugin(plugin: ChannelPlugin): ChannelDock {

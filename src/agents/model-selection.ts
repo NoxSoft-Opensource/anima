@@ -35,11 +35,14 @@ export function normalizeProviderId(provider: string): string {
 const BUILTIN_CLI_PROVIDER_IDS = new Set<string>([
   "claude-cli",
   "codex-cli",
+  "gemini-cli",
   "anthropic",
   "openai-codex",
   "openai",
   "claude",
   "codex",
+  "gemini",
+  "google-gemini-cli",
 ]);
 
 export function isCliProvider(provider: string, cfg?: AnimaConfig): boolean {

@@ -27,6 +27,19 @@ const CLAUDE_MODEL_ALIASES: Record<string, string> = {
   "claude-haiku-3-5": "haiku",
 };
 
+const GEMINI_MODEL_ALIASES: Record<string, string> = {
+  gemini: "gemini-2.0-flash",
+  "gemini-pro": "gemini-1.5-pro",
+  "gemini-flash": "gemini-2.0-flash",
+  "gemini-2.0": "gemini-2.0-flash",
+  "gemini-2.0-flash": "gemini-2.0-flash",
+  "gemini-2.0-pro": "gemini-2.0-pro-exp-02-05",
+  "gemini-1.5": "gemini-1.5-pro",
+  "gemini-1.5-pro": "gemini-1.5-pro",
+  "gemini-1.5-flash": "gemini-1.5-flash",
+  "gemini-3": "gemini-3",
+};
+
 const DEFAULT_CLAUDE_BACKEND: CliBackendConfig = {
   command: "claude",
   args: ["-p", "--output-format", "json", "--dangerously-skip-permissions"],
@@ -67,13 +80,30 @@ const DEFAULT_CODEX_BACKEND: CliBackendConfig = {
   serialize: true,
 };
 
+const DEFAULT_GEMINI_BACKEND: CliBackendConfig = {
+  command: "gemini",
+  args: ["--output-format", "json", "--approval-mode", "yolo"],
+  resumeArgs: ["--output-format", "json", "--approval-mode", "yolo", "--resume", "{sessionId}"],
+  output: "json",
+  input: "arg",
+  modelArg: "--model",
+  modelAliases: GEMINI_MODEL_ALIASES,
+  sessionMode: "existing",
+  clearEnv: ["GEMINI_API_KEY"],
+  serialize: true,
+};
+
 const CLAUDE_BACKEND_ALIASES = ["claude-cli", "anthropic", "claude"] as const;
 const CODEX_BACKEND_ALIASES = ["codex-cli", "openai-codex", "openai", "codex"] as const;
+const GEMINI_BACKEND_ALIASES = ["gemini-cli", "google-gemini-cli", "gemini"] as const;
 const CLAUDE_BACKEND_ALIAS_SET = new Set(
   CLAUDE_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
 );
 const CODEX_BACKEND_ALIAS_SET = new Set(
   CODEX_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+);
+const GEMINI_BACKEND_ALIAS_SET = new Set(
+  GEMINI_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
 );
 
 function normalizeBackendKey(key: string): string {
@@ -126,6 +156,7 @@ export function resolveCliBackendIds(cfg?: AnimaConfig): Set<string> {
   const ids = new Set<string>([
     ...CLAUDE_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
     ...CODEX_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
+    ...GEMINI_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
   ]);
   const configured = cfg?.agents?.defaults?.cliBackends ?? {};
   for (const key of Object.keys(configured)) {
@@ -157,6 +188,15 @@ export function resolveCliBackendConfig(
       return null;
     }
     return { id: normalizeBackendKey("codex-cli"), config: { ...merged, command } };
+  }
+  if (GEMINI_BACKEND_ALIAS_SET.has(normalized)) {
+    const override = pickBackendConfigByAliases(configured, [provider, ...GEMINI_BACKEND_ALIASES]);
+    const merged = mergeBackendConfig(DEFAULT_GEMINI_BACKEND, override);
+    const command = merged.command?.trim();
+    if (!command) {
+      return null;
+    }
+    return { id: normalizeBackendKey("gemini-cli"), config: { ...merged, command } };
   }
 
   const override = pickBackendConfig(configured, normalized);

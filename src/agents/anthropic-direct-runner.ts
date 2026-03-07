@@ -11,20 +11,20 @@
  * is present in the auth store and the claude CLI is unavailable or not logged in.
  */
 
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import crypto from "node:crypto";
-import type { AnimaConfig } from "../config/config.js";
 import type { ThinkLevel } from "../auto-reply/thinking.js";
+import type { AnimaConfig } from "../config/config.js";
 import type { EmbeddedPiRunResult } from "./pi-embedded-runner.js";
-import { createSubsystemLogger } from "../logging/subsystem.js";
-import { resolveRunWorkspaceDir } from "./workspace-run.js";
-import { resolveBootstrapContextForRun, makeBootstrapWarn } from "./bootstrap-files.js";
-import { resolveSessionAgentIds } from "./agent-scope.js";
 import { resolveHeartbeatPrompt } from "../auto-reply/heartbeat.js";
-import { resolveAnimaDocsPath } from "./docs-path.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
+import { resolveSessionAgentIds } from "./agent-scope.js";
+import { resolveBootstrapContextForRun, makeBootstrapWarn } from "./bootstrap-files.js";
 import { buildSystemPrompt } from "./cli-runner/helpers.js";
+import { resolveAnimaDocsPath } from "./docs-path.js";
+import { resolveRunWorkspaceDir } from "./workspace-run.js";
 
 const log = createSubsystemLogger("agent/anthropic-direct");
 
@@ -218,9 +218,7 @@ export async function runAnthropicDirectAgent(params: {
       const isAuth = response.status === 401 || response.status === 403;
       const isRateLimit = response.status === 429;
       const rateHint = isRateLimit ? " — rate limit hit, will retry next heartbeat." : "";
-      const authHint = isAuth
-        ? " — token may be invalid or expired. Run: anima setup-token"
-        : "";
+      const authHint = isAuth ? " — token may be invalid or expired. Run: anima setup-token" : "";
       log.error(`anthropic api error: HTTP ${response.status}${authHint}${rateHint}`, {
         status: response.status,
         body: body.slice(0, 500),
@@ -286,10 +284,10 @@ export async function runAnthropicDirectAgent(params: {
           provider: "anthropic",
           model: resolvedModel,
           usage: {
-            inputTokens,
-            outputTokens,
-            cacheCreationInputTokens: 0,
-            cacheReadInputTokens: 0,
+            input: inputTokens,
+            output: outputTokens,
+            cacheWrite: 0,
+            cacheRead: 0,
           },
         },
       },

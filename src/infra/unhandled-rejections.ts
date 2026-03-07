@@ -1,4 +1,5 @@
 import process from "node:process";
+import { isFailoverError } from "../agents/failover-error.js";
 import { extractErrorCode, formatUncaughtError } from "./errors.js";
 
 type UnhandledRejectionHandler = (reason: unknown) => boolean;
@@ -170,6 +171,13 @@ export function installUnhandledRejectionHandler(): void {
         "[anima] Non-fatal unhandled rejection (continuing):",
         formatUncaughtError(reason),
       );
+      return;
+    }
+
+    // FailoverError indicates a model/CLI backend failed but is recoverable
+    // Log it but don't crash - the failover system should handle this
+    if (isFailoverError(reason)) {
+      console.warn("[anima] CLI failover error (non-fatal):", formatUncaughtError(reason));
       return;
     }
 
