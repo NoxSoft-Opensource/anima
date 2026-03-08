@@ -45,7 +45,7 @@ export default function App(): React.ReactElement {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="sidebar-footer-title">NoxSoft PBC</div>
+          <div className="sidebar-footer-title">NoxSoft Inc</div>
           <div className="sidebar-footer-copy">Local-first agent continuity and orchestration.</div>
         </div>
       </aside>
