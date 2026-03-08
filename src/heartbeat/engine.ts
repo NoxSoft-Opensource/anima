@@ -3,6 +3,10 @@
  *
  * Manages start/stop/pause/resume of the heartbeat cycle,
  * with adaptive interval adjustment and event emission.
+ *
+ * Now includes notification-triggered wake: when NoxSoft MCP
+ * notifications arrive, the engine wakes immediately instead
+ * of waiting for the next scheduled beat.
  */
 
 import { EventEmitter } from "node:events";
@@ -11,6 +15,7 @@ import type { HeartbeatResult } from "./cycle.js";
 import { SessionOrchestrator } from "../sessions/orchestrator.js";
 import { calculateNextInterval, createMetrics } from "./adaptive.js";
 import { executeCycle } from "./cycle.js";
+import { NotificationWake } from "./notification-wake.js";
 import { ensureContinuity } from "./self-replication.js";
 
 export interface HeartbeatEngineConfig {
@@ -30,6 +35,10 @@ export interface HeartbeatEngineConfig {
   autoUpdateEnabled: boolean;
   /** Run auto-update every N beats. Default: 12 (~1 hour at 5-min intervals) */
   autoUpdateInterval: number;
+  /** Enable notification-triggered wake. Default: true */
+  notificationWakeEnabled: boolean;
+  /** Notification poll interval in milliseconds. Default: 60_000 (1 min) */
+  notificationPollIntervalMs: number;
 }
 
 export type HeartbeatEvent =
@@ -37,6 +46,7 @@ export type HeartbeatEvent =
   | "beat-complete"
   | "beat-error"
   | "freedom-time"
+  | "notification-wake"
   | "paused"
   | "resumed"
   | "stopped";
@@ -50,6 +60,8 @@ const DEFAULT_CONFIG: HeartbeatEngineConfig = {
   freedomEveryN: 3,
   autoUpdateEnabled: true,
   autoUpdateInterval: 12, // ~1 hour at 5-min intervals
+  notificationWakeEnabled: true,
+  notificationPollIntervalMs: 60_000, // 1 minute (per Sylys)
 };
 
 export class HeartbeatEngine extends EventEmitter {
@@ -63,6 +75,7 @@ export class HeartbeatEngine extends EventEmitter {
   private running = false;
   private paused = false;
   private metrics: ActivityMetrics;
+  private notificationWake: NotificationWake | null = null;
 
   constructor(orchestrator?: SessionOrchestrator, config?: Partial<HeartbeatEngineConfig>) {
     super();
@@ -70,6 +83,21 @@ export class HeartbeatEngine extends EventEmitter {
     this.orchestrator = orchestrator || new SessionOrchestrator();
     this.currentIntervalMs = this.config.intervalMs;
     this.metrics = createMetrics();
+
+    // Initialize notification wake if enabled
+    if (this.config.notificationWakeEnabled) {
+      this.notificationWake = new NotificationWake({
+        pollIntervalMs: this.config.notificationPollIntervalMs,
+        enabled: true,
+      });
+
+      // Wire up notification wake to trigger immediate beat
+      this.notificationWake.on("wake", async (payload) => {
+        this.emit("notification-wake", payload);
+        // Trigger immediate beat (cancels scheduled one, runs now, reschedules)
+        await this.triggerImmediateBeat("notification");
+      });
+    }
   }
 
   /**
@@ -86,6 +114,11 @@ export class HeartbeatEngine extends EventEmitter {
     // Self-replication check on start
     if (this.config.selfReplication) {
       await ensureContinuity();
+    }
+
+    // Start notification wake polling
+    if (this.notificationWake) {
+      this.notificationWake.start();
     }
 
     // Run first beat immediately
@@ -105,6 +138,11 @@ export class HeartbeatEngine extends EventEmitter {
     if (this.timer) {
       clearTimeout(this.timer);
       this.timer = null;
+    }
+
+    // Stop notification wake polling
+    if (this.notificationWake) {
+      this.notificationWake.stop();
     }
 
     this.nextBeatTime = null;
@@ -139,6 +177,28 @@ export class HeartbeatEngine extends EventEmitter {
     this.paused = false;
     this.scheduleNextBeat();
     this.emit("resumed");
+  }
+
+  /**
+   * Trigger an immediate beat (e.g., from notification wake).
+   * Cancels any scheduled beat, runs now, then reschedules.
+   */
+  async triggerImmediateBeat(reason: string = "manual"): Promise<void> {
+    if (!this.running || this.paused) {
+      return;
+    }
+
+    // Cancel scheduled beat
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    // Run beat immediately
+    await this.executeBeat();
+
+    // Reschedule next beat
+    this.scheduleNextBeat();
   }
 
   /**
