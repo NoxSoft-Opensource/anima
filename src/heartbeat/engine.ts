@@ -11,7 +11,6 @@
 
 import { EventEmitter } from "node:events";
 import type { ActivityMetrics } from "./adaptive.js";
-import type { HeartbeatResult } from "./cycle.js";
 import { SessionOrchestrator } from "../sessions/orchestrator.js";
 import { calculateNextInterval, createMetrics } from "./adaptive.js";
 import { executeCycle } from "./cycle.js";
@@ -183,7 +182,7 @@ export class HeartbeatEngine extends EventEmitter {
    * Trigger an immediate beat (e.g., from notification wake).
    * Cancels any scheduled beat, runs now, then reschedules.
    */
-  async triggerImmediateBeat(reason: string = "manual"): Promise<void> {
+  async triggerImmediateBeat(_reason: string = "manual"): Promise<void> {
     if (!this.running || this.paused) {
       return;
     }

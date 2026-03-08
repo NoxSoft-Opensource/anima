@@ -70,11 +70,11 @@ export class NotificationWake extends EventEmitter {
     this.running = true;
 
     // Run first poll immediately
-    this.poll();
+    void this.poll();
 
     // Schedule recurring polls
     this.timer = setInterval(() => {
-      this.poll();
+      void this.poll();
     }, this.config.pollIntervalMs);
 
     // Prevent timer from keeping process alive
