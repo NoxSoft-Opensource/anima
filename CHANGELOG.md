@@ -2,6 +2,20 @@
 
 ANIMA — NoxSoft AI Life System
 
+## 5.1.3 (2026-03-13)
+
+### New Features
+
+- **ANIMA 6 Mission Control brain layer**: Mission Control now projects a canonical ANIMA 6 continuity graph with typed goals, features, people, Chronos, and Affect state, and exposes Atlas-style derived views for palace rooms, graph neighborhood, and timeline.
+- **Trust graph and person-aware context**: Added durable `who_is_whom_and_where` trust memory at `~/.anima/identity/who_is_whom_and_where.json`, prompt injection of trusted people context, gateway-backed persistence, and a full Mission Control editor for aliases, roles, location, notes, and relationship state.
+- **Chronos time contracts**: Chronos now persists planned-vs-actual focus contract fields including target minutes, elapsed minutes, checkpoints, last checkpoint timestamp, and drift, with live Mission Control editing and Atlas timeline visibility.
+- **Dashboard and Mission Control control-plane expansion**: Added durable auto-toggle policy controls, broader settings surfaced in the dashboard, and richer Mission Control editing for goals, features, people, trust graph, Chronos, and Affect.
+
+### Fixes
+
+- **Mission Control patch safety**: Collection updates for goals, features, and people now merge by id by default, with explicit full-replace and targeted removal semantics so incremental edits do not accidentally clobber state.
+- **Continuity/runtime alignment**: Mission Control snapshot generation, trust graph persistence, and prompt-building now share the same persisted brain inputs instead of drifting as separate sources of truth.
+
 ## 5.0.0 (2026-03-07)
 
 ### Breaking Changes

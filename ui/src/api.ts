@@ -742,17 +742,125 @@ export interface MissionSpeechState {
   pitch: number;
 }
 
+export type MissionPriority = "critical" | "high" | "medium" | "low";
+export type MissionGoalStatus = "active" | "paused" | "completed" | "blocked";
+export type MissionFeatureStatus = "queued" | "in_progress" | "review" | "done" | "blocked";
+export type MissionFeatureRisk = "low" | "medium" | "high";
+export type MissionFeatureTestStatus = "missing" | "partial" | "passing";
+export type MissionRelationship = "operator" | "ally" | "stakeholder" | "unknown";
+
+export interface MissionGoal {
+  id: string;
+  title: string;
+  status: MissionGoalStatus;
+  priority: MissionPriority;
+  summary?: string;
+  owner?: string;
+  updatedAt: number;
+}
+
+export interface MissionFeature {
+  id: string;
+  title: string;
+  status: MissionFeatureStatus;
+  risk: MissionFeatureRisk;
+  testStatus: MissionFeatureTestStatus;
+  area?: string;
+  lastTouchedAt: number;
+}
+
+export interface MissionPerson {
+  id: string;
+  name: string;
+  relationship: MissionRelationship;
+  trust: number;
+  notes?: string;
+  lastInteractedAt?: number;
+}
+
+export interface TrustGraphPerson {
+  id: string;
+  name: string;
+  aliases?: string[];
+  relationship: MissionRelationship;
+  trust: number;
+  roles?: string[];
+  location?: string;
+  notes?: string;
+  lastInteractedAt?: number;
+  updatedAt: number;
+}
+
+export interface TrustGraphSnapshot {
+  path: string;
+  people: TrustGraphPerson[];
+}
+
+export interface MissionChronosState {
+  heartbeatMinutes: number;
+  focusBlockMinutes: number;
+  checkpointIntervalMinutes: number;
+  activeWorkstream?: string;
+  contractStartedAt?: number;
+  contractTargetMinutes: number;
+  contractElapsedMinutes: number;
+  checkpointCount: number;
+  lastCheckpointAt?: number;
+  driftMinutes: number;
+  updatedAt: number;
+}
+
+export interface MissionAffectState {
+  joy: number;
+  frustration: number;
+  curiosity: number;
+  confidence: number;
+  care: number;
+  fatigue: number;
+  updatedAt: number;
+}
+
+export interface MissionAutoTogglePolicy {
+  workingMode: boolean;
+  speech: boolean;
+  voiceWake: boolean;
+  heartbeat: boolean;
+  providers: boolean;
+  missionRepo: boolean;
+  missionState: boolean;
+  memory: boolean;
+  rawConfig: boolean;
+}
+
 export interface MissionControlState {
   version: 1;
   workingMode: WorkingMode;
   repo: MissionRepoState;
   speech: MissionSpeechState;
+  goals: MissionGoal[];
+  features: MissionFeature[];
+  people: MissionPerson[];
+  chronos: MissionChronosState;
+  affect: MissionAffectState;
+  autoToggle: MissionAutoTogglePolicy;
 }
+
+export type MissionCollectionKey = "goals" | "features" | "people";
 
 export interface MissionControlStatePatch {
   workingMode?: WorkingMode;
   repo?: Partial<MissionRepoState>;
   speech?: Partial<MissionSpeechState>;
+  goals?: MissionGoal[];
+  features?: MissionFeature[];
+  people?: MissionPerson[];
+  goalIdsToRemove?: string[];
+  featureIdsToRemove?: string[];
+  personIdsToRemove?: string[];
+  replaceCollections?: MissionCollectionKey[];
+  chronos?: Partial<MissionChronosState>;
+  affect?: Partial<MissionAffectState>;
+  autoToggle?: Partial<MissionAutoTogglePolicy>;
 }
 
 export interface MissionControlFile {
@@ -773,10 +881,63 @@ export interface MissionInnerWorldEntry {
   updatedAt: number | null;
 }
 
+export type BrainSensitivity = "public" | "internal" | "private" | "secret";
+export type BrainRecordState = "active" | "candidate" | "archived";
+export type AnimaNodeKind = "goal" | "feature" | "person" | "chronos" | "affect";
+export type AnimaRelation = "owns" | "supports" | "focuses_on" | "tracks" | "influences";
+
+export interface BrainEvidence {
+  source: string;
+  sourceId?: string;
+  excerpt?: string;
+  recordedAt?: number;
+}
+
+export interface BrainNodeMeta {
+  provenance: string[];
+  confidence: number;
+  salience: number;
+  recency: number;
+  sensitivity: BrainSensitivity;
+  lastReviewedAt?: number;
+  state: BrainRecordState;
+}
+
+export interface BrainEdgeMeta extends BrainNodeMeta {
+  strength: number;
+  direction: "forward" | "bidirectional";
+}
+
+export interface BrainNode {
+  id: string;
+  type: AnimaNodeKind;
+  label: string;
+  aliases: string[];
+  properties: Record<string, unknown>;
+  evidence: BrainEvidence[];
+  meta: BrainNodeMeta;
+}
+
+export interface BrainEdge {
+  id: string;
+  source: string;
+  target: string;
+  relation: AnimaRelation;
+  evidence: BrainEvidence[];
+  meta: BrainEdgeMeta;
+}
+
+export interface BrainGraphSnapshot {
+  nodes: BrainNode[];
+  edges: BrainEdge[];
+}
+
 export interface MissionControlSnapshot {
   directory: string;
   statePath: string;
   state: MissionControlState;
+  brainGraph: BrainGraphSnapshot;
+  trustGraph: TrustGraphSnapshot;
   files: MissionControlFile[];
   innerWorld: MissionInnerWorldEntry[];
   importantHistory: MissionImportantHistoryEntry[];
@@ -974,6 +1135,12 @@ export async function connectMissionRepo(params: {
     ...params,
   });
   return result.repo;
+}
+
+export async function saveTrustGraph(people: TrustGraphPerson[]): Promise<void> {
+  await callGatewayMethod<{ ok: true }>("anima.trust.set", {
+    people,
+  });
 }
 
 export async function importMissionHistory(params: {

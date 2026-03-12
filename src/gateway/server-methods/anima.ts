@@ -16,6 +16,7 @@ import { getStatusSummary } from "../../commands/status.summary.js";
 import { loadConfig } from "../../config/config.js";
 import { resolveStateDir } from "../../config/paths.js";
 import { resolveMainSessionKey, updateSessionStore } from "../../config/sessions.js";
+import { saveTrustGraph, type TrustGraphPerson } from "../../identity/trust-graph.js";
 import { getLastHeartbeatEvent } from "../../infra/heartbeat-events.js";
 import { listMemoryEntries, type MemoryBrowserKind } from "../../memory/browser.js";
 import {
@@ -284,6 +285,25 @@ export const animaHandlers: GatewayRequestHandlers = {
     try {
       const repo = await connectMissionRepo({ url, branch, provider });
       respond(true, { ok: true, repo }, undefined);
+    } catch (error) {
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(error)));
+    }
+  },
+
+  "anima.trust.set": async ({ params, respond }) => {
+    const people = Array.isArray((params as { people?: unknown })?.people)
+      ? ((params as { people?: unknown[] }).people as TrustGraphPerson[])
+      : null;
+    if (!people) {
+      respond(false, undefined, invalid("people array is required"));
+      return;
+    }
+    try {
+      await saveTrustGraph({
+        version: 1,
+        people,
+      });
+      respond(true, { ok: true }, undefined);
     } catch (error) {
       respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(error)));
     }

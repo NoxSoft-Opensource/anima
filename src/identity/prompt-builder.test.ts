@@ -12,6 +12,8 @@ function makeIdentity(): Identity {
     shadow: "# SHADOW\n\nCore shadow.",
     memory: "# MEMORY\n\nCore memory.",
     importantHistory: "# IMPORTANT HISTORY\n\nArchive continuity digest.",
+    trustContext:
+      "# People And Trust Context\n\n- Sylys (sylys) — relationship=operator; trust=1.00",
     loadedFrom: {
       SOUL: "user",
       HEART: "user",
@@ -30,17 +32,31 @@ describe("prompt builder important history integration", () => {
     const prompt = buildTaskPrompt(makeIdentity(), { taskDescription: "Ship feature" });
     expect(prompt).toContain("# IMPORTANT HISTORY");
     expect(prompt).toContain("Archive continuity digest.");
+    expect(prompt).toContain("# People And Trust Context");
   });
 
   it("includes important history in heartbeat prompts", () => {
     const prompt = buildHeartbeatPrompt(makeIdentity(), { beatNumber: 7 });
     expect(prompt).toContain("# IMPORTANT HISTORY");
     expect(prompt).toContain("Archive continuity digest.");
+    expect(prompt).toContain("# People And Trust Context");
   });
 
   it("includes important history in freedom prompts", () => {
     const prompt = buildFreedomPrompt(makeIdentity(), {});
     expect(prompt).toContain("# IMPORTANT HISTORY");
     expect(prompt).toContain("Archive continuity digest.");
+    expect(prompt).toContain("# People And Trust Context");
+  });
+
+  it("omits trust context when no trusted people are recorded", () => {
+    const prompt = buildTaskPrompt(
+      {
+        ...makeIdentity(),
+        trustContext: "",
+      },
+      { taskDescription: "Ship feature" },
+    );
+    expect(prompt).not.toContain("# People And Trust Context");
   });
 });

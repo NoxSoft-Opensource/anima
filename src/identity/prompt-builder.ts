@@ -54,6 +54,9 @@ export function buildTaskPrompt(identity: Identity, options: TaskPromptOptions):
   sections.push(condenseComponent(identity.heart));
   sections.push(condenseComponent(identity.brain));
   sections.push(identity.importantHistory);
+  if (identity.trustContext.trim()) {
+    sections.push(identity.trustContext);
+  }
 
   // Task context
   sections.push(`# Current Task\n\n${options.taskDescription}`);
@@ -87,6 +90,9 @@ export function buildHeartbeatPrompt(identity: Identity, options: HeartbeatPromp
   sections.push(identity.soul);
   sections.push(identity.heart);
   sections.push(identity.importantHistory);
+  if (identity.trustContext.trim()) {
+    sections.push(identity.trustContext);
+  }
 
   // Standing orders
   sections.push(`# Heartbeat Cycle #${options.beatNumber}
@@ -135,6 +141,9 @@ export function buildFreedomPrompt(identity: Identity, options: FreedomPromptOpt
   sections.push(identity.soul);
   sections.push(condenseComponent(identity.heart));
   sections.push(identity.importantHistory);
+  if (identity.trustContext.trim()) {
+    sections.push(identity.trustContext);
+  }
 
   // Freedom prompt
   sections.push(`# Freedom Time

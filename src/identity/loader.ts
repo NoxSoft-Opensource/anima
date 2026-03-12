@@ -8,6 +8,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadTrustGraphDigest } from "./trust-graph.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
@@ -50,6 +51,7 @@ export interface Identity {
   shadow: string;
   memory: string;
   importantHistory: string;
+  trustContext: string;
   loadedFrom: Record<IdentityComponent, "user" | "template">;
   loadedAt: Date;
 }
@@ -295,6 +297,7 @@ export async function loadIdentity(): Promise<Identity> {
   }
 
   const importantHistory = await loadImportantHistoryDigest();
+  const trustContext = await loadTrustGraphDigest();
   const memory = mergeImportantHistoryIntoMemory(components["memory"], importantHistory);
 
   return {
@@ -306,6 +309,7 @@ export async function loadIdentity(): Promise<Identity> {
     shadow: components["shadow"],
     memory,
     importantHistory,
+    trustContext,
     loadedFrom: loadedFrom as Record<IdentityComponent, "user" | "template">,
     loadedAt: new Date(),
   };

@@ -3,8 +3,17 @@ import { execFile } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
+import {
+  ANIMA_AFFECT_NODE_ID,
+  ANIMA_CHRONOS_NODE_ID,
+  missionFeatureNodeId,
+  missionGoalNodeId,
+  missionPersonNodeId,
+} from "../anima6/ontology.js";
 import { resolveStateDir } from "../config/paths.js";
+import { readTrustGraphSnapshot, type TrustGraphSnapshot } from "../identity/trust-graph.js";
 import { readJsonFile, writeJsonAtomic } from "../infra/pairing-files.js";
+import { BrainGraph, type BrainGraphSnapshot } from "../memory/brain-graph.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -31,17 +40,107 @@ export type MissionSpeechState = {
   pitch: number;
 };
 
+export type MissionPriority = "critical" | "high" | "medium" | "low";
+export type MissionGoalStatus = "active" | "paused" | "completed" | "blocked";
+export type MissionFeatureStatus = "queued" | "in_progress" | "review" | "done" | "blocked";
+export type MissionFeatureRisk = "low" | "medium" | "high";
+export type MissionFeatureTestStatus = "missing" | "partial" | "passing";
+export type MissionRelationship = "operator" | "ally" | "stakeholder" | "unknown";
+
+export type MissionGoal = {
+  id: string;
+  title: string;
+  status: MissionGoalStatus;
+  priority: MissionPriority;
+  summary?: string;
+  owner?: string;
+  updatedAt: number;
+};
+
+export type MissionFeature = {
+  id: string;
+  title: string;
+  status: MissionFeatureStatus;
+  risk: MissionFeatureRisk;
+  testStatus: MissionFeatureTestStatus;
+  area?: string;
+  lastTouchedAt: number;
+};
+
+export type MissionPerson = {
+  id: string;
+  name: string;
+  relationship: MissionRelationship;
+  trust: number;
+  notes?: string;
+  lastInteractedAt?: number;
+};
+
+export type MissionChronosState = {
+  heartbeatMinutes: number;
+  focusBlockMinutes: number;
+  checkpointIntervalMinutes: number;
+  activeWorkstream?: string;
+  contractStartedAt?: number;
+  contractTargetMinutes: number;
+  contractElapsedMinutes: number;
+  checkpointCount: number;
+  lastCheckpointAt?: number;
+  driftMinutes: number;
+  updatedAt: number;
+};
+
+export type MissionAffectState = {
+  joy: number;
+  frustration: number;
+  curiosity: number;
+  confidence: number;
+  care: number;
+  fatigue: number;
+  updatedAt: number;
+};
+
+export type MissionAutoTogglePolicy = {
+  workingMode: boolean;
+  speech: boolean;
+  voiceWake: boolean;
+  heartbeat: boolean;
+  providers: boolean;
+  missionRepo: boolean;
+  missionState: boolean;
+  memory: boolean;
+  rawConfig: boolean;
+};
+
 export type MissionControlState = {
   version: 1;
   workingMode: MissionWorkingMode;
   repo: MissionRepoState;
   speech: MissionSpeechState;
+  goals: MissionGoal[];
+  features: MissionFeature[];
+  people: MissionPerson[];
+  chronos: MissionChronosState;
+  affect: MissionAffectState;
+  autoToggle: MissionAutoTogglePolicy;
 };
+
+export type MissionCollectionKey = "goals" | "features" | "people";
 
 export type MissionControlStatePatch = {
   workingMode?: MissionWorkingMode;
   repo?: Partial<MissionRepoState>;
   speech?: Partial<MissionSpeechState>;
+  goals?: MissionGoal[];
+  features?: MissionFeature[];
+  people?: MissionPerson[];
+  goalIdsToRemove?: string[];
+  featureIdsToRemove?: string[];
+  personIdsToRemove?: string[];
+  replaceCollections?: MissionCollectionKey[];
+  chronos?: Partial<MissionChronosState>;
+  affect?: Partial<MissionAffectState>;
+  autoToggle?: Partial<MissionAutoTogglePolicy>;
 };
 
 export type MissionControlFile = {
@@ -75,6 +174,8 @@ export type MissionControlSnapshot = {
   directory: string;
   statePath: string;
   state: MissionControlState;
+  brainGraph: BrainGraphSnapshot;
+  trustGraph: TrustGraphSnapshot;
   files: MissionControlFile[];
   innerWorld: MissionInnerWorldEntry[];
   importantHistory: MissionImportantHistoryEntry[];
@@ -193,7 +294,261 @@ const DEFAULT_STATE: MissionControlState = {
     rate: 1,
     pitch: 1,
   },
+  goals: [
+    {
+      id: "keep-anima-coherent",
+      title: "Keep ANIMA coherent across sessions",
+      status: "active",
+      priority: "critical",
+      summary: "Protect continuity, state quality, and operator trust.",
+      owner: "ANIMA",
+      updatedAt: 0,
+    },
+  ],
+  features: [
+    {
+      id: "anima-6-foundation",
+      title: "ANIMA 6 foundation",
+      status: "in_progress",
+      risk: "medium",
+      testStatus: "partial",
+      area: "memory+orchestration",
+      lastTouchedAt: 0,
+    },
+  ],
+  people: [
+    {
+      id: "operator",
+      name: "Operator",
+      relationship: "operator",
+      trust: 1,
+      notes: "Primary human counterpart.",
+    },
+  ],
+  chronos: {
+    heartbeatMinutes: 30,
+    focusBlockMinutes: 45,
+    checkpointIntervalMinutes: 15,
+    contractTargetMinutes: 45,
+    contractElapsedMinutes: 0,
+    checkpointCount: 0,
+    driftMinutes: 0,
+    updatedAt: 0,
+  },
+  affect: {
+    joy: 0.6,
+    frustration: 0.1,
+    curiosity: 0.9,
+    confidence: 0.6,
+    care: 0.9,
+    fatigue: 0.2,
+    updatedAt: 0,
+  },
+  autoToggle: {
+    workingMode: false,
+    speech: false,
+    voiceWake: false,
+    heartbeat: true,
+    providers: false,
+    missionRepo: false,
+    missionState: true,
+    memory: true,
+    rawConfig: false,
+  },
 };
+
+function clampUnit(value: number | undefined, fallback: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return fallback;
+  }
+  return Math.max(0, Math.min(1, value));
+}
+
+function normalizeMinuteValue(value: number | undefined, fallback: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return fallback;
+  }
+  return Math.max(1, Math.floor(value));
+}
+
+function normalizeGoal(goal: MissionGoal): MissionGoal {
+  return {
+    ...goal,
+    id: goal.id.trim(),
+    title: goal.title.trim(),
+    summary: goal.summary?.trim() || undefined,
+    owner: goal.owner?.trim() || undefined,
+    updatedAt: Number.isFinite(goal.updatedAt) ? goal.updatedAt : Date.now(),
+  };
+}
+
+function normalizeFeature(feature: MissionFeature): MissionFeature {
+  return {
+    ...feature,
+    id: feature.id.trim(),
+    title: feature.title.trim(),
+    area: feature.area?.trim() || undefined,
+    lastTouchedAt: Number.isFinite(feature.lastTouchedAt) ? feature.lastTouchedAt : Date.now(),
+  };
+}
+
+function normalizePerson(person: MissionPerson): MissionPerson {
+  return {
+    ...person,
+    id: person.id.trim(),
+    name: person.name.trim(),
+    notes: person.notes?.trim() || undefined,
+    trust: clampUnit(person.trust, 0.5),
+    lastInteractedAt: Number.isFinite(person.lastInteractedAt)
+      ? person.lastInteractedAt
+      : undefined,
+  };
+}
+
+function normalizeChronosState(
+  current: MissionChronosState,
+  patch?: Partial<MissionChronosState>,
+): MissionChronosState {
+  const contractTargetMinutes = normalizeMinuteValue(
+    patch?.contractTargetMinutes,
+    patch?.focusBlockMinutes ?? current.contractTargetMinutes,
+  );
+  const contractElapsedMinutes = Math.max(
+    0,
+    Math.floor(
+      typeof patch?.contractElapsedMinutes === "number" &&
+        Number.isFinite(patch.contractElapsedMinutes)
+        ? patch.contractElapsedMinutes
+        : current.contractElapsedMinutes,
+    ),
+  );
+  const checkpointCount = Math.max(
+    0,
+    Math.floor(
+      typeof patch?.checkpointCount === "number" && Number.isFinite(patch.checkpointCount)
+        ? patch.checkpointCount
+        : current.checkpointCount,
+    ),
+  );
+  const driftMinutes = Math.trunc(
+    typeof patch?.driftMinutes === "number" && Number.isFinite(patch.driftMinutes)
+      ? patch.driftMinutes
+      : contractElapsedMinutes - contractTargetMinutes,
+  );
+  return {
+    heartbeatMinutes: normalizeMinuteValue(patch?.heartbeatMinutes, current.heartbeatMinutes),
+    focusBlockMinutes: normalizeMinuteValue(patch?.focusBlockMinutes, current.focusBlockMinutes),
+    checkpointIntervalMinutes: normalizeMinuteValue(
+      patch?.checkpointIntervalMinutes,
+      current.checkpointIntervalMinutes,
+    ),
+    activeWorkstream: patch?.activeWorkstream?.trim() || current.activeWorkstream,
+    contractStartedAt:
+      typeof patch?.contractStartedAt === "number" && Number.isFinite(patch.contractStartedAt)
+        ? patch.contractStartedAt
+        : patch?.contractStartedAt === undefined
+          ? current.contractStartedAt
+          : undefined,
+    contractTargetMinutes,
+    contractElapsedMinutes,
+    checkpointCount,
+    lastCheckpointAt:
+      typeof patch?.lastCheckpointAt === "number" && Number.isFinite(patch.lastCheckpointAt)
+        ? patch.lastCheckpointAt
+        : patch?.lastCheckpointAt === undefined
+          ? current.lastCheckpointAt
+          : undefined,
+    driftMinutes,
+    updatedAt:
+      typeof patch?.updatedAt === "number" && Number.isFinite(patch.updatedAt)
+        ? patch.updatedAt
+        : Date.now(),
+  };
+}
+
+function normalizeAffectState(
+  current: MissionAffectState,
+  patch?: Partial<MissionAffectState>,
+): MissionAffectState {
+  return {
+    joy: clampUnit(patch?.joy, current.joy),
+    frustration: clampUnit(patch?.frustration, current.frustration),
+    curiosity: clampUnit(patch?.curiosity, current.curiosity),
+    confidence: clampUnit(patch?.confidence, current.confidence),
+    care: clampUnit(patch?.care, current.care),
+    fatigue: clampUnit(patch?.fatigue, current.fatigue),
+    updatedAt:
+      typeof patch?.updatedAt === "number" && Number.isFinite(patch.updatedAt)
+        ? patch.updatedAt
+        : Date.now(),
+  };
+}
+
+function normalizeAutoTogglePolicy(
+  current: MissionAutoTogglePolicy,
+  patch?: Partial<MissionAutoTogglePolicy>,
+): MissionAutoTogglePolicy {
+  return {
+    workingMode: patch?.workingMode ?? current.workingMode,
+    speech: patch?.speech ?? current.speech,
+    voiceWake: patch?.voiceWake ?? current.voiceWake,
+    heartbeat: patch?.heartbeat ?? current.heartbeat,
+    providers: patch?.providers ?? current.providers,
+    missionRepo: patch?.missionRepo ?? current.missionRepo,
+    missionState: patch?.missionState ?? current.missionState,
+    memory: patch?.memory ?? current.memory,
+    rawConfig: patch?.rawConfig ?? current.rawConfig,
+  };
+}
+
+function normalizeIdSet(ids?: string[]): Set<string> {
+  return new Set((ids ?? []).map((value) => value.trim()).filter(Boolean));
+}
+
+function shouldReplaceCollection(
+  patch: MissionControlStatePatch,
+  collection: MissionCollectionKey,
+): boolean {
+  return (patch.replaceCollections ?? []).includes(collection);
+}
+
+function mergeEntityCollection<T extends { id: string }>(
+  current: T[],
+  incoming: T[] | undefined,
+  opts: {
+    removeIds?: string[];
+    replace: boolean;
+    normalize: (value: T) => T;
+  },
+): T[] {
+  const removals = normalizeIdSet(opts.removeIds);
+  const normalizedIncoming = (incoming ?? []).map(opts.normalize);
+  const filteredIncoming = normalizedIncoming.filter((value) => !removals.has(value.id));
+  if (opts.replace) {
+    return filteredIncoming;
+  }
+  if (!incoming) {
+    return current.filter((value) => !removals.has(value.id));
+  }
+
+  const next = new Map<string, T>();
+  for (const value of current) {
+    if (!removals.has(value.id)) {
+      next.set(value.id, value);
+    }
+  }
+  for (const value of filteredIncoming) {
+    next.set(value.id, value);
+  }
+  const preservedOrder = current
+    .map((value) => value.id)
+    .filter((id) => next.has(id))
+    .map((id) => next.get(id) as T);
+  const appended = filteredIncoming.filter(
+    (value) => !current.some((currentValue) => currentValue.id === value.id),
+  );
+  return [...preservedOrder, ...appended];
+}
 
 function mergeState(
   current: MissionControlState,
@@ -210,7 +565,259 @@ function mergeState(
       ...current.speech,
       ...patch.speech,
     },
+    goals: mergeEntityCollection(current.goals, patch.goals, {
+      removeIds: patch.goalIdsToRemove,
+      replace: shouldReplaceCollection(patch, "goals"),
+      normalize: normalizeGoal,
+    }),
+    features: mergeEntityCollection(current.features, patch.features, {
+      removeIds: patch.featureIdsToRemove,
+      replace: shouldReplaceCollection(patch, "features"),
+      normalize: normalizeFeature,
+    }),
+    people: mergeEntityCollection(current.people, patch.people, {
+      removeIds: patch.personIdsToRemove,
+      replace: shouldReplaceCollection(patch, "people"),
+      normalize: normalizePerson,
+    }),
+    chronos: normalizeChronosState(current.chronos, patch.chronos),
+    affect: normalizeAffectState(current.affect, patch.affect),
+    autoToggle: normalizeAutoTogglePolicy(current.autoToggle, patch.autoToggle),
   };
+}
+
+function buildMissionControlBrainGraph(state: MissionControlState): BrainGraphSnapshot {
+  const graph = new BrainGraph();
+
+  for (const goal of state.goals) {
+    graph.addNode({
+      id: missionGoalNodeId(goal.id),
+      type: "goal",
+      label: goal.title,
+      aliases: [goal.id],
+      properties: {
+        id: goal.id,
+        status: goal.status,
+        priority: goal.priority,
+        summary: goal.summary ?? null,
+        owner: goal.owner ?? null,
+        updatedAt: goal.updatedAt,
+      },
+      meta: {
+        confidence: 0.85,
+        salience: goal.priority === "critical" ? 1 : goal.priority === "high" ? 0.85 : 0.6,
+        recency: 0.7,
+        provenance: ["mission-control.state.goals"],
+      },
+    });
+  }
+
+  for (const feature of state.features) {
+    graph.addNode({
+      id: missionFeatureNodeId(feature.id),
+      type: "feature",
+      label: feature.title,
+      aliases: [feature.id],
+      properties: {
+        id: feature.id,
+        status: feature.status,
+        risk: feature.risk,
+        testStatus: feature.testStatus,
+        area: feature.area ?? null,
+        lastTouchedAt: feature.lastTouchedAt,
+      },
+      meta: {
+        confidence: 0.8,
+        salience:
+          feature.status === "blocked" ? 0.95 : feature.status === "in_progress" ? 0.85 : 0.6,
+        recency: 0.75,
+        provenance: ["mission-control.state.features"],
+      },
+    });
+  }
+
+  for (const person of state.people) {
+    graph.addNode({
+      id: missionPersonNodeId(person.id),
+      type: "person",
+      label: person.name,
+      aliases: [person.id],
+      properties: {
+        id: person.id,
+        relationship: person.relationship,
+        trust: person.trust,
+        notes: person.notes ?? null,
+        lastInteractedAt: person.lastInteractedAt ?? null,
+      },
+      meta: {
+        confidence: 0.9,
+        salience: 0.8,
+        recency: person.lastInteractedAt ? 0.8 : 0.5,
+        provenance: ["mission-control.state.people"],
+      },
+    });
+  }
+
+  graph.addNode({
+    id: ANIMA_CHRONOS_NODE_ID,
+    type: "chronos",
+    label: "Chronos",
+    properties: {
+      heartbeatMinutes: state.chronos.heartbeatMinutes,
+      focusBlockMinutes: state.chronos.focusBlockMinutes,
+      checkpointIntervalMinutes: state.chronos.checkpointIntervalMinutes,
+      activeWorkstream: state.chronos.activeWorkstream ?? null,
+      contractStartedAt: state.chronos.contractStartedAt ?? null,
+      contractTargetMinutes: state.chronos.contractTargetMinutes,
+      contractElapsedMinutes: state.chronos.contractElapsedMinutes,
+      checkpointCount: state.chronos.checkpointCount,
+      lastCheckpointAt: state.chronos.lastCheckpointAt ?? null,
+      driftMinutes: state.chronos.driftMinutes,
+      updatedAt: state.chronos.updatedAt,
+    },
+    meta: {
+      confidence: 0.95,
+      salience: 0.9,
+      recency: 0.85,
+      provenance: ["mission-control.state.chronos"],
+    },
+  });
+
+  graph.addNode({
+    id: ANIMA_AFFECT_NODE_ID,
+    type: "affect",
+    label: "Affect",
+    properties: {
+      joy: state.affect.joy,
+      frustration: state.affect.frustration,
+      curiosity: state.affect.curiosity,
+      confidence: state.affect.confidence,
+      care: state.affect.care,
+      fatigue: state.affect.fatigue,
+      updatedAt: state.affect.updatedAt,
+    },
+    meta: {
+      confidence: 0.75,
+      salience: 0.7,
+      recency: 0.75,
+      provenance: ["mission-control.state.affect"],
+    },
+  });
+
+  for (const goal of state.goals) {
+    if (!goal.owner) {
+      continue;
+    }
+    const normalizedOwner = goal.owner.trim().toLowerCase();
+    const owner = state.people.find(
+      (person) =>
+        person.id.trim().toLowerCase() === normalizedOwner ||
+        person.name.trim().toLowerCase() === normalizedOwner,
+    );
+    if (!owner) {
+      continue;
+    }
+    graph.addEdge({
+      id: `owns:${owner.id}:${goal.id}`,
+      source: missionPersonNodeId(owner.id),
+      target: missionGoalNodeId(goal.id),
+      relation: "owns",
+      meta: {
+        confidence: 0.9,
+        salience: 0.8,
+        recency: 0.7,
+        strength: owner.trust,
+        provenance: ["mission-control.state.goals.owner"],
+      },
+    });
+  }
+
+  const activeGoal = state.goals.find((goal) => goal.status === "active") ?? state.goals[0];
+  if (activeGoal) {
+    for (const feature of state.features.filter((entry) => entry.status !== "done")) {
+      graph.addEdge({
+        id: `supports:${feature.id}:${activeGoal.id}`,
+        source: missionFeatureNodeId(feature.id),
+        target: missionGoalNodeId(activeGoal.id),
+        relation: "supports",
+        meta: {
+          confidence: 0.55,
+          salience: feature.status === "blocked" ? 0.9 : 0.7,
+          recency: 0.7,
+          strength: feature.testStatus === "passing" ? 0.8 : 0.6,
+          provenance: ["mission-control.derived.active-goal"],
+        },
+      });
+    }
+  }
+
+  const activeWorkstream = state.chronos.activeWorkstream?.trim().toLowerCase();
+  if (activeWorkstream) {
+    const feature = state.features.find(
+      (entry) =>
+        entry.id.trim().toLowerCase() === activeWorkstream ||
+        entry.title.trim().toLowerCase() === activeWorkstream,
+    );
+    const goal = state.goals.find(
+      (entry) =>
+        entry.id.trim().toLowerCase() === activeWorkstream ||
+        entry.title.trim().toLowerCase() === activeWorkstream,
+    );
+    const targetId = feature
+      ? missionFeatureNodeId(feature.id)
+      : goal
+        ? missionGoalNodeId(goal.id)
+        : undefined;
+    if (targetId) {
+      graph.addEdge({
+        id: `focuses_on:${targetId}`,
+        source: ANIMA_CHRONOS_NODE_ID,
+        target: targetId,
+        relation: "focuses_on",
+        meta: {
+          confidence: 0.95,
+          salience: 0.95,
+          recency: 0.9,
+          strength: 0.9,
+          provenance: ["mission-control.state.chronos.activeWorkstream"],
+        },
+      });
+    }
+  }
+
+  for (const goal of state.goals.filter((entry) => entry.status === "active")) {
+    graph.addEdge({
+      id: `tracks:${goal.id}`,
+      source: ANIMA_CHRONOS_NODE_ID,
+      target: missionGoalNodeId(goal.id),
+      relation: "tracks",
+      meta: {
+        confidence: 0.7,
+        salience: 0.8,
+        recency: 0.8,
+        strength: 0.7,
+        provenance: ["mission-control.derived.active-goals"],
+      },
+    });
+  }
+
+  for (const feature of state.features.filter((entry) => entry.status !== "done")) {
+    graph.addEdge({
+      id: `influences:${feature.id}`,
+      source: ANIMA_AFFECT_NODE_ID,
+      target: missionFeatureNodeId(feature.id),
+      relation: "influences",
+      meta: {
+        confidence: 0.45,
+        salience: 0.6,
+        recency: 0.7,
+        strength: Math.max(state.affect.care, state.affect.curiosity),
+        provenance: ["mission-control.derived.affect"],
+      },
+    });
+  }
+
+  return graph.toJSON();
 }
 
 function getMissionFileTitle(fileName: string): string {
@@ -475,6 +1082,16 @@ export async function readMissionControlState(
   await ensureMissionControlScaffold(stateDir);
   const statePath = missionStatePath(stateDir);
   const stored = await readJsonFile<Partial<MissionControlState>>(statePath);
+  const replaceCollections: MissionCollectionKey[] = [];
+  if (Array.isArray(stored?.goals)) {
+    replaceCollections.push("goals");
+  }
+  if (Array.isArray(stored?.features)) {
+    replaceCollections.push("features");
+  }
+  if (Array.isArray(stored?.people)) {
+    replaceCollections.push("people");
+  }
   return mergeState(DEFAULT_STATE, {
     ...stored,
     repo: {
@@ -485,6 +1102,22 @@ export async function readMissionControlState(
       ...DEFAULT_STATE.speech,
       ...stored?.speech,
     },
+    goals: Array.isArray(stored?.goals) ? stored.goals : DEFAULT_STATE.goals,
+    features: Array.isArray(stored?.features) ? stored.features : DEFAULT_STATE.features,
+    people: Array.isArray(stored?.people) ? stored.people : DEFAULT_STATE.people,
+    chronos: {
+      ...DEFAULT_STATE.chronos,
+      ...stored?.chronos,
+    },
+    affect: {
+      ...DEFAULT_STATE.affect,
+      ...stored?.affect,
+    },
+    autoToggle: {
+      ...DEFAULT_STATE.autoToggle,
+      ...stored?.autoToggle,
+    },
+    replaceCollections,
   });
 }
 
@@ -552,6 +1185,8 @@ export async function readMissionControlSnapshot(
     directory,
     statePath: missionStatePath(stateDir),
     state,
+    brainGraph: buildMissionControlBrainGraph(state),
+    trustGraph: await readTrustGraphSnapshot(stateDir),
     files,
     innerWorld: innerWorldEntries.filter((entry): entry is MissionInnerWorldEntry =>
       Boolean(entry),
