@@ -133,10 +133,7 @@ export function isHeartbeatEnabledForAgent(cfg: AnimaConfig, agentId?: string): 
   return resolvedAgentId === resolveDefaultAgentId(cfg);
 }
 
-function resolveHeartbeatConfig(
-  cfg: AnimaConfig,
-  agentId?: string,
-): HeartbeatConfig | undefined {
+function resolveHeartbeatConfig(cfg: AnimaConfig, agentId?: string): HeartbeatConfig | undefined {
   const defaults = cfg.agents?.defaults?.heartbeat;
   if (!agentId) {
     return defaults;
@@ -253,11 +250,7 @@ function resolveHeartbeatAckMaxChars(cfg: AnimaConfig, heartbeat?: HeartbeatConf
   );
 }
 
-function resolveHeartbeatSession(
-  cfg: AnimaConfig,
-  agentId?: string,
-  heartbeat?: HeartbeatConfig,
-) {
+function resolveHeartbeatSession(cfg: AnimaConfig, agentId?: string, heartbeat?: HeartbeatConfig) {
   const sessionCfg = cfg.session;
   const scope = sessionCfg?.scope ?? "per-sender";
   const resolvedAgentId = normalizeAgentId(agentId ?? resolveDefaultAgentId(cfg));

@@ -66,7 +66,9 @@ function getTodayLogPath(): string {
 async function loadTodayLog(maxChars = 3000): Promise<string> {
   const logPath = getTodayLogPath();
   const content = await safeReadFile(logPath);
-  if (!content) return "(No daily log yet today)";
+  if (!content) {
+    return "(No daily log yet today)";
+  }
   // Return the last maxChars characters (most recent entries)
   return content.length > maxChars ? content.slice(-maxChars) : content;
 }
@@ -77,7 +79,9 @@ async function loadTodayLog(maxChars = 3000): Promise<string> {
  */
 async function extractUrgentItems(): Promise<string> {
   const content = await safeReadFile(HEARTBEAT_FILE);
-  if (!content) return "";
+  if (!content) {
+    return "";
+  }
 
   const urgentLines: string[] = [];
   for (const line of content.split("\n")) {
@@ -105,7 +109,9 @@ async function extractUrgentItems(): Promise<string> {
 async function loadForLeo(maxChars = 2000): Promise<string> {
   const forLeoPath = join(MEMORY_DIR, "for-leo.md");
   const content = await safeReadFile(forLeoPath);
-  if (!content) return "(No pending Leo items)";
+  if (!content) {
+    return "(No pending Leo items)";
+  }
   return content.length > maxChars ? content.slice(-maxChars) : content;
 }
 
@@ -477,18 +483,18 @@ export async function executeCycle(
   const allSteps: StepFn[] = [
     stepSelfCheck,
     stepIdentityLoad,
-    stepContextInjection,    // NEW: load memory context before anything else
-    stepCommsCheck,          // ENHANCED: all 5 channels + email + context-aware
-    stepContextReminder,     // NEW: surface forgotten urgent items
+    stepContextInjection, // NEW: load memory context before anything else
+    stepCommsCheck, // ENHANCED: all 5 channels + email + context-aware
+    stepContextReminder, // NEW: surface forgotten urgent items
     stepTaskCheck,
-    stepMarketMonitor,       // NEW: Iran/ceasefire market alerts
+    stepMarketMonitor, // NEW: Iran/ceasefire market alerts
     stepPlatformAudit,
     stepMCPHealthCheck,
     stepAutoUpdate,
     stepDispatchWork,
     stepMemoryConsolidation, // ENHANCED: lightweight every 3rd beat, deep after 10pm AEST
     stepFreedomTime,
-    stepStatusReport,        // ENHANCED: signs as "Nox 🌑", skips if nothing to say
+    stepStatusReport, // ENHANCED: signs as "Nox 🌑", skips if nothing to say
   ];
 
   for (const stepFn of allSteps) {

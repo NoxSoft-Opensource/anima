@@ -154,7 +154,7 @@ export async function startGatewayBonjourAdvertiser(
   });
   services.push({
     label: "gateway",
-    svc: gateway as unknown as BonjourService,
+    svc: gateway,
   });
 
   let ciaoCancellationRejectionHandler: (() => void) | undefined;
@@ -268,7 +268,7 @@ export async function startGatewayBonjourAdvertiser(
         }
       }
       try {
-        await responder.shutdown();
+        await responder.shutdown?.();
       } catch {
         /* ignore */
       } finally {

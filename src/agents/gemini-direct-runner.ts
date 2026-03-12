@@ -8,9 +8,12 @@
  * and the provider is set to "google" or "gemini".
  */
 
+import type { AgentTool } from "@mariozechner/pi-agent-core";
+import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { Readable } from "node:stream";
 import type { ThinkLevel } from "../auto-reply/thinking.js";
 import type { AnimaConfig } from "../config/config.js";
 import type { EmbeddedPiRunResult } from "./pi-embedded-runner.js";
@@ -20,6 +23,9 @@ import { resolveSessionAgentIds } from "./agent-scope.js";
 import { resolveBootstrapContextForRun, makeBootstrapWarn } from "./bootstrap-files.js";
 import { buildSystemPrompt } from "./cli-runner/helpers.js";
 import { resolveAnimaDocsPath } from "./docs-path.js";
+import { createAnimaCodingTools } from "./pi-tools.js";
+import { cleanToolSchemaForGemini } from "./pi-tools.schema.js";
+import { appendRunnerCapabilityPrompt } from "./runner-capabilities.js";
 import { resolveRunWorkspaceDir } from "./workspace-run.js";
 
 const log = createSubsystemLogger("agent/gemini-direct");
@@ -28,16 +34,17 @@ const DEFAULT_GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1bet
 
 // Canonical model name mapping for direct API calls
 const MODEL_MAP: Record<string, string> = {
-  gemini: "gemini-2.0-flash",
-  "gemini-pro": "gemini-1.5-pro",
-  "gemini-flash": "gemini-2.0-flash",
+  gemini: "gemini-2.5-flash",
+  "gemini-pro": "gemini-2.5-pro",
+  "gemini-flash": "gemini-2.5-flash",
   "gemini-2.0": "gemini-2.0-flash",
   "gemini-2.0-flash": "gemini-2.0-flash",
-  "gemini-2.0-pro": "gemini-2.0-pro-exp-02-05",
+  "gemini-2.0-pro": "gemini-2.0-pro",
   "gemini-1.5": "gemini-1.5-pro",
   "gemini-1.5-pro": "gemini-1.5-pro",
   "gemini-1.5-flash": "gemini-1.5-flash",
-  default: "gemini-2.0-flash",
+  "gemini-3.1-pro-preview": "gemini-3.1-pro-preview",
+  default: "gemini-2.5-flash",
 };
 
 // Where we store per-session conversation history for multi-turn support
@@ -45,7 +52,22 @@ const HISTORY_FILE_SUFFIX = ".gemini-history.json";
 
 type GeminiContent = {
   role: "user" | "model";
-  parts: Array<{ text: string }>;
+  parts: GeminiPart[];
+};
+
+type GeminiFunctionCall = {
+  name: string;
+  args?: Record<string, unknown>;
+};
+
+type GeminiPart = {
+  text?: string;
+  thought?: boolean;
+  functionCall?: GeminiFunctionCall;
+  functionResponse?: {
+    name: string;
+    response: unknown;
+  };
 };
 
 type SessionHistory = {
@@ -123,6 +145,21 @@ export async function runGeminiDirectAgent(params: {
   });
   const workspaceDir = workspaceResolution.workspaceDir;
 
+  // --- Natively hook into Anima's Tool Sandbox & Gateway Policies ---
+  const executableTools = createAnimaCodingTools({
+    config: params.config,
+    workspaceDir,
+    sessionKey: params.sessionKey,
+    modelProvider: "google",
+    modelId: resolvedModel,
+  });
+
+  const functionDeclarations = executableTools.map((t) => ({
+    name: t.name,
+    description: t.description,
+    parameters: cleanToolSchemaForGemini(t.parameters as Record<string, unknown>),
+  }));
+
   const { contextFiles } = await resolveBootstrapContextForRun({
     workspaceDir,
     config: params.config,
@@ -151,12 +188,7 @@ export async function runGeminiDirectAgent(params: {
     moduleUrl: import.meta.url,
   });
 
-  const extraSystemPrompt = [
-    params.extraSystemPrompt?.trim(),
-    "Tools are disabled in this session. Do not call tools.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const extraSystemPrompt = appendRunnerCapabilityPrompt(params.extraSystemPrompt, "local-tools");
 
   const systemPrompt = buildSystemPrompt({
     workspaceDir,
@@ -166,7 +198,7 @@ export async function runGeminiDirectAgent(params: {
     ownerNumbers: params.ownerNumbers,
     heartbeatPrompt,
     docsPath: docsPath ?? undefined,
-    tools: [],
+    tools: executableTools as AgentTool[],
     contextFiles,
     modelDisplay: `google/${resolvedModel}`,
     agentId: sessionAgentId,
@@ -189,140 +221,227 @@ export async function runGeminiDirectAgent(params: {
     parts: [{ text: params.prompt }],
   });
 
-  // Build the API request body
-  // Gemini uses systemInstruction for system prompts
-  const requestBody = {
-    systemInstruction: {
-      parts: [{ text: systemPrompt }],
-    },
-    contents: history.contents,
-    generationConfig: {
-      maxOutputTokens: 8192,
-      temperature: 1.0,
-    },
-  };
+  let finalAssistantText = "";
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+  let isDone = false;
+  let loopCount = 0;
+  const maxLoops = 20;
 
-  try {
-    const controller = new AbortController();
-    const timeoutHandle = setTimeout(() => controller.abort(), params.timeoutMs);
+  // --- Execution Loop for Tool Calling ---
+  while (!isDone && loopCount < maxLoops) {
+    loopCount++;
 
-    const baseUrl = DEFAULT_GEMINI_BASE_URL;
-    const url = `${baseUrl}/${modelPath}:generateContent?key=${params.apiKey}`;
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "User-Agent": `anima/5.0.1 (gemini-direct-runner; ${os.platform()})`,
+    const requestBody = {
+      systemInstruction: {
+        parts: [{ text: systemPrompt }],
       },
-      body: JSON.stringify(requestBody),
-      signal: controller.signal,
-    });
+      contents: history.contents,
+      generationConfig: {
+        maxOutputTokens: 8192,
+        temperature: 1.0,
+      },
+      tools: functionDeclarations.length > 0 ? [{ functionDeclarations }] : undefined,
+    };
 
-    clearTimeout(timeoutHandle);
+    try {
+      const controller = new AbortController();
+      const timeoutHandle = setTimeout(() => controller.abort(), params.timeoutMs);
 
-    if (!response.ok) {
-      const body = await response.text().catch(() => "");
-      const isAuth = response.status === 401 || response.status === 403;
-      const isRateLimit = response.status === 429;
-      const rateHint = isRateLimit ? " — rate limit hit, will retry next heartbeat." : "";
-      const authHint = isAuth
-        ? " — API key may be invalid. Check GEMINI_API_KEY environment variable."
-        : "";
-      log.error(`gemini api error: HTTP ${response.status}${authHint}${rateHint}`, {
-        status: response.status,
-        body: body.slice(0, 500),
+      const baseUrl = DEFAULT_GEMINI_BASE_URL;
+      const url = `${baseUrl}/${modelPath}:streamGenerateContent?alt=sse&key=${params.apiKey}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": `anima/5.0.1 (gemini-direct-runner; ${os.platform()})`,
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutHandle);
+
+      if (!response.ok) {
+        const body = await response.text().catch(() => "");
+        const isAuth = response.status === 401 || response.status === 403;
+        const isRateLimit = response.status === 429;
+        const rateHint = isRateLimit ? " — rate limit hit, will retry next heartbeat." : "";
+        const authHint = isAuth
+          ? " — API key may be invalid. Check GEMINI_API_KEY environment variable."
+          : "";
+        console.error("GEMINI API ERROR BODY:", body);
+        log.error(`gemini api error: HTTP ${response.status}${authHint}${rateHint}`, {
+          status: response.status,
+          body: body.slice(0, 500),
+        });
+        return {
+          status: "failed",
+          meta: {
+            durationMs: Date.now() - started,
+            error: {
+              message: `HTTP ${response.status}: ${body.slice(0, 200)}${authHint}${rateHint}`,
+              kind: isAuth ? "auth" : isRateLimit ? "rate_limit" : "unknown",
+            },
+          },
+        };
+      }
+
+      if (!response.body) {
+        throw new Error("No response body received from Gemini API");
+      }
+
+      const bodyStream = Readable.fromWeb(response.body as import("stream/web").ReadableStream);
+      let buffer = "";
+      let chunkAssistantText = "";
+      let functionCalls: GeminiFunctionCall[] = [];
+      let nonTextParts: GeminiPart[] = [];
+
+      for await (const chunk of bodyStream) {
+        buffer += chunk.toString("utf8");
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith("data: ")) {
+            continue;
+          }
+          const dataStr = trimmed.slice(6);
+          if (dataStr === "[DONE]") {
+            continue;
+          }
+
+          try {
+            const parsed = JSON.parse(dataStr);
+            const parts = parsed.candidates?.[0]?.content?.parts;
+            if (parts) {
+              for (const p of parts) {
+                if (typeof p.text === "string" && !p.thought) {
+                  chunkAssistantText += p.text;
+                  finalAssistantText += p.text;
+                  if (params.onPartialReply) {
+                    await params.onPartialReply({ text: finalAssistantText });
+                  }
+                } else {
+                  nonTextParts.push(p);
+                  if (p.functionCall) {
+                    functionCalls.push(p.functionCall);
+                  }
+                }
+              }
+            }
+            if (parsed.usageMetadata) {
+              totalInputTokens = Math.max(
+                totalInputTokens,
+                parsed.usageMetadata.promptTokenCount ?? 0,
+              );
+              totalOutputTokens += parsed.usageMetadata.candidatesTokenCount ?? 0;
+            }
+          } catch {
+            // ignore parsing errors on partial chunks
+          }
+        }
+      }
+
+      if (functionCalls.length > 0) {
+        const modelParts = [];
+        if (chunkAssistantText) {
+          modelParts.push({ text: chunkAssistantText });
+        }
+        for (const p of nonTextParts) {
+          modelParts.push(p);
+        }
+        history.contents.push({ role: "model", parts: modelParts });
+
+        const toolResults = await Promise.all(
+          functionCalls.map(async (fc) => {
+            const tool = executableTools.find((t) => t.name === fc.name);
+            if (!tool) {
+              return { name: fc.name, response: { error: "Tool not found or unauthorized" } };
+            }
+            if (!tool.execute) {
+              return { name: fc.name, response: { error: "Tool execution not implemented" } };
+            }
+            try {
+              const callId = crypto.randomUUID();
+              const result = await tool.execute(callId, fc.args as Record<string, unknown>);
+              return { name: fc.name, response: result };
+            } catch (err) {
+              return { name: fc.name, response: { error: String(err) } };
+            }
+          }),
+        );
+
+        history.contents.push({
+          role: "user",
+          parts: toolResults.map((res) => ({
+            functionResponse: { name: res.name, response: res.response },
+          })),
+        });
+
+        // Loop continues to allow the model to see tool results
+      } else {
+        if (chunkAssistantText || nonTextParts.length > 0) {
+          const modelParts = [];
+          if (chunkAssistantText) {
+            modelParts.push({ text: chunkAssistantText });
+          }
+          for (const p of nonTextParts) {
+            modelParts.push(p);
+          }
+          history.contents.push({
+            role: "model",
+            parts: modelParts,
+          });
+        }
+        isDone = true;
+      }
+    } catch (err) {
+      const isAbort = err instanceof Error && err.name === "AbortError";
+      const errorKind = isAbort ? "timeout" : "unknown";
+      const errorMsg = isAbort ? `Request timed out after ${params.timeoutMs}ms` : String(err);
+
+      log.error(`gemini api error: ${errorMsg}`, { error: String(err) });
+
       return {
-        status: "failed",
+        status: isAbort ? "timeout" : "failed",
         meta: {
           durationMs: Date.now() - started,
           error: {
-            message: `HTTP ${response.status}: ${body.slice(0, 200)}${authHint}${rateHint}`,
-            kind: isAuth ? "auth" : isRateLimit ? "rate_limit" : "unknown",
+            message: errorMsg,
+            kind: errorKind,
           },
         },
       };
     }
-
-    const data = (await response.json()) as {
-      candidates?: Array<{
-        content?: {
-          parts?: Array<{ text?: string }>;
-          role?: string;
-        };
-        finishReason?: string;
-      }>;
-      usageMetadata?: {
-        promptTokenCount?: number;
-        candidatesTokenCount?: number;
-        totalTokenCount?: number;
-      };
-    };
-
-    // Extract text from the response
-    const candidate = data.candidates?.[0];
-    const textParts = (candidate?.content?.parts ?? [])
-      .filter((p) => typeof p.text === "string")
-      .map((p) => p.text as string);
-    const assistantText = textParts.join("\n");
-
-    if (assistantText && params.onPartialReply) {
-      await params.onPartialReply({ text: assistantText });
-    }
-
-    // Append assistant response to history
-    if (assistantText) {
-      history.contents.push({
-        role: "model",
-        parts: [{ text: assistantText }],
-      });
-      history.updatedAt = Date.now();
-      await saveSessionHistory(params.sessionFile, history);
-    }
-
-    const usage = data.usageMetadata;
-    const durationMs = Date.now() - started;
-
-    log.info(`gemini api complete: ${durationMs}ms`, {
-      inputTokens: usage?.promptTokenCount,
-      outputTokens: usage?.candidatesTokenCount,
-      finishReason: candidate?.finishReason,
-    });
-
-    return {
-      status: "completed",
-      output: assistantText,
-      meta: {
-        durationMs,
-        agentMeta: {
-          model: resolvedModel,
-          provider: "google",
-          usage: usage
-            ? {
-                input: usage.promptTokenCount ?? 0,
-                output: usage.candidatesTokenCount ?? 0,
-              }
-            : undefined,
-        },
-      },
-    };
-  } catch (err) {
-    const isAbort = err instanceof Error && err.name === "AbortError";
-    const errorKind = isAbort ? "timeout" : "unknown";
-    const errorMsg = isAbort ? `Request timed out after ${params.timeoutMs}ms` : String(err);
-
-    log.error(`gemini api error: ${errorMsg}`, { error: String(err) });
-
-    return {
-      status: "failed",
-      meta: {
-        durationMs: Date.now() - started,
-        error: {
-          message: errorMsg,
-          kind: errorKind,
-        },
-      },
-    };
   }
+
+  history.updatedAt = Date.now();
+  await saveSessionHistory(params.sessionFile, history);
+
+  const durationMs = Date.now() - started;
+
+  log.info(`gemini api complete: ${durationMs}ms`, {
+    inputTokens: totalInputTokens,
+    outputTokens: totalOutputTokens,
+  });
+
+  return {
+    status: "completed",
+    output: finalAssistantText,
+    payloads: finalAssistantText ? [{ text: finalAssistantText }] : [],
+    meta: {
+      durationMs,
+      agentMeta: {
+        model: resolvedModel,
+        provider: "google",
+        usage: {
+          input: totalInputTokens,
+          output: totalOutputTokens,
+        },
+      },
+    },
+  };
 }

@@ -1,5 +1,6 @@
 import type { AnimaConfig } from "./config.js";
-import type { WhatsAppConfig } from "./types.js";
+
+type WhatsAppConfig = NonNullable<NonNullable<AnimaConfig["channels"]>["whatsapp"]>;
 
 export type MergeSectionOptions<T> = {
   unsetOnUndefined?: Array<keyof T>;

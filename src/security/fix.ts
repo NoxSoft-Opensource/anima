@@ -287,15 +287,7 @@ function applyConfigFixes(params: { cfg: AnimaConfig; env: NodeJS.ProcessEnv }):
     changes.push('logging.redactSensitive=off -> "tools"');
   }
 
-  for (const channel of [
-    "telegram",
-    "whatsapp",
-    "discord",
-    "signal",
-    "imessage",
-    "slack",
-    "msteams",
-  ]) {
+  for (const channel of ["noxsoft"]) {
     setGroupPolicyAllowlist({ cfg: next, channel, changes, policyFlips });
   }
 

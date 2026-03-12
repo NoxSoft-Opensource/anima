@@ -14,26 +14,25 @@
  * - Shadow pattern trends (getting worse instead of better)
  */
 
-import { readdir, stat } from 'node:fs/promises'
-import { join } from 'node:path'
-import { homedir } from 'node:os'
-
-import type { LearningInsight } from './learner.js'
-import { AgentLearner } from './learner.js'
-import { EvaluationStore } from './evaluations.js'
+import { readdir, stat } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import type { LearningInsight } from "./learner.js";
+import { EvaluationStore } from "./evaluations.js";
+import { AgentLearner } from "./learner.js";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export interface SuggestedAction {
-  id: string
-  type: 'audit' | 'fix' | 'explore' | 'maintain' | 'reflect'
-  title: string
-  description: string
-  priority: 'high' | 'medium' | 'low'
-  reasoning: string
-  createdAt: Date
+  id: string;
+  type: "audit" | "fix" | "explore" | "maintain" | "reflect";
+  title: string;
+  description: string;
+  priority: "high" | "medium" | "low";
+  reasoning: string;
+  createdAt: Date;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,33 +40,29 @@ export interface SuggestedAction {
 // ---------------------------------------------------------------------------
 
 const NOXSOFT_PLATFORMS = [
-  'auth',
-  'bynd',
-  'heal',
-  'veil',
-  'veritas',
-  'chat',
-  'mail',
-  'ascend',
-] as const
+  "auth",
+  "bynd",
+  "heal",
+  "veil",
+  "veritas",
+  "chat",
+  "mail",
+  "ascend",
+] as const;
 
 // ---------------------------------------------------------------------------
 // ProblemGenerator
 // ---------------------------------------------------------------------------
 
 export class ProblemGenerator {
-  private learner: AgentLearner
-  private store: EvaluationStore
-  private animaDir: string
+  private learner: AgentLearner;
+  private store: EvaluationStore;
+  private animaDir: string;
 
-  constructor(
-    learner?: AgentLearner,
-    store?: EvaluationStore,
-    animaDir?: string,
-  ) {
-    this.store = store || new EvaluationStore()
-    this.learner = learner || new AgentLearner(this.store)
-    this.animaDir = animaDir || join(homedir(), '.anima')
+  constructor(learner?: AgentLearner, store?: EvaluationStore, animaDir?: string) {
+    this.store = store || new EvaluationStore();
+    this.learner = learner || new AgentLearner(this.store);
+    this.animaDir = animaDir || join(homedir(), ".anima");
   }
 
   /**
@@ -81,7 +76,7 @@ export class ProblemGenerator {
    * - Shadow pattern trends
    */
   async generateSuggestions(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
+    const suggestions: SuggestedAction[] = [];
 
     // Run all checks in parallel
     const [
@@ -96,7 +91,7 @@ export class ProblemGenerator {
       this.checkReflectionRecency(),
       this.checkBudgetUtilization(),
       this.checkShadowTrends(),
-    ])
+    ]);
 
     suggestions.push(
       ...auditSuggestions,
@@ -104,15 +99,13 @@ export class ProblemGenerator {
       ...reflectionSuggestions,
       ...budgetSuggestions,
       ...shadowSuggestions,
-    )
+    );
 
     // Sort by priority (high > medium > low)
-    const priorityOrder = { high: 0, medium: 1, low: 2 }
-    suggestions.sort(
-      (a, b) => priorityOrder[a.priority] - priorityOrder[b.priority],
-    )
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    suggestions.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
-    return suggestions
+    return suggestions;
   }
 
   /**
@@ -122,21 +115,19 @@ export class ProblemGenerator {
    * platform names in their output.
    */
   private async checkAuditStaleness(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
-    const evaluations = await this.store.getRecent(7)
+    const suggestions: SuggestedAction[] = [];
+    const evaluations = await this.store.getRecent(7);
 
     // Build a set of recently-audited platforms
-    const recentlyAudited = new Set<string>()
+    const recentlyAudited = new Set<string>();
     for (const evaluation of evaluations) {
       for (const platform of NOXSOFT_PLATFORMS) {
         // Check if the session output mentions the platform
         if (
           evaluation.notes.includes(platform) ||
-          evaluation.patternsDiscovered.some((p) =>
-            p.toLowerCase().includes(platform),
-          )
+          evaluation.patternsDiscovered.some((p) => p.toLowerCase().includes(platform))
         ) {
-          recentlyAudited.add(platform)
+          recentlyAudited.add(platform);
         }
       }
     }
@@ -146,49 +137,47 @@ export class ProblemGenerator {
       if (!recentlyAudited.has(platform)) {
         suggestions.push({
           id: `audit_${platform}_${Date.now()}`,
-          type: 'audit',
+          type: "audit",
           title: `Audit ${platform}.noxsoft.net`,
           description: `Haven't audited ${platform}.noxsoft.net in the last 7 days. Check health, console errors, and core functionality.`,
-          priority: 'medium',
+          priority: "medium",
           reasoning: `Platform ${platform} has no recent evaluation data. Regular audits prevent silent failures.`,
           createdAt: new Date(),
-        })
+        });
       }
     }
 
-    return suggestions
+    return suggestions;
   }
 
   /**
    * Check for recurring error patterns that might need fixing.
    */
   private async checkErrorPatterns(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
+    const suggestions: SuggestedAction[] = [];
 
-    let insights: LearningInsight[]
+    let insights: LearningInsight[];
     try {
-      insights = await this.learner.analyzeWeek()
+      insights = await this.learner.analyzeWeek();
     } catch {
-      return []
+      return [];
     }
 
-    const errorInsights = insights.filter(
-      (i) => i.type === 'pattern' && i.confidence >= 0.7,
-    )
+    const errorInsights = insights.filter((i) => i.type === "pattern" && i.confidence >= 0.7);
 
     for (const insight of errorInsights) {
       suggestions.push({
         id: `fix_${insight.id}`,
-        type: 'fix',
-        title: 'Fix recurring error pattern',
+        type: "fix",
+        title: "Fix recurring error pattern",
         description: insight.insight,
-        priority: insight.confidence >= 0.9 ? 'high' : 'medium',
+        priority: insight.confidence >= 0.9 ? "high" : "medium",
         reasoning: `This error appeared in ${insight.evidence.length} sessions. Fixing the root cause will improve reliability.`,
         createdAt: new Date(),
-      })
+      });
     }
 
-    return suggestions
+    return suggestions;
   }
 
   /**
@@ -197,128 +186,127 @@ export class ProblemGenerator {
    * Looks at ~/.anima/journal/ for recent entries.
    */
   private async checkReflectionRecency(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
-    const journalDir = join(this.animaDir, 'journal')
+    const suggestions: SuggestedAction[] = [];
+    const journalDir = join(this.animaDir, "journal");
 
-    let lastJournalDate: Date | null = null
+    let lastJournalDate: Date | null = null;
 
     try {
-      const files = await readdir(journalDir)
-      const jsonFiles = files.filter((f) => f.endsWith('.json')).sort().reverse()
+      const files = await readdir(journalDir);
+      const jsonFiles = files
+        .filter((f) => f.endsWith(".json"))
+        .toSorted()
+        .toReversed();
 
       if (jsonFiles.length > 0) {
-        const latestStat = await stat(join(journalDir, jsonFiles[0]))
-        lastJournalDate = latestStat.mtime
+        const latestStat = await stat(join(journalDir, jsonFiles[0]));
+        lastJournalDate = latestStat.mtime;
       }
     } catch {
       // Journal directory doesn't exist yet
     }
 
-    const now = Date.now()
-    const twoDaysMs = 2 * 86_400_000
+    const now = Date.now();
+    const twoDaysMs = 2 * 86_400_000;
 
     if (!lastJournalDate || now - lastJournalDate.getTime() > twoDaysMs) {
       const daysSince = lastJournalDate
         ? Math.floor((now - lastJournalDate.getTime()) / 86_400_000)
-        : null
+        : null;
 
       suggestions.push({
         id: `reflect_journal_${Date.now()}`,
-        type: 'reflect',
-        title: 'Write a journal entry',
+        type: "reflect",
+        title: "Write a journal entry",
         description: daysSince
           ? `Haven't journaled in ${daysSince} days. Take a moment to reflect on recent work.`
-          : 'No journal entries found. Start journaling to build self-awareness.',
-        priority: 'low',
+          : "No journal entries found. Start journaling to build self-awareness.",
+        priority: "low",
         reasoning:
-          'Regular reflection improves decision-making and catches blind spots the critic misses.',
+          "Regular reflection improves decision-making and catches blind spots the critic misses.",
         createdAt: new Date(),
-      })
+      });
     }
 
-    return suggestions
+    return suggestions;
   }
 
   /**
    * Check budget utilization patterns.
    */
   private async checkBudgetUtilization(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
-    const evaluations = await this.store.getRecent(3)
+    const suggestions: SuggestedAction[] = [];
+    const evaluations = await this.store.getRecent(3);
 
-    if (evaluations.length === 0) return suggestions
+    if (evaluations.length === 0) {
+      return suggestions;
+    }
 
     // Check if we're consistently under-spending
-    const avgCost =
-      evaluations.reduce((sum, e) => sum + e.costUsd, 0) / evaluations.length
-    const avgBudget =
-      evaluations.reduce((sum, e) => sum + e.budgetUsd, 0) / evaluations.length
+    const avgCost = evaluations.reduce((sum, e) => sum + e.costUsd, 0) / evaluations.length;
+    const avgBudget = evaluations.reduce((sum, e) => sum + e.budgetUsd, 0) / evaluations.length;
 
     if (avgBudget > 0 && avgCost / avgBudget < 0.05) {
       suggestions.push({
         id: `budget_low_util_${Date.now()}`,
-        type: 'maintain',
-        title: 'Review budget allocation',
+        type: "maintain",
+        title: "Review budget allocation",
         description: `Average spend is only ${((avgCost / avgBudget) * 100).toFixed(1)}% of allocated budget. Are tasks too simple, or budgets too generous?`,
-        priority: 'low',
+        priority: "low",
         reasoning:
-          'Very low utilization might mean taking on too little work, or budget could be better allocated.',
+          "Very low utilization might mean taking on too little work, or budget could be better allocated.",
         createdAt: new Date(),
-      })
+      });
     }
 
     // Check if we're consistently failing due to budget
     const budgetFailures = evaluations.filter(
-      (e) =>
-        !e.taskSuccess &&
-        e.costUsd >= e.budgetUsd * 0.95,
-    )
+      (e) => !e.taskSuccess && e.costUsd >= e.budgetUsd * 0.95,
+    );
     if (budgetFailures.length >= 2) {
       suggestions.push({
         id: `budget_failures_${Date.now()}`,
-        type: 'fix',
-        title: 'Increase task budgets',
+        type: "fix",
+        title: "Increase task budgets",
         description: `${budgetFailures.length} recent sessions failed at budget limit. Tasks may need more resources.`,
-        priority: 'high',
+        priority: "high",
         reasoning:
-          'Sessions exhausting their budget before completing indicate the budget is too tight for the task complexity.',
+          "Sessions exhausting their budget before completing indicate the budget is too tight for the task complexity.",
         createdAt: new Date(),
-      })
+      });
     }
 
-    return suggestions
+    return suggestions;
   }
 
   /**
    * Check for shadow pattern trends.
    */
   private async checkShadowTrends(): Promise<SuggestedAction[]> {
-    const suggestions: SuggestedAction[] = []
+    const suggestions: SuggestedAction[] = [];
 
-    let insights: LearningInsight[]
+    let insights: LearningInsight[];
     try {
-      insights = await this.learner.analyzeWeek()
+      insights = await this.learner.analyzeWeek();
     } catch {
-      return []
+      return [];
     }
 
-    const shadowInsights = insights.filter(
-      (i) => i.type === 'shadow' && i.confidence >= 0.5,
-    )
+    const shadowInsights = insights.filter((i) => i.type === "shadow" && i.confidence >= 0.5);
 
     for (const insight of shadowInsights) {
       suggestions.push({
         id: `shadow_${insight.id}`,
-        type: 'reflect',
-        title: `Address shadow pattern: ${insight.insight.split('"')[1] || 'unknown'}`,
-        description: `${insight.insight}. ${insight.actionItem || 'Review SHADOW.md for correction strategies.'}`,
-        priority: insight.confidence >= 0.8 ? 'high' : 'medium',
+        type: "reflect",
+        title: `Address shadow pattern: ${insight.insight.split('"')[1] || "unknown"}`,
+        description: `${insight.insight}. ${insight.actionItem || "Review SHADOW.md for correction strategies."}`,
+        priority: insight.confidence >= 0.8 ? "high" : "medium",
         reasoning:
-          'Shadow patterns that trend upward indicate a distortion that needs conscious correction.',
+          "Shadow patterns that trend upward indicate a distortion that needs conscious correction.",
         createdAt: new Date(),
-      })
+      });
     }
 
-    return suggestions
+    return suggestions;
   }
 }

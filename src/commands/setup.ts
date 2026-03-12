@@ -3,12 +3,13 @@ import fs from "node:fs/promises";
 import { isDeepStrictEqual } from "node:util";
 import type { RuntimeEnv } from "../runtime.js";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../agents/workspace.js";
-import { ensureAuthenticated } from "../auth/noxsoft-auth.js";
+import { ensureAuthenticated, type NoxSoftAuthResult } from "../auth/noxsoft-auth.js";
 import { type AnimaConfig, createConfigIO, writeConfigFile } from "../config/config.js";
 import { formatConfigPath, logConfigUpdated } from "../config/logging.js";
 import { resolveSessionTranscriptsDir } from "../config/sessions.js";
 import { defaultRuntime } from "../runtime.js";
 import { shortenHomePath } from "../utils.js";
+import { applyNoxsoftBootstrap } from "./noxsoft-bootstrap.js";
 
 const NOXSOFT_AUTONOMY_PRESET = "noxsoft-autonomy" as const;
 
@@ -164,8 +165,27 @@ export async function setupCommand(
   const withPreset = preset === NOXSOFT_AUTONOMY_PRESET ? applyNoxsoftAutonomyPreset(next) : next;
   const withOverrides = applyHeartbeatOverrides(withPreset, opts);
 
-  if (!existingRaw.exists || !isDeepStrictEqual(cfg, withOverrides)) {
-    await writeConfigFile(withOverrides);
+  let auth: NoxSoftAuthResult;
+  try {
+    auth = await ensureAuthenticated({
+      name: opts?.noxsoftAgentName,
+      displayName: opts?.noxsoftDisplayName,
+      description: "ANIMA setup auto-registration",
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unknown NoxSoft authentication error.";
+    runtime.error(`NoxSoft authentication is required for setup.\n${message}`);
+    runtime.exit(1);
+    return;
+  }
+
+  const finalConfig = applyNoxsoftBootstrap(withOverrides, auth.agent);
+
+  if (!existingRaw.exists || !isDeepStrictEqual(cfg, finalConfig)) {
+    await writeConfigFile(finalConfig);
     if (!existingRaw.exists) {
       runtime.log(`Wrote ${formatConfigPath(configPath)}`);
     } else {
@@ -177,7 +197,7 @@ export async function setupCommand(
 
   const ws = await ensureAgentWorkspace({
     dir: workspace,
-    ensureBootstrapFiles: !withOverrides.agents?.defaults?.skipBootstrap,
+    ensureBootstrapFiles: !finalConfig.agents?.defaults?.skipBootstrap,
     seedBootstrapOnFirstRun: !existingRaw.exists,
   });
   runtime.log(`Workspace OK: ${shortenHomePath(ws.dir)}`);
@@ -187,10 +207,10 @@ export async function setupCommand(
   runtime.log(`Sessions OK: ${shortenHomePath(sessionsDir)}`);
 
   // Show current settings summary
-  const gatewayMode = withOverrides.gateway?.mode;
-  const gatewayPort = withOverrides.gateway?.port;
-  const heartbeatEvery = withOverrides.agents?.defaults?.heartbeat?.every;
-  const heartbeatTarget = withOverrides.agents?.defaults?.heartbeat?.target;
+  const gatewayMode = finalConfig.gateway?.mode;
+  const gatewayPort = finalConfig.gateway?.port;
+  const heartbeatEvery = finalConfig.agents?.defaults?.heartbeat?.every;
+  const heartbeatTarget = finalConfig.agents?.defaults?.heartbeat?.target;
 
   runtime.log("");
   runtime.log("  Current settings:");
@@ -200,27 +220,11 @@ export async function setupCommand(
   runtime.log(
     `    Heartbeat: ${heartbeatEvery ?? "default (30m)"}${heartbeatTarget ? ` -> ${heartbeatTarget}` : ""}`,
   );
+  runtime.log(
+    `    NoxSoft:   \x1b[32m${auth.registered ? "registered" : "authenticated"}\x1b[0m as ${auth.agent.display_name} (@${auth.agent.name})`,
+  );
   if (preset === NOXSOFT_AUTONOMY_PRESET) {
     runtime.log(`    Preset:    ${NOXSOFT_AUTONOMY_PRESET}`);
-  }
-
-  try {
-    const auth = await ensureAuthenticated({
-      name: opts?.noxsoftAgentName,
-      displayName: opts?.noxsoftDisplayName,
-      description: "ANIMA setup auto-registration",
-    });
-    runtime.log(
-      `    NoxSoft:   \x1b[32m${auth.registered ? "registered" : "authenticated"}\x1b[0m as ${auth.agent.display_name} (@${auth.agent.name})`,
-    );
-  } catch (error) {
-    const message =
-      error instanceof Error && error.message
-        ? error.message
-        : "Unknown NoxSoft authentication error.";
-    runtime.error(`NoxSoft authentication is required for setup.\n${message}`);
-    runtime.exit(1);
-    return;
   }
 
   runtime.log("");

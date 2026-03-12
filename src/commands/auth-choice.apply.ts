@@ -6,6 +6,7 @@ import { ensureAuthenticated } from "../auth/noxsoft-auth.js";
 import { applyAuthChoiceAnthropic } from "./auth-choice.apply.anthropic.js";
 import { applyAuthChoiceGemini } from "./auth-choice.apply.gemini.js";
 import { applyAuthChoiceOpenAICodex } from "./auth-choice.apply.openai-codex.js";
+import { applyNoxsoftBootstrap } from "./noxsoft-bootstrap.js";
 
 export type ApplyAuthChoiceParams = {
   authChoice: AuthChoice;
@@ -36,7 +37,7 @@ export async function applyAuthChoice(
     params.runtime.log(
       `NoxSoft ${auth.registered ? "registered" : "authenticated"}: ${auth.agent.display_name} (@${auth.agent.name})`,
     );
-    return { config: params.config };
+    return { config: applyNoxsoftBootstrap(params.config, auth.agent) };
   }
 
   const codexResult = await applyAuthChoiceOpenAICodex(params);

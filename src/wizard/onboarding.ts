@@ -1,4 +1,9 @@
-import type { GatewayAuthChoice, OnboardMode, OnboardOptions } from "../commands/onboard-types.js";
+import type {
+  AuthChoice,
+  GatewayAuthChoice,
+  OnboardMode,
+  OnboardOptions,
+} from "../commands/onboard-types.js";
 import type { AnimaConfig } from "../config/config.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { QuickstartGatewayDefaults, WizardFlow } from "./onboarding.types.js";
@@ -13,6 +18,7 @@ import {
   warnIfModelConfigLooksOff,
 } from "../commands/auth-choice.js";
 import { applyPrimaryModel, promptDefaultModel } from "../commands/model-picker.js";
+import { applyNoxsoftBootstrap } from "../commands/noxsoft-bootstrap.js";
 // promptCustomApiConfig removed — NoxSoft auth only
 import {
   applyWizardMetadata,
@@ -117,6 +123,7 @@ export async function runOnboardingWizard(
       displayName: opts.noxsoftDisplayName,
       description: "ANIMA onboarding wizard",
     });
+    nextConfig = applyNoxsoftBootstrap(nextConfig, auth.agent);
     await prompter.note(
       `${auth.registered ? "Registered" : "Authenticated"} as ${auth.agent.display_name} (@${auth.agent.name}).`,
       "NoxSoft authentication",
@@ -145,6 +152,7 @@ export async function runOnboardingWizard(
         description: "ANIMA onboarding wizard",
         inviteCode: typeof inviteCode === "string" ? inviteCode.trim() : undefined,
       });
+      nextConfig = applyNoxsoftBootstrap(nextConfig, auth.agent);
       await prompter.note(
         `${auth.registered ? "Registered" : "Authenticated"} as ${auth.agent.display_name} (@${auth.agent.name}).`,
         "NoxSoft authentication",
@@ -208,10 +216,10 @@ export async function runOnboardingWizard(
   }
 
   const authChoiceFromPrompt = opts.authChoice === undefined && !autoDetectedAuth;
-  const authChoice =
+  const authChoice: AuthChoice =
     opts.authChoice ??
     (autoDetectedAuth
-      ? ("anthropic-claude-code" as GatewayAuthChoice)
+      ? "apiKey"
       : await promptAuthChoiceGrouped({
           prompter,
           store: authStore,

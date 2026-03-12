@@ -71,10 +71,15 @@ function mergeConsecutiveAssistantTurns(
  * Merges consecutive assistant messages together.
  */
 export function validateGeminiTurns(messages: AgentMessage[]): AgentMessage[] {
-  return validateTurnsWithConsecutiveMerge({
+  const mergedAssistant = validateTurnsWithConsecutiveMerge({
     messages,
     role: "assistant",
     merge: mergeConsecutiveAssistantTurns,
+  });
+  return validateTurnsWithConsecutiveMerge({
+    messages: mergedAssistant,
+    role: "user",
+    merge: mergeConsecutiveUserTurns,
   });
 }
 

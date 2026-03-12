@@ -581,4 +581,135 @@ describe("runWithModelFallback", () => {
     expect(result.provider).toBe("openai");
     expect(result.model).toBe("gpt-4.1-mini");
   });
+
+  it("prefers the working-mode model when the session is in write mode", async () => {
+    const cfg = makeCfg({
+      agents: {
+        defaults: {
+          model: {
+            primary: "anthropic/claude-opus-4-6",
+            auto: {
+              enabled: true,
+              byWorkingMode: {
+                write: ["openai-codex/gpt-5.3-codex"],
+              },
+            },
+          },
+        },
+      },
+    });
+    const calls: Array<{ provider: string; model: string }> = [];
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "anthropic",
+      model: "claude-opus-4-6",
+      sessionEntry: {
+        execSecurity: "full",
+      },
+      run: async (provider, model) => {
+        calls.push({ provider, model });
+        return "ok";
+      },
+    });
+
+    expect(result.result).toBe("ok");
+    expect(calls).toEqual([{ provider: "openai-codex", model: "gpt-5.3-codex" }]);
+  });
+
+  it("preserves explicit session overrides ahead of working-mode defaults", async () => {
+    const cfg = makeCfg({
+      agents: {
+        defaults: {
+          model: {
+            primary: "anthropic/claude-opus-4-6",
+            auto: {
+              enabled: true,
+              byWorkingMode: {
+                write: ["openai-codex/gpt-5.3-codex"],
+              },
+            },
+            fallbacks: ["openai/gpt-4.1-mini"],
+          },
+        },
+      },
+    });
+    const calls: Array<{ provider: string; model: string }> = [];
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "anthropic",
+      model: "claude-sonnet-4-5",
+      sessionEntry: {
+        execSecurity: "full",
+        providerOverride: "anthropic",
+        modelOverride: "claude-sonnet-4-5",
+      },
+      run: async (provider, model) => {
+        calls.push({ provider, model });
+        return "ok";
+      },
+    });
+
+    expect(result.result).toBe("ok");
+    expect(calls).toEqual([{ provider: "anthropic", model: "claude-sonnet-4-5" }]);
+  });
+
+  it("prefers cheaper configured candidates for heavy sessions", async () => {
+    const cfg = {
+      agents: {
+        defaults: {
+          model: {
+            primary: "openai/expensive",
+            fallbacks: ["openai/cheap"],
+          },
+        },
+      },
+      models: {
+        providers: {
+          openai: {
+            baseUrl: "https://api.openai.com/v1",
+            models: [
+              {
+                id: "cheap",
+                name: "Cheap",
+                reasoning: true,
+                input: ["text"],
+                cost: { input: 0.1, output: 0.2, cacheRead: 0, cacheWrite: 0 },
+                contextWindow: 128_000,
+                maxTokens: 8_192,
+              },
+              {
+                id: "expensive",
+                name: "Expensive",
+                reasoning: true,
+                input: ["text"],
+                cost: { input: 5, output: 15, cacheRead: 0, cacheWrite: 0 },
+                contextWindow: 128_000,
+                maxTokens: 8_192,
+              },
+            ],
+          },
+        },
+      },
+    } as unknown as AnimaConfig;
+    const calls: Array<{ provider: string; model: string }> = [];
+
+    const result = await runWithModelFallback({
+      cfg,
+      provider: "openai",
+      model: "expensive",
+      thinkLevel: "low",
+      sessionEntry: {
+        sessionEstimatedCostUsdTotal: 0.75,
+      },
+      run: async (provider, model) => {
+        calls.push({ provider, model });
+        return "ok";
+      },
+    });
+
+    expect(result.result).toBe("ok");
+    expect(calls).toEqual([{ provider: "openai", model: "cheap" }]);
+  });
 });

@@ -6,9 +6,9 @@
  * and spawns a session to run it.
  */
 
-import type { Skill } from './loader.js'
-import type { SessionOrchestrator } from '../sessions/orchestrator.js'
-import type { SessionResult } from '../sessions/spawner.js'
+import type { SessionOrchestrator } from "../sessions/orchestrator.js";
+import type { SessionResult } from "../sessions/spawner.js";
+import type { Skill } from "./loader.js";
 
 export class SkillExecutor {
   /**
@@ -22,7 +22,7 @@ export class SkillExecutor {
     params: Record<string, string>,
     orchestrator: SessionOrchestrator,
   ): Promise<SessionResult> {
-    const prompt = this.buildPrompt(skill, params)
+    const prompt = this.buildPrompt(skill, params);
 
     return orchestrator.executeTask({
       taskDescription: prompt,
@@ -30,7 +30,7 @@ export class SkillExecutor {
       model: skill.model,
       maxBudgetUsd: skill.maxBudget,
       timeoutMs: skill.timeout,
-    })
+    });
   }
 
   /**
@@ -39,32 +39,29 @@ export class SkillExecutor {
    * Replaces {param} placeholders in both the skill content (Markdown body)
    * and adds a header with skill metadata.
    */
-  private buildPrompt(
-    skill: Skill,
-    params: Record<string, string>,
-  ): string {
+  private buildPrompt(skill: Skill, params: Record<string, string>): string {
     // Interpolate parameters into the skill content
-    let content = skill.content
+    let content = skill.content;
     for (const [key, value] of Object.entries(params)) {
-      content = content.replaceAll(`{${key}}`, value)
+      content = content.replaceAll(`{${key}}`, value);
     }
 
     // Build the full prompt with context
-    const parts: string[] = []
+    const parts: string[] = [];
 
-    parts.push(`# Skill: ${skill.name}`)
-    parts.push('')
+    parts.push(`# Skill: ${skill.name}`);
+    parts.push("");
 
     if (Object.keys(params).length > 0) {
-      parts.push('## Parameters')
+      parts.push("## Parameters");
       for (const [key, value] of Object.entries(params)) {
-        parts.push(`- **${key}**: ${value}`)
+        parts.push(`- **${key}**: ${value}`);
       }
-      parts.push('')
+      parts.push("");
     }
 
-    parts.push(content)
+    parts.push(content);
 
-    return parts.join('\n')
+    return parts.join("\n");
   }
 }

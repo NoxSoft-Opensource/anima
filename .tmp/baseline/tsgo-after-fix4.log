@@ -1,0 +1,16 @@
+src/agents/tools/discord-actions.ts(4,42): error TS2307: Cannot find module './discord-actions-guild.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(5,46): error TS2307: Cannot find module './discord-actions-messaging.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(6,47): error TS2307: Cannot find module './discord-actions-moderation.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(7,45): error TS2307: Cannot find module './discord-actions-presence.js' or its corresponding type declarations.
+src/channels/targets.ts(1,44): error TS2307: Cannot find module './plugins/directory-config.js' or its corresponding type declarations.
+src/cli/channels-cli.ts(4,3): error TS2724: '"../commands/channels.js"' has no exported member named 'channelsCapabilitiesCommand'. Did you mean 'channelsListCommand'?
+src/infra/bonjour.ts(271,15): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/repl/commands.ts(607,15): error TS2322: Type 'unknown' is not assignable to type 'number | undefined'.
+src/repl/commands.ts(608,15): error TS2322: Type 'unknown' is not assignable to type 'number | undefined'.
+src/repl/commands.ts(609,15): error TS2322: Type 'unknown' is not assignable to type 'number | undefined'.
+src/repl/commands.ts(634,60): error TS2339: Property 'start' does not exist on type '{}'.
+src/repl/commands.ts(634,93): error TS2339: Property 'end' does not exist on type '{}'.
+src/svrn/config.ts(116,5): error TS2322: Type '{ maxCpuPercent?: number | undefined; maxRamMB?: number | undefined; maxBandwidthMbps?: number | undefined; }' is not assignable to type '{ maxCpuPercent: number; maxRamMB: number; maxBandwidthMbps: number; }'.
+  Types of property 'maxCpuPercent' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.

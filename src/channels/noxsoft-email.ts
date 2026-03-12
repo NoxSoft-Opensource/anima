@@ -11,8 +11,8 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { Channel, IncomingMessage, MessagePriority, OutgoingMessage } from "./bridge.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("noxsoft-email");
 
@@ -164,8 +164,7 @@ export class NoxSoftEmailChannel implements Channel {
         log.warn("send_email intent without recipient; dropping");
         return;
       }
-      const subject =
-        (message.metadata?.subject as string | undefined) ?? "Message from ANIMA";
+      const subject = (message.metadata?.subject as string | undefined) ?? "Message from ANIMA";
       this.pendingIntents.push({
         action: "send_email",
         to: message.to,

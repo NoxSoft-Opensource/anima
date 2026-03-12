@@ -63,7 +63,9 @@ export class AnimaAutoUpdater extends EventEmitter {
 
   /** Start the periodic update check loop. */
   start(): void {
-    if (!this.config.enabled) return;
+    if (!this.config.enabled) {
+      return;
+    }
 
     // Check immediately on start
     void this.check();
@@ -103,7 +105,9 @@ export class AnimaAutoUpdater extends EventEmitter {
 
   /** Manually trigger an update check. Returns info if update found, null otherwise. */
   async check(): Promise<UpdateInfo | null> {
-    if (this.checking) return null;
+    if (this.checking) {
+      return null;
+    }
     this.checking = true;
 
     try {
@@ -111,7 +115,9 @@ export class AnimaAutoUpdater extends EventEmitter {
       const latestVersion = await this.fetchLatestVersion(tag);
       this.lastCheckTime = new Date();
 
-      if (!latestVersion) return null;
+      if (!latestVersion) {
+        return null;
+      }
 
       if (this.isNewer(latestVersion, this.currentVersion)) {
         const info: UpdateInfo = {
@@ -197,7 +203,9 @@ export class AnimaAutoUpdater extends EventEmitter {
 
       if (!response.ok) {
         // 404 = package or tag doesn't exist yet -- not an error
-        if (response.status === 404) return null;
+        if (response.status === 404) {
+          return null;
+        }
         return null;
       }
 
@@ -216,30 +224,22 @@ export class AnimaAutoUpdater extends EventEmitter {
       // update in the parent project. If global, update globally.
       const thisDir = path.dirname(fileURLToPath(import.meta.url));
       const isGlobal =
-        thisDir.includes("/lib/node_modules/") ||
-        thisDir.includes("\\node_modules\\");
+        thisDir.includes("/lib/node_modules/") || thisDir.includes("\\node_modules\\");
 
       const args = isGlobal
         ? ["install", "-g", `${PACKAGE_NAME}@${version}`]
         : ["install", `${PACKAGE_NAME}@${version}`];
 
       // Find the project root (where package.json lives)
-      const cwd = isGlobal
-        ? undefined
-        : this.findProjectRoot(thisDir) ?? undefined;
+      const cwd = isGlobal ? undefined : (this.findProjectRoot(thisDir) ?? undefined);
 
-      execFile(
-        "npm",
-        args,
-        { timeout: 120_000, cwd },
-        (error) => {
-          if (error) {
-            reject(new Error(`Failed to install update: ${error.message}`));
-            return;
-          }
-          resolve();
-        },
-      );
+      execFile("npm", args, { timeout: 120_000, cwd }, (error) => {
+        if (error) {
+          reject(new Error(`Failed to install update: ${error.message}`));
+          return;
+        }
+        resolve();
+      });
     });
   }
 
@@ -285,9 +285,10 @@ export class AnimaAutoUpdater extends EventEmitter {
       for (let i = 0; i < 5; i++) {
         const pkgPath = path.join(dir, "package.json");
         if (fs.existsSync(pkgPath)) {
-          const pkg = JSON.parse(
-            fs.readFileSync(pkgPath, "utf-8"),
-          ) as { name?: string; version?: string };
+          const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as {
+            name?: string;
+            version?: string;
+          };
           if (pkg.name === PACKAGE_NAME) {
             return pkg.version ?? "0.0.0";
           }
@@ -310,8 +311,12 @@ export class AnimaAutoUpdater extends EventEmitter {
     const [aMajor = 0, aMinor = 0, aPatch = 0] = parse(a);
     const [bMajor = 0, bMinor = 0, bPatch = 0] = parse(b);
 
-    if (aMajor !== bMajor) return aMajor > bMajor;
-    if (aMinor !== bMinor) return aMinor > bMinor;
+    if (aMajor !== bMajor) {
+      return aMajor > bMajor;
+    }
+    if (aMinor !== bMinor) {
+      return aMinor > bMinor;
+    }
     return aPatch > bPatch;
   }
 
@@ -321,16 +326,16 @@ export class AnimaAutoUpdater extends EventEmitter {
     for (let i = 0; i < 10; i++) {
       const pkgPath = path.join(dir, "package.json");
       if (fs.existsSync(pkgPath)) {
-        const pkg = JSON.parse(
-          fs.readFileSync(pkgPath, "utf-8"),
-        ) as { name?: string };
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as { name?: string };
         // Don't return this package's own directory -- find the parent project
         if (pkg.name !== PACKAGE_NAME) {
           return dir;
         }
       }
       const parent = path.dirname(dir);
-      if (parent === dir) break;
+      if (parent === dir) {
+        break;
+      }
       dir = parent;
     }
     return null;

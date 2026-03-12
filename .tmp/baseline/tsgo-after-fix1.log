@@ -1,0 +1,1113 @@
+src/agents/tools/discord-actions.ts(4,42): error TS2307: Cannot find module './discord-actions-guild.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(5,46): error TS2307: Cannot find module './discord-actions-messaging.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(6,47): error TS2307: Cannot find module './discord-actions-moderation.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(7,45): error TS2307: Cannot find module './discord-actions-presence.js' or its corresponding type declarations.
+src/channels/targets.ts(1,44): error TS2307: Cannot find module './plugins/directory-config.js' or its corresponding type declarations.
+src/cli/channels-cli.ts(4,3): error TS2724: '"../commands/channels.js"' has no exported member named 'channelsCapabilitiesCommand'. Did you mean 'channelsListCommand'?
+src/cli/program/message/helpers.ts(64,11): error TS2739: Type 'import("/Users/grimreaper/.hell/anima/src/cli/deps").CliDeps' is missing the following properties from type 'import("/Users/grimreaper/.hell/anima/src/cli/outbound-send-deps").CliDeps': sendMessageTelegram, sendMessageDiscord, sendMessageSlack, sendMessageSignal, sendMessageIMessage
+src/commands/agent.ts(487,7): error TS2739: Type 'import("/Users/grimreaper/.hell/anima/src/cli/deps").CliDeps' is missing the following properties from type 'import("/Users/grimreaper/.hell/anima/src/cli/outbound-send-deps").CliDeps': sendMessageTelegram, sendMessageDiscord, sendMessageSlack, sendMessageSignal, sendMessageIMessage
+src/commands/configure.wizard.ts(359,29): error TS2345: Argument of type '"model"' is not assignable to parameter of type '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"'.
+src/commands/configure.wizard.ts(363,29): error TS2345: Argument of type '"web"' is not assignable to parameter of type '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"'.
+src/commands/configure.wizard.ts(374,29): error TS2345: Argument of type '"channels"' is not assignable to parameter of type '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"'.
+src/commands/configure.wizard.ts(389,29): error TS2345: Argument of type '"skills"' is not assignable to parameter of type '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"'.
+src/commands/configure.wizard.ts(431,13): error TS2367: This comparison appears to be unintentional because the types '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"' and '"model"' have no overlap.
+src/commands/configure.wizard.ts(436,13): error TS2367: This comparison appears to be unintentional because the types '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"' and '"web"' have no overlap.
+src/commands/configure.wizard.ts(450,13): error TS2367: This comparison appears to be unintentional because the types '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"' and '"channels"' have no overlap.
+src/commands/configure.wizard.ts(466,13): error TS2367: This comparison appears to be unintentional because the types '"daemon" | "gateway" | "health" | "heartbeat" | "identity" | "memory" | "workspace"' and '"skills"' have no overlap.
+src/commands/onboard-custom.ts(467,7): error TS2322: Type '{ [x: string]: ModelProviderConfig | { auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; ... 4 more ...; models: (ModelDefinitionConfig | { ...; })[]; }; }' is not assignable to type 'Record<string, ModelProviderConfig>'.
+  'string' index signatures are incompatible.
+    Type 'ModelProviderConfig | { auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; authHeader?: boolean | undefined; baseUrl: string; api: "anthropic-messages" | "openai-completions"; apiKey?: string | undefined; models: (ModelDefinitionConfig | { ...; })[]; }' is not assignable to type 'ModelProviderConfig'.
+      Type '{ auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; authHeader?: boolean | undefined; baseUrl: string; api: "anthropic-messages" | "openai-completions"; apiKey?: string | undefined; models: (ModelDefinitionConfig | { ...; })[]; }' is not assignable to type 'ModelProviderConfig'.
+        Types of property 'api' are incompatible.
+          Type '"anthropic-messages" | "openai-completions"' is not assignable to type '"anthropic-messages" | undefined'.
+            Type '"openai-completions"' is not assignable to type '"anthropic-messages"'.
+src/commands/setup-token.ts(161,14): error TS18048: 'val' is possibly 'undefined'.
+src/commands/setup-token.ts(164,33): error TS18048: 'val' is possibly 'undefined'.
+src/config/merge-config.ts(2,15): error TS2305: Module '"./types.js"' has no exported member 'WhatsAppConfig'.
+src/cron/isolated-agent/run.ts(1,15): error TS2305: Module '"../../agents/pi-embedded-messaging.js"' has no exported member 'MessagingToolSend'.
+src/cron/isolated-agent/run.ts(668,15): error TS2339: Property 'didSendViaMessagingTool' does not exist on type 'EmbeddedPiRunResult'.
+src/gateway/server-cron.ts(84,9): error TS2739: Type 'import("/Users/grimreaper/.hell/anima/src/cli/deps").CliDeps' is missing the following properties from type 'import("/Users/grimreaper/.hell/anima/src/cli/outbound-send-deps").CliDeps': sendMessageTelegram, sendMessageDiscord, sendMessageSlack, sendMessageSignal, sendMessageIMessage
+src/gateway/server-methods/mcp.ts(11,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(49,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(66,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(76,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server/hooks.ts(80,11): error TS2739: Type 'import("/Users/grimreaper/.hell/anima/src/cli/deps").CliDeps' is missing the following properties from type 'import("/Users/grimreaper/.hell/anima/src/cli/outbound-send-deps").CliDeps': sendMessageTelegram, sendMessageDiscord, sendMessageSlack, sendMessageSignal, sendMessageIMessage
+src/infra/bonjour.ts(91,51): error TS2307: Cannot find module '@homebridge/ciao' or its corresponding type declarations.
+src/macos/gateway-daemon.ts(42,30): error TS2307: Cannot find module 'long' or its corresponding type declarations.
+src/macos/relay.ts(21,28): error TS2307: Cannot find module 'long' or its corresponding type declarations.
+src/repl/commands.ts(537,48): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(538,23): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(538,49): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(545,27): error TS2339: Property 'isRunning' does not exist on type 'SVRNNode'.
+src/repl/commands.ts(556,37): error TS2339: Property 'getWallet' does not exist on type 'SVRNNode'.
+src/repl/commands.ts(598,40): error TS2339: Property 'maxCpuPercent' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(599,45): error TS2339: Property 'maxRamMB' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(600,44): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(607,37): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(608,32): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(609,40): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(614,39): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(614,69): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(614,95): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(623,37): error TS2339: Property 'getConfig' does not exist on type 'SVRNNode'.
+src/svrn/config.ts(51,30): error TS2307: Cannot find module '@noxsoft/svrn-node' or its corresponding type declarations.
+src/svrn/config.ts(114,5): error TS2322: Type '{ maxCpuPercent?: number | undefined; maxRamMB?: number | undefined; maxBandwidthMbps?: number | undefined; }' is not assignable to type '{ maxCpuPercent: number; maxRamMB: number; maxBandwidthMbps: number; }'.
+  Types of property 'maxCpuPercent' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/svrn/node.ts(48,30): error TS2307: Cannot find module '@noxsoft/svrn-node' or its corresponding type declarations.
+src/test-helpers/state-dir-env.ts(2,3): error TS2300: Duplicate identifier 'animaStateDir'.
+src/test-helpers/state-dir-env.ts(3,3): error TS2300: Duplicate identifier 'animaStateDir'.
+src/test-helpers/state-dir-env.ts(9,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/wizard/onboarding.ts(223,7): error TS2322: Type 'AuthChoice | GatewayAuthChoice' is not assignable to type 'AuthChoice'.
+  Type '"password"' is not assignable to type 'AuthChoice'.
+src/wizard/onboarding.ts(240,64): error TS2345: Argument of type 'AuthChoice | GatewayAuthChoice' is not assignable to parameter of type 'AuthChoice'.
+  Type '"password"' is not assignable to type 'AuthChoice'.
+ui/src/App.tsx(3,23): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Dashboard.js'?
+ui/src/App.tsx(4,21): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Freedom.js'?
+ui/src/App.tsx(5,21): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Journal.js'?
+ui/src/App.tsx(6,17): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/MCP.js'?
+ui/src/App.tsx(7,20): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Memory.js'?
+ui/src/App.tsx(8,28): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/MissionControl.js'?
+ui/src/App.tsx(9,22): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Sessions.js'?
+ui/src/App.tsx(10,22): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Settings.js'?
+ui/src/App.tsx(11,18): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './pages/Soul.js'?
+ui/src/App.tsx(12,37): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './amplitude.js'?
+ui/src/App.tsx(45,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(46,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(47,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(48,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(49,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(52,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(54,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(65,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(71,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(72,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(73,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(77,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(78,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(79,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(79,45): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(80,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(80,43): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(81,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(81,40): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(82,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(82,42): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(83,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(83,44): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(84,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(84,39): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(85,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(85,44): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(86,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(86,43): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(87,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(87,43): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(88,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/App.tsx(88,36): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/api.ts(7,71): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './gateway-connect.js'?
+ui/src/api.ts(12,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './gateway-connection.js'?
+ui/src/components/MarkdownText.tsx(12,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/components/MarkdownText.tsx(13,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/components/MarkdownText.tsx(17,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/lib/heartbeat.ts(1,37): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/main.tsx(4,17): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './App.js'?
+ui/src/main.tsx(5,37): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './amplitude.js'?
+ui/src/main.tsx(11,3): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/main.tsx(12,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/main.tsx(13,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(20,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Dashboard.tsx(21,26): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../components/MarkdownText.js'?
+ui/src/pages/Dashboard.tsx(22,71): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../gateway-connect.js'?
+ui/src/pages/Dashboard.tsx(23,64): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../gateway-connection.js'?
+ui/src/pages/Dashboard.tsx(28,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../lib/heartbeat.js'?
+ui/src/pages/Dashboard.tsx(260,10): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(265,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(266,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(267,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(268,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(279,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(281,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(300,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(301,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(302,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(303,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(304,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(306,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(308,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(309,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(310,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(311,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(314,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(316,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(317,34): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(318,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(319,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(320,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(321,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(323,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(350,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(351,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(352,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(353,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(355,26): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(356,35): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(360,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(362,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(377,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(378,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(383,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(384,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(386,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(390,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(392,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(393,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(394,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(398,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(399,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(400,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(423,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(425,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(426,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(427,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(437,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(439,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(536,21): error TS7006: Parameter 'current' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1158,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1159,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1160,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1161,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1162,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1163,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1171,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1172,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1173,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1174,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1175,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1176,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1179,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1180,50): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1182,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1190,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1191,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1192,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1193,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1194,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1198,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1199,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1202,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1212,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1213,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1214,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1215,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1216,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1217,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1220,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1221,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1225,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1229,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1237,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1238,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1239,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1240,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1241,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1245,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1247,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1249,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1250,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1256,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1257,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1261,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1262,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1263,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1264,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1265,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1266,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1267,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1271,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1276,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1278,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1284,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1288,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1289,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1293,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1296,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1299,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1306,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1307,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1308,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1309,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1310,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1318,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1321,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1322,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1330,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1339,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1350,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1352,26): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1354,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1355,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1362,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1373,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1374,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1375,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1376,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1377,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1378,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1382,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1395,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1396,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1397,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1406,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1411,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1412,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1413,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1414,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1418,39): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1423,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1424,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1425,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1429,39): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1435,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1436,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1437,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1442,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1447,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1448,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1456,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1463,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1471,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1472,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1473,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1480,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1486,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1487,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1488,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1489,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1490,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1494,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1499,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1500,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1504,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1509,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1515,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1519,45): error TS7006: Parameter 'file' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1520,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1521,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1522,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1524,49): error TS7006: Parameter 'file' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1533,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1535,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1536,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1537,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1540,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1543,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1544,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1545,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1546,58): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1547,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1548,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1549,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1550,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1551,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1553,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1555,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1561,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1562,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1564,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1565,66): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/Dashboard.tsx(1566,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1567,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1568,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1569,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1570,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1571,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1573,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1577,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1582,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1588,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1589,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1590,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1591,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1592,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1593,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1599,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1600,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1601,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1608,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1610,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Dashboard.tsx(1617,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(3,28): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Freedom.tsx(55,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(56,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(58,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(60,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(65,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(88,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(104,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(106,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(107,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(111,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(113,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(116,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(118,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(130,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(131,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(132,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(133,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(144,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(145,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(149,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(160,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(162,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(169,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(170,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(178,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(179,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Freedom.tsx(180,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(24,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(25,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(27,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(29,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(30,31): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(34,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(39,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(42,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(44,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(51,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(52,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(53,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(54,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(67,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(70,28): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(73,28): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(76,28): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(79,28): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Journal.tsx(81,26): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(2,71): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../gateway-connect.js'?
+ui/src/pages/MCP.tsx(3,64): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../gateway-connection.js'?
+ui/src/pages/MCP.tsx(83,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(84,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(85,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(86,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(95,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(96,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(97,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(105,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(106,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(107,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(114,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(115,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(116,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(124,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(125,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(128,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(155,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(156,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(160,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(161,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(162,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(163,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(164,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(169,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(174,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(176,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(177,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(178,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(182,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(183,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(184,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(190,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(191,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(192,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(199,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(200,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(204,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(205,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(213,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(222,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(325,11): error TS2367: This comparison appears to be unintentional because the types '"res"' and '"event"' have no overlap.
+ui/src/pages/MCP.tsx(438,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(439,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(447,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(450,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(451,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(458,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(462,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(463,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(475,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(492,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(500,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(501,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(511,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(512,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(515,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(523,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(524,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(527,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(532,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(533,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(536,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(545,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(546,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(549,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(554,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MCP.tsx(556,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(2,63): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Memory.tsx(3,26): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../components/MarkdownText.js'?
+ui/src/pages/Memory.tsx(43,46): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/Memory.tsx(76,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(77,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(78,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(79,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(80,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(81,49): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(87,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(95,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(97,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(108,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(109,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(110,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(111,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(112,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(115,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(119,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(124,20): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(127,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(131,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(133,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(139,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(140,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(141,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(143,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(146,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(153,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(154,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(155,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(156,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(157,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(160,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(165,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(166,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(167,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(168,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Memory.tsx(172,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(9,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/MissionControl.tsx(10,26): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../components/MarkdownText.js'?
+ui/src/pages/MissionControl.tsx(37,49): error TS7006: Parameter 'file' implicitly has an 'any' type.
+ui/src/pages/MissionControl.tsx(59,28): error TS7006: Parameter 'file' implicitly has an 'any' type.
+ui/src/pages/MissionControl.tsx(130,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(131,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(132,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(133,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(134,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(139,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(148,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(149,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(150,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(151,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(152,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(157,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(163,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(164,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(165,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(166,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(174,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(175,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(176,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(183,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(184,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(185,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(188,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(189,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(190,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(198,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(199,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(208,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(210,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(214,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(218,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(219,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(220,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(221,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(222,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(223,54): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(228,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(229,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(230,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(237,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(238,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(249,18): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(250,16): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(252,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(253,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(254,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(255,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(256,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(257,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(259,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(261,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(262,43): error TS7006: Parameter 'file' implicitly has an 'any' type.
+ui/src/pages/MissionControl.tsx(263,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(269,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(270,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(271,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(273,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(279,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(280,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(281,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(282,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(290,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(306,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(307,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(308,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(309,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(310,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(314,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(323,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(326,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(336,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(337,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(338,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(339,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(340,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(345,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(346,46): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/MissionControl.tsx(347,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(348,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(349,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(350,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(351,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(353,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(357,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(363,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(364,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(365,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(366,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(367,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(369,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(372,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(377,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(378,47): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/MissionControl.tsx(379,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(380,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(381,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(382,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(383,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(384,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(386,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(390,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/MissionControl.tsx(395,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(3,48): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Sessions.tsx(30,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(37,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(38,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(42,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(43,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(45,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(46,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(60,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(70,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(73,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(79,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(98,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(99,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(100,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(111,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(112,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(115,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(122,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(123,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(124,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(125,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(126,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(127,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(128,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(129,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(130,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(131,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(132,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(135,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(137,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(144,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(145,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(146,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(156,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(162,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(163,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(173,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(179,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(180,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Sessions.tsx(190,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(24,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Settings.tsx(29,8): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../lib/heartbeat.js'?
+ui/src/pages/Settings.tsx(241,39): error TS7006: Parameter 'p' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(259,24): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(265,43): error TS7006: Parameter 'p' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(271,24): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(277,40): error TS7006: Parameter 'p' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(299,26): error TS7006: Parameter 'p' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(360,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(361,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(362,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(363,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(364,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(369,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(374,24): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(375,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(377,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(378,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(379,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(380,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(381,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(382,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(387,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(388,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(389,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(390,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(392,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(393,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(394,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(398,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(399,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(400,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(402,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(403,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(404,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(409,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(411,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(415,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(416,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(417,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(419,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(422,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(423,57): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(424,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(425,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(426,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(427,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(428,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(429,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(431,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(439,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(445,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(446,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(447,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(448,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(449,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(456,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(458,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(459,50): error TS7006: Parameter 'provider' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(460,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(461,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(464,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(473,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(474,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(477,31): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(489,31): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(501,27): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(504,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(505,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(506,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(514,25): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(527,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(530,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(531,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(532,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(539,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(545,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(546,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(547,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(548,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(553,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(554,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(555,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(558,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(559,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(560,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(561,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(569,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(589,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(590,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(591,23): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(600,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(601,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(609,21): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(619,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(620,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(630,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(631,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(642,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(648,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(649,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(650,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(651,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(652,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(657,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(658,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(659,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(660,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(668,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(669,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(670,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(677,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(678,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(687,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(688,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(689,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(690,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(697,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(698,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(699,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(705,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(706,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(707,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(713,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(714,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(715,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(722,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(723,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(732,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(734,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(739,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(740,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(741,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(742,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(743,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(748,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(749,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(750,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(751,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(761,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(762,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(765,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(766,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(767,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(775,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(776,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(777,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(784,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(786,19): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(792,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(793,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(794,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(801,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(802,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(803,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(818,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(819,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(820,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(836,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(837,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(838,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(847,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(848,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(858,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(859,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(870,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(871,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(872,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(873,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(874,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(879,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(880,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(881,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(882,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(886,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(891,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(892,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(893,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(897,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(902,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(903,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(904,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(908,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(913,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(914,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(915,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(919,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(925,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(926,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(927,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(932,35): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(937,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(938,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(939,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(943,37): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+ui/src/pages/Settings.tsx(949,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(950,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(958,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(965,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(972,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(988,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(989,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(990,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(992,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(994,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1000,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1001,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1009,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1019,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1021,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1022,17): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1030,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1031,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Settings.tsx(1032,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(3,52): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../api.js'?
+ui/src/pages/Soul.tsx(35,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(43,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(44,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(45,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(56,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(57,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(58,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(61,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(72,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(80,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(93,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(107,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(133,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(134,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(135,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(139,43): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(147,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(148,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(149,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(160,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(161,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(162,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/pages/Soul.tsx(166,33): error TS7006: Parameter 'component' implicitly has an 'any' type.
+ui/src/pages/Soul.tsx(166,44): error TS7006: Parameter 'index' implicitly has an 'any' type.
+ui/src/pages/Soul.tsx(167,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+ui/src/ui/app-channels.ts(2,35): error TS2307: Cannot find module './types.ts' or its corresponding type declarations.
+ui/src/ui/app-channels.ts(8,8): error TS2307: Cannot find module './controllers/channels.ts' or its corresponding type declarations.
+ui/src/ui/app-channels.ts(9,40): error TS2307: Cannot find module './controllers/config.ts' or its corresponding type declarations.
+ui/src/ui/app-channels.ts(10,45): error TS2307: Cannot find module './views/channels.nostr-profile-form.ts' or its corresponding type declarations.
+ui/src/ui/app-chat.ts(2,37): error TS2307: Cannot find module './gateway.ts' or its corresponding type declarations.
+ui/src/ui/app-chat.ts(3,52): error TS2307: Cannot find module './ui-types.ts' or its corresponding type declarations.
+ui/src/ui/app-chat.ts(7,33): error TS2307: Cannot find module './app-tool-stream.ts' or its corresponding type declarations.
+ui/src/ui/app-chat.ts(9,30): error TS2307: Cannot find module './controllers/sessions.ts' or its corresponding type declarations.
+ui/src/ui/app-chat.ts(11,30): error TS2307: Cannot find module './uuid.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(1,36): error TS2307: Cannot find module './app-events.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(3,42): error TS2307: Cannot find module './controllers/exec-approval.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(4,56): error TS2307: Cannot find module './gateway.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(7,85): error TS2307: Cannot find module './types.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(15,75): error TS2307: Cannot find module './app-tool-stream.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(16,28): error TS2307: Cannot find module './controllers/agents.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(17,39): error TS2307: Cannot find module './controllers/assistant-identity.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(20,29): error TS2307: Cannot find module './controllers/devices.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(26,8): error TS2307: Cannot find module './controllers/exec-approval.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(27,27): error TS2307: Cannot find module './controllers/nodes.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(28,30): error TS2307: Cannot find module './controllers/sessions.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(29,38): error TS2307: Cannot find module './gateway.ts' or its corresponding type declarations.
+ui/src/ui/app-gateway.ts(132,15): error TS7006: Parameter 'hello' implicitly has an 'any' type.
+ui/src/ui/app-gateway.ts(152,17): error TS7031: Binding element 'code' implicitly has an 'any' type.
+ui/src/ui/app-gateway.ts(152,23): error TS7031: Binding element 'reason' implicitly has an 'any' type.
+ui/src/ui/app-gateway.ts(162,15): error TS7006: Parameter 'evt' implicitly has an 'any' type.
+ui/src/ui/app-gateway.ts(168,15): error TS7031: Binding element 'expected' implicitly has an 'any' type.
+ui/src/ui/app-gateway.ts(168,25): error TS7031: Binding element 'received' implicitly has an 'any' type.
+ui/src/ui/app-polling.ts(2,27): error TS2307: Cannot find module './controllers/debug.ts' or its corresponding type declarations.
+ui/src/ui/app-polling.ts(3,26): error TS2307: Cannot find module './controllers/logs.ts' or its corresponding type declarations.
+ui/src/ui/app-polling.ts(4,27): error TS2307: Cannot find module './controllers/nodes.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(3,35): error TS2307: Cannot find module './app-view-state.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(4,45): error TS2307: Cannot find module './theme-transition.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(5,32): error TS2307: Cannot find module './theme.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(6,41): error TS2307: Cannot find module './types.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(11,23): error TS2307: Cannot find module './icons.ts' or its corresponding type declarations.
+ui/src/ui/app-render.helpers.ts(253,33): error TS7006: Parameter 'row' implicitly has an 'any' type.
+ui/src/ui/app-render.helpers.ts(282,68): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/app-render.helpers.ts(283,53): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(2,35): error TS2307: Cannot find module './app-view-state.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(5,32): error TS2307: Cannot find module './app-render-usage-tab.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(7,69): error TS2307: Cannot find module './controllers/agent-files.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(8,56): error TS2307: Cannot find module './controllers/agent-identity.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(9,33): error TS2307: Cannot find module './controllers/agent-skills.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(10,28): error TS2307: Cannot find module './controllers/agents.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(11,30): error TS2307: Cannot find module './controllers/channels.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(20,8): error TS2307: Cannot find module './controllers/config.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(27,8): error TS2307: Cannot find module './controllers/cron.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(28,44): error TS2307: Cannot find module './controllers/debug.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(35,8): error TS2307: Cannot find module './controllers/devices.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(41,8): error TS2307: Cannot find module './controllers/exec-approvals.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(42,26): error TS2307: Cannot find module './controllers/logs.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(43,27): error TS2307: Cannot find module './controllers/nodes.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(44,30): error TS2307: Cannot find module './controllers/presence.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(45,59): error TS2307: Cannot find module './controllers/sessions.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(52,8): error TS2307: Cannot find module './controllers/skills.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(53,23): error TS2307: Cannot find module './icons.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(55,30): error TS2307: Cannot find module './views/agents.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(56,32): error TS2307: Cannot find module './views/channels.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(58,30): error TS2307: Cannot find module './views/config.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(59,28): error TS2307: Cannot find module './views/cron.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(61,42): error TS2307: Cannot find module './views/exec-approval.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(62,46): error TS2307: Cannot find module './views/gateway-url-confirmation.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(63,33): error TS2307: Cannot find module './views/instances.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(64,28): error TS2307: Cannot find module './views/logs.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(65,29): error TS2307: Cannot find module './views/nodes.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(67,32): error TS2307: Cannot find module './views/sessions.ts' or its corresponding type declarations.
+ui/src/ui/app-render.ts(77,28): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(252,29): error TS7006: Parameter 'probe' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(253,35): error TS7006: Parameter 'force' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(256,33): error TS7006: Parameter 'path' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(256,39): error TS7006: Parameter 'value' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(259,38): error TS7006: Parameter 'accountId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(259,49): error TS7006: Parameter 'profile' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(262,45): error TS7006: Parameter 'field' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(262,52): error TS7006: Parameter 'value' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(294,35): error TS7006: Parameter 'next' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(301,27): error TS7006: Parameter 'key' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(301,32): error TS7006: Parameter 'patch' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(302,28): error TS7006: Parameter 'key' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(320,61): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(326,32): error TS7006: Parameter 'patch' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(329,28): error TS7006: Parameter 'job' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(329,33): error TS7006: Parameter 'enabled' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(330,25): error TS7006: Parameter 'job' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(331,28): error TS7006: Parameter 'job' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(332,30): error TS7006: Parameter 'jobId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(374,67): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(379,33): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(401,33): error TS7006: Parameter 'panel' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(425,31): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(426,32): error TS7006: Parameter 'name' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(433,37): error TS7006: Parameter 'name' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(433,43): error TS7006: Parameter 'content' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(436,31): error TS7006: Parameter 'name' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(440,30): error TS7006: Parameter 'name' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(448,40): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(448,49): error TS7006: Parameter 'profile' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(448,58): error TS7006: Parameter 'clearAllow' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(476,42): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(476,51): error TS7006: Parameter 'alsoAllow' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(476,62): error TS7006: Parameter 'deny' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(510,40): error TS7006: Parameter 'next' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(516,38): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(516,47): error TS7006: Parameter 'skillName' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(516,58): error TS7006: Parameter 'enabled' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(540,59): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(554,38): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(574,43): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(594,33): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(594,42): error TS7006: Parameter 'modelId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(630,42): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(630,51): error TS7006: Parameter 'fallbacks' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(650,53): error TS7006: Parameter 'name' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(729,35): error TS7006: Parameter 'requestId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(730,34): error TS7006: Parameter 'requestId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(731,34): error TS7006: Parameter 'deviceId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(731,44): error TS7006: Parameter 'role' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(731,50): error TS7006: Parameter 'scopes' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(733,34): error TS7006: Parameter 'deviceId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(733,44): error TS7006: Parameter 'role' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(742,33): error TS7006: Parameter 'nodeId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(749,31): error TS7006: Parameter 'agentIndex' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(749,43): error TS7006: Parameter 'nodeId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(758,47): error TS7006: Parameter 'kind' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(758,53): error TS7006: Parameter 'nodeId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(766,46): error TS7006: Parameter 'agentId' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(769,40): error TS7006: Parameter 'path' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(769,46): error TS7006: Parameter 'value' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(771,41): error TS7006: Parameter 'path' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(883,31): error TS7006: Parameter 'next' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(886,36): error TS7006: Parameter 'mode' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(887,31): error TS7006: Parameter 'path' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(887,37): error TS7006: Parameter 'value' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(888,34): error TS7006: Parameter 'query' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(889,35): error TS7006: Parameter 'section' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(893,38): error TS7006: Parameter 'section' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(934,38): error TS7006: Parameter 'next' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(935,33): error TS7006: Parameter 'level' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(935,40): error TS7006: Parameter 'enabled' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(938,38): error TS7006: Parameter 'next' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(940,28): error TS7006: Parameter 'lines' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(940,35): error TS7006: Parameter 'label' implicitly has an 'any' type.
+ui/src/ui/app-render.ts(941,28): error TS7006: Parameter 'event' implicitly has an 'any' type.
+ui/src/ui/app-settings.ts(2,39): error TS2307: Cannot find module './types.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(11,56): error TS2307: Cannot find module './controllers/agent-identity.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(12,33): error TS2307: Cannot find module './controllers/agent-skills.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(13,28): error TS2307: Cannot find module './controllers/agents.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(14,30): error TS2307: Cannot find module './controllers/channels.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(15,46): error TS2307: Cannot find module './controllers/config.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(16,46): error TS2307: Cannot find module './controllers/cron.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(17,27): error TS2307: Cannot find module './controllers/debug.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(18,29): error TS2307: Cannot find module './controllers/devices.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(19,35): error TS2307: Cannot find module './controllers/exec-approvals.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(20,26): error TS2307: Cannot find module './controllers/logs.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(21,27): error TS2307: Cannot find module './controllers/nodes.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(22,30): error TS2307: Cannot find module './controllers/presence.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(23,30): error TS2307: Cannot find module './controllers/sessions.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(24,28): error TS2307: Cannot find module './controllers/skills.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(34,67): error TS2307: Cannot find module './theme-transition.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(35,66): error TS2307: Cannot find module './theme.ts' or its corresponding type declarations.
+ui/src/ui/app-settings.ts(203,52): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/app.ts(3,36): error TS2307: Cannot find module './app-events.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(4,35): error TS2307: Cannot find module './app-view-state.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(5,40): error TS2307: Cannot find module './controllers/devices.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(6,42): error TS2307: Cannot find module './controllers/exec-approval.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(7,63): error TS2307: Cannot find module './controllers/exec-approvals.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(8,35): error TS2307: Cannot find module './controllers/skills.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(9,59): error TS2307: Cannot find module './gateway.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(11,47): error TS2307: Cannot find module './theme.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(30,8): error TS2307: Cannot find module './types.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(31,44): error TS2307: Cannot find module './views/channels.nostr-profile-form.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(50,62): error TS2307: Cannot find module './app-defaults.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(57,8): error TS2307: Cannot find module './app-lifecycle.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(78,8): error TS2307: Cannot find module './app-tool-stream.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(80,72): error TS2307: Cannot find module './controllers/assistant-identity.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(82,77): error TS2307: Cannot find module './ui-types.ts' or its corresponding type declarations.
+ui/src/ui/app.ts(232,32): error TS2307: Cannot find module './types.js' or its corresponding type declarations.
+ui/src/ui/app.ts(233,37): error TS2307: Cannot find module './types.js' or its corresponding type declarations.
+ui/src/ui/app.ts(250,36): error TS2307: Cannot find module './types.js' or its corresponding type declarations.
+ui/src/ui/controllers/chat.ts(1,43): error TS2307: Cannot find module '../gateway.ts' or its corresponding type declarations.
+ui/src/ui/controllers/chat.ts(2,37): error TS2307: Cannot find module '../ui-types.ts' or its corresponding type declarations.
+ui/src/ui/controllers/chat.ts(3,30): error TS2307: Cannot find module '../uuid.ts' or its corresponding type declarations.
+ui/src/ui/controllers/config.test.ts(9,8): error TS2307: Cannot find module './config.ts' or its corresponding type declarations.
+ui/src/ui/device-identity.ts(1,53): error TS2307: Cannot find module '@noble/ed25519' or its corresponding type declarations.
+ui/src/ui/navigation.ts(1,31): error TS2307: Cannot find module './icons.js' or its corresponding type declarations.
+ui/src/ui/storage.ts(3,32): error TS2307: Cannot find module './theme.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.test.ts(3,41): error TS2307: Cannot find module '../types.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(4,41): error TS2307: Cannot find module '../types.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(5,45): error TS2307: Cannot find module '../types/chat-types.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(6,52): error TS2307: Cannot find module '../ui-types.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(11,8): error TS2307: Cannot find module '../chat/grouped-render.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(12,60): error TS2307: Cannot find module '../chat/message-normalizer.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(13,23): error TS2307: Cannot find module '../icons.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(14,37): error TS2307: Cannot find module '../text-direction.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(15,39): error TS2307: Cannot find module './markdown-sidebar.ts' or its corresponding type declarations.
+ui/src/ui/views/chat.ts(193,57): error TS7006: Parameter 'row' implicitly has an 'any' type.
+ui/src/ui/views/debug.ts(2,36): error TS2307: Cannot find module '../app-events.ts' or its corresponding type declarations.
+ui/src/ui/views/debug.ts(3,36): error TS2307: Cannot find module '../presenter.ts' or its corresponding type declarations.
+ui/src/ui/views/overview.ts(2,37): error TS2307: Cannot find module '../gateway.ts' or its corresponding type declarations.
+ui/src/ui/views/overview.ts(4,62): error TS2307: Cannot find module '../format.ts' or its corresponding type declarations.
+ui/src/ui/views/overview.ts(5,31): error TS2307: Cannot find module '../presenter.ts' or its corresponding type declarations.
+ui/src/ui/views/skills-grouping.ts(1,39): error TS2307: Cannot find module '../types.ts' or its corresponding type declarations.
+ui/src/ui/views/skills.ts(2,38): error TS2307: Cannot find module '../controllers/skills.ts' or its corresponding type declarations.
+ui/src/ui/views/skills.ts(3,58): error TS2307: Cannot find module '../types.ts' or its corresponding type declarations.
+ui/src/ui/views/skills.ts(4,27): error TS2307: Cannot find module '../format.ts' or its corresponding type declarations.
+ui/src/ui/views/skills.ts(10,8): error TS2307: Cannot find module './skills-shared.ts' or its corresponding type declarations.
+ui/src/ui/views/skills.ts(32,22): error TS7006: Parameter 'skill' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(2,58): error TS2307: Cannot find module '../usage-helpers.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(13,8): error TS2307: Cannot find module './usage-metrics.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(24,8): error TS2307: Cannot find module './usage-query.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(25,66): error TS2307: Cannot find module './usage-render-details.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(32,8): error TS2307: Cannot find module './usage-render-overview.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(33,35): error TS2307: Cannot find module './usageStyles.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(41,8): error TS2307: Cannot find module './usageTypes.ts' or its corresponding type declarations.
+ui/src/ui/views/usage.ts(115,48): error TS7006: Parameter 'd' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(170,16): error TS7006: Parameter 'term' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(171,13): error TS7006: Parameter 'term' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(188,43): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(192,40): error TS7006: Parameter 'entry' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(194,65): error TS7006: Parameter 'tool' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(202,31): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(203,32): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(243,50): error TS7006: Parameter 'd' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(245,8): error TS7006: Parameter 'acc' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(245,13): error TS7006: Parameter 'd' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(281,61): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(304,34): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(316,60): error TS7006: Parameter 's' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(326,39): error TS7006: Parameter 'd' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(687,37): error TS7006: Parameter 'term' implicitly has an 'any' type.
+ui/src/ui/views/usage.ts(711,22): error TS7006: Parameter 'suggestion' implicitly has an 'any' type.

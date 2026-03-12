@@ -11,8 +11,8 @@
  */
 
 import { randomUUID } from "node:crypto";
-import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { Channel, IncomingMessage, MessagePriority, OutgoingMessage } from "./bridge.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("noxsoft-chat");
 

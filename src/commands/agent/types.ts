@@ -35,6 +35,8 @@ export type AgentCommandOpts = {
   clientTools?: ClientToolDefinition[];
   /** Agent id override (must exist in config). */
   agentId?: string;
+  /** Persisted session model override for this run/session. */
+  model?: string;
   to?: string;
   sessionId?: string;
   sessionKey?: string;

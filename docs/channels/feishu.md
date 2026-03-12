@@ -374,8 +374,8 @@ anima pairing list feishu
 
 ## Gateway management commands
 
-| Command                    | Description                   |
-| -------------------------- | ----------------------------- |
+| Command                 | Description                   |
+| ----------------------- | ----------------------------- |
 | `anima gateway status`  | Show gateway status           |
 | `anima gateway install` | Install/start gateway service |
 | `anima gateway stop`    | Stop gateway service          |

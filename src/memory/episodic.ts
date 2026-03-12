@@ -95,13 +95,24 @@ function parseEpisodeMarkdown(content: string, filePath: string): Episode | null
     }
     const tagsMatch = line.match(/^\s*-\s*\*\*Tags:\*\*\s*(.+)$/);
     if (tagsMatch) {
-      tags.push(...tagsMatch[1].split(",").map((t) => t.trim()).filter(Boolean));
+      tags.push(
+        ...tagsMatch[1]
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+      );
     }
   }
 
   // Details: everything after the first "---" separator.
   const sepIndex = lines.findIndex((l) => l.trim() === "---");
-  const details = sepIndex >= 0 ? lines.slice(sepIndex + 1).join("\n").trim() : "";
+  const details =
+    sepIndex >= 0
+      ? lines
+          .slice(sepIndex + 1)
+          .join("\n")
+          .trim()
+      : "";
 
   const id = path.basename(filePath, ".md");
 
@@ -152,7 +163,7 @@ export class EpisodicMemory {
     const dateDirs = dirs
       .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
       .filter((d) => d >= fromDate && d <= toDate)
-      .sort();
+      .toSorted();
 
     for (const dateDir of dateDirs) {
       const fullDir = path.join(this.basePath, dateDir);
@@ -208,7 +219,10 @@ export class EpisodicMemory {
       return [];
     }
 
-    const dateDirs = dirs.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse();
+    const dateDirs = dirs
+      .filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+      .toSorted()
+      .toReversed();
 
     for (const dateDir of dateDirs) {
       const fullDir = path.join(this.basePath, dateDir);

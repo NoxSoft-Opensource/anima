@@ -8,7 +8,7 @@ export const mcpHandlers: GatewayRequestHandlers = {
       const servers = await listServers();
       respond(true, { servers });
     } catch (err) {
-      respond(false, undefined, errorShape(ErrorCodes.INTERNAL, String(err)));
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }
   },
 
@@ -46,7 +46,7 @@ export const mcpHandlers: GatewayRequestHandlers = {
       await syncConfig();
       respond(true, { servers: registry.servers });
     } catch (err) {
-      respond(false, undefined, errorShape(ErrorCodes.INTERNAL, String(err)));
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }
   },
 
@@ -63,7 +63,7 @@ export const mcpHandlers: GatewayRequestHandlers = {
       await syncConfig();
       respond(true, { servers: registry.servers });
     } catch (err) {
-      respond(false, undefined, errorShape(ErrorCodes.INTERNAL, String(err)));
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }
   },
 
@@ -73,7 +73,7 @@ export const mcpHandlers: GatewayRequestHandlers = {
       const result = await syncConfig();
       respond(true, result);
     } catch (err) {
-      respond(false, undefined, errorShape(ErrorCodes.INTERNAL, String(err)));
+      respond(false, undefined, errorShape(ErrorCodes.UNAVAILABLE, String(err)));
     }
   },
 };

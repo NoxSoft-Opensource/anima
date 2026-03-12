@@ -224,9 +224,7 @@ export async function gatherDaemonStatus(
     ? await probeGatewayStatus({
         url: probeUrl,
         token:
-          opts.rpc.token ||
-          mergedDaemonEnv.ANIMA_GATEWAY_TOKEN ||
-          daemonCfg.gateway?.auth?.token,
+          opts.rpc.token || mergedDaemonEnv.ANIMA_GATEWAY_TOKEN || daemonCfg.gateway?.auth?.token,
         password:
           opts.rpc.password ||
           mergedDaemonEnv.ANIMA_GATEWAY_PASSWORD ||

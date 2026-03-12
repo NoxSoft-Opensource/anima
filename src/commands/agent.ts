@@ -3,26 +3,16 @@ import {
   listAgentIds,
   resolveAgentDir,
   resolveAgentModelFallbacksOverride,
-  resolveAgentModelPrimary,
   resolveAgentSkillsFilter,
   resolveAgentWorkspaceDir,
 } from "../agents/agent-scope.js";
 import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { clearSessionAuthProfileOverride } from "../agents/auth-profiles/session-override.js";
-import { runCliAgent } from "../agents/cli-runner.js";
 import { getCliSessionId } from "../agents/cli-session.js";
-import { DEFAULT_MODEL, DEFAULT_PROVIDER } from "../agents/defaults.js";
 import { AGENT_LANE_SUBAGENT } from "../agents/lanes.js";
 import { loadModelCatalog } from "../agents/model-catalog.js";
 import { runWithModelFallback } from "../agents/model-fallback.js";
-import {
-  buildAllowedModelSet,
-  isCliProvider,
-  modelKey,
-  normalizeModelRef,
-  resolveConfiguredModelRef,
-  resolveThinkingDefault,
-} from "../agents/model-selection.js";
+import { resolveThinkingDefault } from "../agents/model-selection.js";
 import { runEmbeddedPiAgent } from "../agents/pi-embedded.js";
 import { buildWorkspaceSkillSnapshot } from "../agents/skills.js";
 import { getSkillsSnapshotVersion } from "../agents/skills/refresh.js";
@@ -59,9 +49,12 @@ import { applyModelOverrideToSessionEntry } from "../sessions/model-overrides.js
 import { resolveSendPolicy } from "../sessions/send-policy.js";
 import { resolveMessageChannel } from "../utils/message-channel.js";
 import { deliverAgentCommandResult } from "./agent/delivery.js";
+import { resolveAgentModelSelection } from "./agent/model-resolution.js";
 import { resolveAgentRunContext } from "./agent/run-context.js";
 import { updateSessionStoreAfterAgentRun } from "./agent/session-store.js";
 import { resolveSession } from "./agent/session.js";
+
+type ModelCatalog = Awaited<ReturnType<typeof loadModelCatalog>>;
 
 export async function agentCommand(
   opts: AgentCommandOpts,
@@ -77,6 +70,10 @@ export async function agentCommand(
   }
 
   const cfg = loadConfig();
+  const explicitModelRaw = opts.model?.trim();
+  if (opts.model !== undefined && !explicitModelRaw) {
+    throw new Error("--model cannot be empty.");
+  }
   const agentIdOverrideRaw = opts.agentId?.trim();
   const agentIdOverride = agentIdOverrideRaw ? normalizeAgentId(agentIdOverrideRaw) : undefined;
   if (agentIdOverride) {
@@ -104,27 +101,6 @@ export async function agentCommand(
     ensureBootstrapFiles: !agentCfg?.skipBootstrap,
   });
   const workspaceDir = workspace.dir;
-  const configuredModel = resolveConfiguredModelRef({
-    cfg,
-    defaultProvider: DEFAULT_PROVIDER,
-    defaultModel: DEFAULT_MODEL,
-  });
-  const thinkingLevelsHint = formatThinkingLevels(configuredModel.provider, configuredModel.model);
-
-  const thinkOverride = normalizeThinkLevel(opts.thinking);
-  const thinkOnce = normalizeThinkLevel(opts.thinkingOnce);
-  if (opts.thinking && !thinkOverride) {
-    throw new Error(`Invalid thinking level. Use one of: ${thinkingLevelsHint}.`);
-  }
-  if (opts.thinkingOnce && !thinkOnce) {
-    throw new Error(`Invalid one-shot thinking level. Use one of: ${thinkingLevelsHint}.`);
-  }
-
-  const verboseOverride = normalizeVerboseLevel(opts.verbose);
-  if (opts.verbose && !verboseOverride) {
-    throw new Error('Invalid verbose level. Use "on", "full", or "off".');
-  }
-
   const laneRaw = typeof opts.lane === "string" ? opts.lane.trim() : "";
   const isSubagentLane = laneRaw === String(AGENT_LANE_SUBAGENT);
   const timeoutSecondsRaw =
@@ -164,6 +140,26 @@ export async function agentCommand(
   } = sessionResolution;
   let sessionEntry = resolvedSessionEntry;
   const runId = opts.runId?.trim() || sessionId;
+  const configuredModel = await resolveAgentModelSelection({
+    cfg,
+    agentId: sessionAgentId,
+    sessionEntry,
+  });
+  const thinkingLevelsHint = formatThinkingLevels(configuredModel.provider, configuredModel.model);
+
+  const thinkOverride = normalizeThinkLevel(opts.thinking);
+  const thinkOnce = normalizeThinkLevel(opts.thinkingOnce);
+  if (opts.thinking && !thinkOverride) {
+    throw new Error(`Invalid thinking level. Use one of: ${thinkingLevelsHint}.`);
+  }
+  if (opts.thinkingOnce && !thinkOnce) {
+    throw new Error(`Invalid one-shot thinking level. Use one of: ${thinkingLevelsHint}.`);
+  }
+
+  const verboseOverride = normalizeVerboseLevel(opts.verbose);
+  if (opts.verbose && !verboseOverride) {
+    throw new Error('Invalid verbose level. Use "on", "full", or "off".');
+  }
 
   try {
     if (opts.deliver === true) {
@@ -224,113 +220,44 @@ export async function agentCommand(
       sessionEntry = next;
     }
 
-    // Persist explicit /command overrides to the session store when we have a key.
-    if (sessionStore && sessionKey) {
-      const entry = sessionStore[sessionKey] ??
-        sessionEntry ?? { sessionId, updatedAt: Date.now() };
-      const next: SessionEntry = { ...entry, sessionId, updatedAt: Date.now() };
-      if (thinkOverride) {
-        next.thinkingLevel = thinkOverride;
-      }
-      applyVerboseOverride(next, verboseOverride);
-      sessionStore[sessionKey] = next;
-      await updateSessionStore(storePath, (store) => {
-        store[sessionKey] = next;
-      });
-    }
-
-    const agentModelPrimary = resolveAgentModelPrimary(cfg, sessionAgentId);
-    const cfgForModelSelection = agentModelPrimary
-      ? {
-          ...cfg,
-          agents: {
-            ...cfg.agents,
-            defaults: {
-              ...cfg.agents?.defaults,
-              model: {
-                ...(typeof cfg.agents?.defaults?.model === "object"
-                  ? cfg.agents.defaults.model
-                  : undefined),
-                primary: agentModelPrimary,
-              },
-            },
-          },
-        }
-      : cfg;
-
-    const configuredDefaultRef = resolveConfiguredModelRef({
-      cfg: cfgForModelSelection,
-      defaultProvider: DEFAULT_PROVIDER,
-      defaultModel: DEFAULT_MODEL,
+    const modelSelection = await resolveAgentModelSelection({
+      cfg,
+      agentId: sessionAgentId,
+      sessionEntry,
+      explicitModel: explicitModelRaw,
     });
-    const { provider: defaultProvider, model: defaultModel } = normalizeModelRef(
-      configuredDefaultRef.provider,
-      configuredDefaultRef.model,
-    );
-    let provider = defaultProvider;
-    let model = defaultModel;
-    const hasAllowlist = agentCfg?.models && Object.keys(agentCfg.models).length > 0;
+    const defaultProvider = modelSelection.defaultProvider;
+    const defaultModel = modelSelection.defaultModel;
+    let provider = modelSelection.provider;
+    let model = modelSelection.model;
+    let modelCatalog: ModelCatalog | undefined;
     const hasStoredOverride = Boolean(
       sessionEntry?.modelOverride || sessionEntry?.providerOverride,
     );
-    const needsModelCatalog = hasAllowlist || hasStoredOverride;
-    let allowedModelKeys = new Set<string>();
-    let allowedModelCatalog: Awaited<ReturnType<typeof loadModelCatalog>> = [];
-    let modelCatalog: Awaited<ReturnType<typeof loadModelCatalog>> | null = null;
-
-    if (needsModelCatalog) {
-      modelCatalog = await loadModelCatalog({ config: cfg });
-      const allowed = buildAllowedModelSet({
-        cfg,
-        catalog: modelCatalog,
-        defaultProvider,
-        defaultModel,
-      });
-      allowedModelKeys = allowed.allowedKeys;
-      allowedModelCatalog = allowed.allowedCatalog;
-    }
-
-    if (sessionEntry && sessionStore && sessionKey && hasStoredOverride) {
-      const entry = sessionEntry;
-      const overrideProvider = sessionEntry.providerOverride?.trim() || defaultProvider;
-      const overrideModel = sessionEntry.modelOverride?.trim();
-      if (overrideModel) {
-        const normalizedOverride = normalizeModelRef(overrideProvider, overrideModel);
-        const key = modelKey(normalizedOverride.provider, normalizedOverride.model);
-        if (
-          !isCliProvider(normalizedOverride.provider, cfg) &&
-          allowedModelKeys.size > 0 &&
-          !allowedModelKeys.has(key)
-        ) {
-          const { updated } = applyModelOverrideToSessionEntry({
-            entry,
-            selection: { provider: defaultProvider, model: defaultModel, isDefault: true },
-          });
-          if (updated) {
-            sessionStore[sessionKey] = entry;
-            await updateSessionStore(storePath, (store) => {
-              store[sessionKey] = entry;
-            });
-          }
-        }
-      }
-    }
-
-    const storedProviderOverride = sessionEntry?.providerOverride?.trim();
     const storedModelOverride = sessionEntry?.modelOverride?.trim();
-    if (storedModelOverride) {
-      const candidateProvider = storedProviderOverride || defaultProvider;
-      const normalizedStored = normalizeModelRef(candidateProvider, storedModelOverride);
-      const key = modelKey(normalizedStored.provider, normalizedStored.model);
-      if (
-        isCliProvider(normalizedStored.provider, cfg) ||
-        allowedModelKeys.size === 0 ||
-        allowedModelKeys.has(key)
-      ) {
-        provider = normalizedStored.provider;
-        model = normalizedStored.model;
+
+    if (
+      sessionEntry &&
+      sessionStore &&
+      sessionKey &&
+      hasStoredOverride &&
+      !modelSelection.storedOverrideValid &&
+      !explicitModelRaw
+    ) {
+      const entry = sessionEntry;
+      const { updated } = applyModelOverrideToSessionEntry({
+        entry,
+        selection: { provider: defaultProvider, model: defaultModel, isDefault: true },
+      });
+      if (updated) {
+        sessionStore[sessionKey] = entry;
+        await updateSessionStore(storePath, (store) => {
+          store[sessionKey] = entry;
+        });
+        sessionEntry = entry;
       }
     }
+
     if (sessionEntry) {
       const authProfileId = sessionEntry.authProfileOverride;
       if (authProfileId) {
@@ -351,8 +278,8 @@ export async function agentCommand(
     }
 
     if (!resolvedThinkLevel) {
-      let catalogForThinking = modelCatalog ?? allowedModelCatalog;
-      if (!catalogForThinking || catalogForThinking.length === 0) {
+      let catalogForThinking = modelCatalog;
+      if (!catalogForThinking?.length) {
         modelCatalog = await loadModelCatalog({ config: cfg });
         catalogForThinking = modelCatalog;
       }
@@ -379,6 +306,32 @@ export async function agentCommand(
         });
       }
     }
+
+    if (sessionStore && sessionKey) {
+      const entry = sessionStore[sessionKey] ??
+        sessionEntry ?? { sessionId, updatedAt: Date.now() };
+      const next: SessionEntry = { ...entry, sessionId, updatedAt: Date.now() };
+      if (thinkOverride) {
+        next.thinkingLevel = thinkOverride;
+      }
+      applyVerboseOverride(next, verboseOverride);
+      if (explicitModelRaw) {
+        applyModelOverrideToSessionEntry({
+          entry: next,
+          selection: {
+            provider,
+            model,
+            isDefault: provider === defaultProvider && model === defaultModel,
+          },
+        });
+      }
+      sessionStore[sessionKey] = next;
+      await updateSessionStore(storePath, (store) => {
+        store[sessionKey] = next;
+      });
+      sessionEntry = next;
+    }
+
     const sessionFile = resolveSessionFilePath(sessionId, sessionEntry, {
       agentId: sessionAgentId,
     });
@@ -401,9 +354,10 @@ export async function agentCommand(
       // empty array (instead of undefined) tells resolveFallbackCandidates to skip
       // the implicit primary append, so the session stays on its overridden model.
       const agentFallbacksOverride = resolveAgentModelFallbacksOverride(cfg, sessionAgentId);
-      const effectiveFallbacksOverride = storedModelOverride
-        ? (agentFallbacksOverride ?? [])
-        : agentFallbacksOverride;
+      const effectiveFallbacksOverride =
+        explicitModelRaw || storedModelOverride
+          ? (agentFallbacksOverride ?? [])
+          : agentFallbacksOverride;
 
       // Track model fallback attempts so retries on an existing session don't
       // re-inject the original prompt as a duplicate user message.
@@ -413,6 +367,8 @@ export async function agentCommand(
         provider,
         model,
         agentDir,
+        sessionEntry,
+        thinkLevel: resolvedThinkLevel,
         fallbacksOverride: effectiveFallbacksOverride,
         run: (providerOverride, modelOverride) => {
           const isFallbackRetry = fallbackAttemptIndex > 0;
@@ -424,27 +380,6 @@ export async function agentCommand(
           const effectivePrompt = isFallbackRetry
             ? "Continue where you left off. The previous model attempt failed or timed out."
             : body;
-          if (isCliProvider(providerOverride, cfg)) {
-            const cliSessionId = getCliSessionId(sessionEntry, providerOverride);
-            return runCliAgent({
-              sessionId,
-              sessionKey,
-              agentId: sessionAgentId,
-              sessionFile,
-              workspaceDir,
-              config: cfg,
-              prompt: effectivePrompt,
-              provider: providerOverride,
-              model: modelOverride,
-              thinkLevel: resolvedThinkLevel,
-              timeoutMs,
-              runId,
-              extraSystemPrompt: opts.extraSystemPrompt,
-              cliSessionId,
-              images: isFallbackRetry ? undefined : opts.images,
-              streamParams: opts.streamParams,
-            });
-          }
           const authProfileId =
             providerOverride === provider ? sessionEntry?.authProfileOverride : undefined;
           return runEmbeddedPiAgent({
@@ -481,6 +416,8 @@ export async function agentCommand(
             verboseLevel: resolvedVerboseLevel,
             timeoutMs,
             runId,
+            execSecurity: sessionEntry?.execSecurity,
+            cliSessionId: getCliSessionId(sessionEntry, providerOverride),
             lane: opts.lane,
             abortSignal: opts.abortSignal,
             extraSystemPrompt: opts.extraSystemPrompt,
@@ -511,7 +448,7 @@ export async function agentCommand(
             phase: "end",
             startedAt,
             endedAt: Date.now(),
-            aborted: result.meta.aborted ?? false,
+            aborted: false,
           },
         });
       }

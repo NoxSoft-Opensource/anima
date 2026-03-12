@@ -266,13 +266,24 @@ export function registerAnimaCommands(program: Command): void {
 
   mcpCmd
     .command("update")
-    .description("Sync the MCP registry with Claude's mcp.json config")
+    .description("Sync the MCP registry with Claude and Codex configs")
     .action(async () => {
       const { syncConfig } = await import("../../mcp/config-sync.js");
       const result = await syncConfig();
-      console.log(
-        `Synced: ${result.added.length} added, ${result.updated.length} updated, ${result.removed.length} removed, ${result.preserved.length} preserved`,
-      );
+
+      const formatRes = (res: any) =>
+        `${res.added.length} added, ${res.updated.length} updated, ${res.removed.length} removed`;
+
+      console.log(`\nClaude Sync: ${formatRes(result.claude)}`);
+      console.log(`Codex Sync: ${formatRes(result.codex)}`);
+
+      const total = result.added.length + result.updated.length + result.removed.length;
+      if (total > 0) {
+        console.log(`\nTotal changes: ${total}`);
+      } else {
+        console.log("\nNo changes needed. Registry is up to date.");
+      }
+      console.log("");
     });
 
   // anima wander — trigger freedom exploration

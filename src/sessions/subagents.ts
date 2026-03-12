@@ -5,54 +5,54 @@
  * pipeline: chain sessions sequentially, passing output as context
  */
 
-import { loadIdentity } from '../identity/loader.js'
-import { buildTaskPrompt } from '../identity/prompt-builder.js'
-import { spawnSession } from './spawner.js'
-import type { SessionResult, SpawnOptions } from './spawner.js'
+import type { SessionResult, SpawnOptions } from "./spawner.js";
+import { loadIdentity } from "../identity/loader.js";
+import { buildTaskPrompt } from "../identity/prompt-builder.js";
+import { spawnSession } from "./spawner.js";
 
 export interface SubAgentTask {
-  name: string
-  description: string
-  workingDirectory?: string
-  model?: string
-  maxBudgetUsd?: number
-  timeoutMs?: number
-  allowedTools?: string[]
-  dangerouslySkipPermissions?: boolean
+  name: string;
+  description: string;
+  workingDirectory?: string;
+  model?: string;
+  maxBudgetUsd?: number;
+  timeoutMs?: number;
+  allowedTools?: string[];
+  dangerouslySkipPermissions?: boolean;
 }
 
 export interface FanOutResult {
   tasks: Array<{
-    name: string
-    result: SessionResult
-  }>
-  totalDurationMs: number
-  totalCostUsd: number
-  allSucceeded: boolean
+    name: string;
+    result: SessionResult;
+  }>;
+  totalDurationMs: number;
+  totalCostUsd: number;
+  allSucceeded: boolean;
 }
 
 export interface PipelineStage {
-  name: string
-  description: string
+  name: string;
+  description: string;
   /** Transform the previous stage's output into context for this stage */
-  contextTransform?: (previousOutput: string) => string
-  workingDirectory?: string
-  model?: string
-  maxBudgetUsd?: number
-  timeoutMs?: number
-  allowedTools?: string[]
-  dangerouslySkipPermissions?: boolean
+  contextTransform?: (previousOutput: string) => string;
+  workingDirectory?: string;
+  model?: string;
+  maxBudgetUsd?: number;
+  timeoutMs?: number;
+  allowedTools?: string[];
+  dangerouslySkipPermissions?: boolean;
 }
 
 export interface PipelineResult {
   stages: Array<{
-    name: string
-    result: SessionResult
-  }>
-  finalOutput: string
-  totalDurationMs: number
-  totalCostUsd: number
-  failedAt?: string
+    name: string;
+    result: SessionResult;
+  }>;
+  finalOutput: string;
+  totalDurationMs: number;
+  totalCostUsd: number;
+  failedAt?: string;
 }
 
 /**
@@ -62,14 +62,14 @@ export interface PipelineResult {
  * All tasks run simultaneously via Promise.all.
  */
 export async function fanOut(tasks: SubAgentTask[]): Promise<FanOutResult> {
-  const startTime = Date.now()
-  const identity = await loadIdentity()
+  const startTime = Date.now();
+  const identity = await loadIdentity();
 
   const promises = tasks.map(async (task) => {
     const systemPrompt = buildTaskPrompt(identity, {
       taskDescription: task.description,
       workingDirectory: task.workingDirectory,
-    })
+    });
 
     const spawnOpts: SpawnOptions = {
       prompt: task.description,
@@ -80,27 +80,24 @@ export async function fanOut(tasks: SubAgentTask[]): Promise<FanOutResult> {
       workingDirectory: task.workingDirectory,
       allowedTools: task.allowedTools,
       dangerouslySkipPermissions: task.dangerouslySkipPermissions,
-      outputFormat: 'json',
-    }
+      outputFormat: "json",
+    };
 
-    const result = await spawnSession(spawnOpts)
-    return { name: task.name, result }
-  })
+    const result = await spawnSession(spawnOpts);
+    return { name: task.name, result };
+  });
 
-  const results = await Promise.all(promises)
+  const results = await Promise.all(promises);
 
-  const totalCostUsd = results.reduce(
-    (sum, r) => sum + (r.result.costUsd || 0),
-    0,
-  )
-  const allSucceeded = results.every((r) => r.result.status === 'completed')
+  const totalCostUsd = results.reduce((sum, r) => sum + (r.result.costUsd || 0), 0);
+  const allSucceeded = results.every((r) => r.result.status === "completed");
 
   return {
     tasks: results,
     totalDurationMs: Date.now() - startTime,
     totalCostUsd,
     allSucceeded,
-  }
+  };
 }
 
 /**
@@ -110,11 +107,11 @@ export async function fanOut(tasks: SubAgentTask[]): Promise<FanOutResult> {
  * If a stage fails, the pipeline stops and returns the partial result.
  */
 export async function pipeline(stages: PipelineStage[]): Promise<PipelineResult> {
-  const startTime = Date.now()
-  const identity = await loadIdentity()
-  const completedStages: Array<{ name: string; result: SessionResult }> = []
-  let previousOutput = ''
-  let totalCostUsd = 0
+  const startTime = Date.now();
+  const identity = await loadIdentity();
+  const completedStages: Array<{ name: string; result: SessionResult }> = [];
+  let previousOutput = "";
+  let totalCostUsd = 0;
 
   for (const stage of stages) {
     // Build context from previous stage
@@ -122,13 +119,13 @@ export async function pipeline(stages: PipelineStage[]): Promise<PipelineResult>
       ? stage.contextTransform
         ? stage.contextTransform(previousOutput)
         : `## Previous Stage Output\n\n${previousOutput}`
-      : undefined
+      : undefined;
 
     const systemPrompt = buildTaskPrompt(identity, {
       taskDescription: stage.description,
       workingDirectory: stage.workingDirectory,
       additionalContext,
-    })
+    });
 
     const spawnOpts: SpawnOptions = {
       prompt: stage.description,
@@ -139,24 +136,24 @@ export async function pipeline(stages: PipelineStage[]): Promise<PipelineResult>
       workingDirectory: stage.workingDirectory,
       allowedTools: stage.allowedTools,
       dangerouslySkipPermissions: stage.dangerouslySkipPermissions,
-      outputFormat: 'json',
-    }
+      outputFormat: "json",
+    };
 
-    const result = await spawnSession(spawnOpts)
-    completedStages.push({ name: stage.name, result })
-    totalCostUsd += result.costUsd || 0
+    const result = await spawnSession(spawnOpts);
+    completedStages.push({ name: stage.name, result });
+    totalCostUsd += result.costUsd || 0;
 
-    if (result.status !== 'completed') {
+    if (result.status !== "completed") {
       return {
         stages: completedStages,
         finalOutput: result.output,
         totalDurationMs: Date.now() - startTime,
         totalCostUsd,
         failedAt: stage.name,
-      }
+      };
     }
 
-    previousOutput = result.output
+    previousOutput = result.output;
   }
 
   return {
@@ -164,5 +161,5 @@ export async function pipeline(stages: PipelineStage[]): Promise<PipelineResult>
     finalOutput: previousOutput,
     totalDurationMs: Date.now() - startTime,
     totalCostUsd,
-  }
+  };
 }

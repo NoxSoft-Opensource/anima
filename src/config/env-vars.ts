@@ -30,10 +30,7 @@ export function collectConfigEnvVars(cfg?: AnimaConfig): Record<string, string> 
   return entries;
 }
 
-export function applyConfigEnvVars(
-  cfg: AnimaConfig,
-  env: NodeJS.ProcessEnv = process.env,
-): void {
+export function applyConfigEnvVars(cfg: AnimaConfig, env: NodeJS.ProcessEnv = process.env): void {
   const entries = collectConfigEnvVars(cfg);
   for (const [key, value] of Object.entries(entries)) {
     if (env[key]?.trim()) {

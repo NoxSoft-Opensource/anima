@@ -10,6 +10,14 @@ type RunResult = Awaited<
   ReturnType<(typeof import("../../agents/pi-embedded.js"))["runEmbeddedPiAgent"]>
 >;
 
+function readAgentMetaNumber(
+  agentMeta: RunResult["meta"]["agentMeta"],
+  key: string,
+): number | undefined {
+  const value = (agentMeta as Record<string, unknown> | undefined)?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
+}
+
 export async function updateSessionStoreAfterAgentRun(params: {
   cfg: AnimaConfig;
   contextTokensOverride?: number;
@@ -38,7 +46,10 @@ export async function updateSessionStoreAfterAgentRun(params: {
 
   const usage = result.meta.agentMeta?.usage;
   const promptTokens = result.meta.agentMeta?.promptTokens;
-  const compactionsThisRun = Math.max(0, result.meta.agentMeta?.compactionCount ?? 0);
+  const compactionsThisRun = Math.max(
+    0,
+    readAgentMetaNumber(result.meta.agentMeta, "compactionCount") ?? 0,
+  );
   const modelUsed = result.meta.agentMeta?.model ?? fallbackModel ?? defaultModel;
   const providerUsed = result.meta.agentMeta?.provider ?? fallbackProvider ?? defaultProvider;
   const contextTokens =
@@ -62,7 +73,7 @@ export async function updateSessionStoreAfterAgentRun(params: {
       setCliSessionId(next, providerUsed, cliSessionId);
     }
   }
-  next.abortedLastRun = result.meta.aborted ?? false;
+  next.abortedLastRun = false;
   if (hasNonzeroUsage(usage)) {
     const input = usage.input ?? 0;
     const output = usage.output ?? 0;

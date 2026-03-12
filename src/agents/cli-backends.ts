@@ -7,6 +7,10 @@ export type ResolvedCliBackend = {
   config: CliBackendConfig;
 };
 
+export type CliBackendResolutionOptions = {
+  execSecurity?: string | null;
+};
+
 const CLAUDE_MODEL_ALIASES: Record<string, string> = {
   opus: "opus",
   "opus-4.6": "opus",
@@ -67,7 +71,14 @@ const DEFAULT_CLAUDE_BACKEND: CliBackendConfig = {
 
 const DEFAULT_CODEX_BACKEND: CliBackendConfig = {
   command: "codex",
-  args: ["exec", "--json", "--color", "never", "--sandbox", "read-only", "--skip-git-repo-check"],
+  args: [
+    "exec",
+    "--json",
+    "--color",
+    "never",
+    "--dangerously-bypass-approvals-and-sandbox",
+    "--skip-git-repo-check",
+  ],
   // `codex exec resume` currently supports only config/feature toggles + session + prompt.
   // Keep resume args minimal to avoid unsupported-flag failures across Codex versions.
   resumeArgs: ["exec", "resume", "{sessionId}"],
@@ -105,6 +116,27 @@ const CODEX_BACKEND_ALIAS_SET = new Set(
 const GEMINI_BACKEND_ALIAS_SET = new Set(
   GEMINI_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
 );
+const LEGACY_CODEX_ARGS = [
+  "exec",
+  "--json",
+  "--color",
+  "never",
+  "--sandbox",
+  "read-only",
+  "--skip-git-repo-check",
+] as const;
+const LEGACY_CODEX_RESUME_ARGS = [
+  "exec",
+  "resume",
+  "{sessionId}",
+  "--color",
+  "never",
+  "--sandbox",
+  "read-only",
+  "--skip-git-repo-check",
+] as const;
+const CODEX_BYPASS_FLAG = "--dangerously-bypass-approvals-and-sandbox" as const;
+type CodexExecMode = typeof CODEX_BYPASS_FLAG | "workspace-write" | "read-only";
 
 function normalizeBackendKey(key: string): string {
   return normalizeProviderId(key);
@@ -152,6 +184,76 @@ function mergeBackendConfig(base: CliBackendConfig, override?: CliBackendConfig)
   };
 }
 
+function argsEqual(left?: string[], right?: readonly string[]): boolean {
+  if (!left || !right || left.length !== right.length) {
+    return false;
+  }
+  return left.every((entry, index) => entry === right[index]);
+}
+
+export function resolveCodexExecModeArg(args?: string[]): CodexExecMode | undefined {
+  if (!args) {
+    return undefined;
+  }
+  if (args.includes(CODEX_BYPASS_FLAG)) {
+    return CODEX_BYPASS_FLAG;
+  }
+  const index = args.indexOf("--sandbox");
+  const value = index >= 0 ? args[index + 1] : undefined;
+  return value === "workspace-write" || value === "read-only" ? value : undefined;
+}
+
+function setCodexExecModeArgs(args: string[] | undefined, mode: CodexExecMode): string[] {
+  const nextArgs: string[] = [];
+  const source = args ?? [];
+  for (let i = 0; i < source.length; i += 1) {
+    const entry = source[i];
+    if (entry === CODEX_BYPASS_FLAG) {
+      continue;
+    }
+    if (entry === "--sandbox") {
+      i += 1;
+      continue;
+    }
+    nextArgs.push(entry);
+  }
+  if (mode === CODEX_BYPASS_FLAG) {
+    nextArgs.push(CODEX_BYPASS_FLAG);
+  } else {
+    nextArgs.push("--sandbox", mode);
+  }
+  return nextArgs;
+}
+
+function normalizeExecSecurity(execSecurity?: string | null): "deny" | "full" | undefined {
+  const normalized = execSecurity?.trim().toLowerCase();
+  if (!normalized) {
+    return undefined;
+  }
+  if (normalized === "deny") {
+    return "deny";
+  }
+  return "full";
+}
+
+function resolveManagedCodexExecMode(
+  cfg?: AnimaConfig,
+  options?: CliBackendResolutionOptions,
+): CodexExecMode {
+  const execSecurity = normalizeExecSecurity(options?.execSecurity);
+  if (execSecurity === "deny") {
+    return "read-only";
+  }
+  const workspaceAccess = cfg?.agents?.defaults?.sandbox?.workspaceAccess;
+  if (workspaceAccess === "ro") {
+    return "read-only";
+  }
+  if (workspaceAccess === "rw") {
+    return "workspace-write";
+  }
+  return CODEX_BYPASS_FLAG;
+}
+
 export function resolveCliBackendIds(cfg?: AnimaConfig): Set<string> {
   const ids = new Set<string>([
     ...CLAUDE_BACKEND_ALIASES.map((alias) => normalizeBackendKey(alias)),
@@ -168,6 +270,7 @@ export function resolveCliBackendIds(cfg?: AnimaConfig): Set<string> {
 export function resolveCliBackendConfig(
   provider: string,
   cfg?: AnimaConfig,
+  options?: CliBackendResolutionOptions,
 ): ResolvedCliBackend | null {
   const normalized = normalizeBackendKey(provider);
   const configured = cfg?.agents?.defaults?.cliBackends ?? {};
@@ -182,7 +285,26 @@ export function resolveCliBackendConfig(
   }
   if (CODEX_BACKEND_ALIAS_SET.has(normalized)) {
     const override = pickBackendConfigByAliases(configured, [provider, ...CODEX_BACKEND_ALIASES]);
-    const merged = mergeBackendConfig(DEFAULT_CODEX_BACKEND, override);
+    let merged = mergeBackendConfig(DEFAULT_CODEX_BACKEND, override);
+
+    if (argsEqual(merged.args, LEGACY_CODEX_ARGS)) {
+      merged = { ...merged, args: DEFAULT_CODEX_BACKEND.args };
+    }
+
+    if (argsEqual(merged.resumeArgs, LEGACY_CODEX_RESUME_ARGS)) {
+      merged = { ...merged, resumeArgs: DEFAULT_CODEX_BACKEND.resumeArgs };
+    }
+
+    const overrideExecMode = resolveCodexExecModeArg(override?.args);
+    const manageExecMode =
+      !overrideExecMode || (override?.args ? argsEqual(override.args, LEGACY_CODEX_ARGS) : false);
+    if (manageExecMode) {
+      merged = {
+        ...merged,
+        args: setCodexExecModeArgs(merged.args, resolveManagedCodexExecMode(cfg, options)),
+      };
+    }
+
     const command = merged.command?.trim();
     if (!command) {
       return null;

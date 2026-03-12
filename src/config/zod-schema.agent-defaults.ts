@@ -19,6 +19,32 @@ export const AgentDefaultsSchema = z
       .object({
         primary: z.string().optional(),
         fallbacks: z.array(z.string()).optional(),
+        auto: z
+          .object({
+            enabled: z.boolean().optional(),
+            providerOrder: z.array(z.string()).optional(),
+            byProvider: z
+              .record(
+                z.string(),
+                z
+                  .object({
+                    models: z.array(z.string()).optional(),
+                  })
+                  .strict(),
+              )
+              .optional(),
+            byWorkingMode: z
+              .object({
+                read: z.array(z.string()).optional(),
+                write: z.array(z.string()).optional(),
+              })
+              .strict()
+              .optional(),
+            usageCheck: z.union([z.literal("off"), z.literal("prefer-available")]).optional(),
+            usageThresholdPercent: z.number().min(0).max(100).optional(),
+          })
+          .strict()
+          .optional(),
       })
       .strict()
       .optional(),

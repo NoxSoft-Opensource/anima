@@ -79,9 +79,7 @@ export async function runDaemonInstall(opts: DaemonInstallOptions) {
     resolvedAuth.mode === "token" && !resolvedAuth.token && !resolvedAuth.allowTailscale;
 
   let token: string | undefined =
-    opts.token ||
-    cfg.gateway?.auth?.token ||
-    process.env.ANIMA_GATEWAY_TOKEN;
+    opts.token || cfg.gateway?.auth?.token || process.env.ANIMA_GATEWAY_TOKEN;
 
   if (!token && needsToken) {
     token = randomToken();

@@ -32,6 +32,7 @@ const testProgramContext: ProgramContext = {
   programVersion: "0.0.0-test",
   channelOptions: [],
   agentChannelOptions: "web",
+  messageChannelOptions: "web",
 };
 
 describe("command-registry", () => {

@@ -1,4 +1,4 @@
-import type { MessagingToolSend } from "../../agents/pi-embedded-messaging.js";
+import type { MessagingToolSend } from "../../agents/pi-embedded-runner.js";
 import type { AnimaConfig } from "../../config/config.js";
 import type { AgentDefaultsConfig } from "../../config/types.js";
 import type { CronJob } from "../types.js";
@@ -9,7 +9,6 @@ import {
   resolveAgentWorkspaceDir,
   resolveDefaultAgentId,
 } from "../../agents/agent-scope.js";
-import { runCliAgent } from "../../agents/cli-runner.js";
 import { getCliSessionId, setCliSessionId } from "../../agents/cli-session.js";
 import { lookupContextTokens } from "../../agents/context.js";
 import { resolveCronStyleNow } from "../../agents/current-time.js";
@@ -358,12 +357,13 @@ export async function runCronIsolatedAgentTurn(params: {
   }
   const modelOverrideRaw =
     params.job.payload.kind === "agentTurn" ? params.job.payload.model : undefined;
-  const modelOverride = typeof modelOverrideRaw === "string" ? modelOverrideRaw.trim() : undefined;
-  if (modelOverride !== undefined && modelOverride.length > 0) {
+  const requestedModelOverride =
+    typeof modelOverrideRaw === "string" ? modelOverrideRaw.trim() : undefined;
+  if (requestedModelOverride !== undefined && requestedModelOverride.length > 0) {
     const resolvedOverride = resolveAllowedModelRef({
       cfg: cfgWithAgentDefaults,
       catalog: await loadCatalog(),
-      raw: modelOverride,
+      raw: requestedModelOverride,
       defaultProvider: resolvedDefault.provider,
       defaultModel: resolvedDefault.model,
     });
@@ -417,7 +417,7 @@ export async function runCronIsolatedAgentTurn(params: {
   // Respect session model override — check session.modelOverride before falling
   // back to the default config model. This ensures /model changes are honoured
   // by cron and isolated agent runs.
-  if (!modelOverride && !hooksGmailModelApplied) {
+  if (!requestedModelOverride && !hooksGmailModelApplied) {
     const sessionModelOverride = cronSession.sessionEntry.modelOverride?.trim();
     if (sessionModelOverride) {
       const sessionProviderOverride =
@@ -571,26 +571,10 @@ export async function runCronIsolatedAgentTurn(params: {
       provider,
       model,
       agentDir,
+      sessionEntry: cronSession.sessionEntry,
+      thinkLevel,
       fallbacksOverride: resolveAgentModelFallbacksOverride(params.cfg, agentId),
       run: (providerOverride, modelOverride) => {
-        if (isCliProvider(providerOverride, cfgWithAgentDefaults)) {
-          const cliSessionId = getCliSessionId(cronSession.sessionEntry, providerOverride);
-          return runCliAgent({
-            sessionId: cronSession.sessionEntry.sessionId,
-            sessionKey: agentSessionKey,
-            agentId,
-            sessionFile,
-            workspaceDir,
-            config: cfgWithAgentDefaults,
-            prompt: commandBody,
-            provider: providerOverride,
-            model: modelOverride,
-            thinkLevel,
-            timeoutMs,
-            runId: cronSession.sessionEntry.sessionId,
-            cliSessionId,
-          });
-        }
         return runEmbeddedPiAgent({
           sessionId: cronSession.sessionEntry.sessionId,
           sessionKey: agentSessionKey,
@@ -607,6 +591,8 @@ export async function runCronIsolatedAgentTurn(params: {
           model: modelOverride,
           thinkLevel,
           verboseLevel: resolvedVerboseLevel,
+          execSecurity: cronSession.sessionEntry.execSecurity,
+          cliSessionId: getCliSessionId(cronSession.sessionEntry, providerOverride),
           timeoutMs,
           runId: cronSession.sessionEntry.sessionId,
           requireExplicitMessageTarget: true,
@@ -680,7 +666,6 @@ export async function runCronIsolatedAgentTurn(params: {
   const skipHeartbeatDelivery = deliveryRequested && isHeartbeatOnlyResponse(payloads, ackMaxChars);
   const skipMessagingToolDelivery =
     deliveryRequested &&
-    runResult.didSendViaMessagingTool === true &&
     (runResult.messagingToolSentTargets ?? []).some((target) =>
       matchesMessagingToolDeliveryTarget(target, {
         channel: resolvedDelivery.channel,

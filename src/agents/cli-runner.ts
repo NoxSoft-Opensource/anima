@@ -13,6 +13,7 @@ import { runCommandWithTimeout } from "../process/exec.js";
 import { resolveSessionAgentIds } from "./agent-scope.js";
 import { makeBootstrapWarn, resolveBootstrapContextForRun } from "./bootstrap-files.js";
 import { resolveCliBackendConfig } from "./cli-backends.js";
+import { resolveCodexExecModeArg } from "./cli-backends.js";
 import {
   appendImagePathsToPrompt,
   buildCliArgs,
@@ -31,6 +32,7 @@ import {
 import { resolveAnimaDocsPath } from "./docs-path.js";
 import { FailoverError, resolveFailoverStatus } from "./failover-error.js";
 import { classifyFailoverReason, isFailoverErrorMessage } from "./pi-embedded-helpers.js";
+import { appendRunnerCapabilityPrompt } from "./runner-capabilities.js";
 import { redactRunIdentifier, resolveRunWorkspaceDir } from "./workspace-run.js";
 
 const log = createSubsystemLogger("agent/claude-cli");
@@ -52,6 +54,7 @@ export async function runCliAgent(params: {
   streamParams?: import("../commands/agent/types.js").AgentStreamParams;
   ownerNumbers?: string[];
   cliSessionId?: string;
+  sessionExecSecurity?: string;
   images?: ImageContent[];
   onTextStream?: (text: string) => void;
 }): Promise<EmbeddedPiRunResult> {
@@ -73,21 +76,19 @@ export async function runCliAgent(params: {
   }
   const workspaceDir = resolvedWorkspace;
 
-  const backendResolved = resolveCliBackendConfig(params.provider, params.config);
+  const backendResolved = resolveCliBackendConfig(params.provider, params.config, {
+    execSecurity: params.sessionExecSecurity,
+  });
   if (!backendResolved) {
     throw new Error(`Unknown CLI backend: ${params.provider}`);
   }
   const backend = backendResolved.config;
+  const effectiveCodexExecMode = resolveCodexExecModeArg(backend.args);
   const modelId = (params.model ?? "default").trim() || "default";
   const normalizedModel = normalizeCliModel(modelId, backend);
   const modelDisplay = `${params.provider}/${modelId}`;
 
-  const extraSystemPrompt = [
-    params.extraSystemPrompt?.trim(),
-    "Tools are disabled in this session. Do not call tools.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const extraSystemPrompt = appendRunnerCapabilityPrompt(params.extraSystemPrompt, "cli-native");
 
   const sessionLabel = params.sessionKey ?? params.sessionId;
   const { contextFiles } = await resolveBootstrapContextForRun({
@@ -125,16 +126,53 @@ export async function runCliAgent(params: {
     agentId: sessionAgentId,
   });
 
-  const { sessionId: cliSessionIdToSend, isNew } = resolveSessionIdToSend({
+  const { sessionId: cliSessionIdToSend, isNew: isNewSessionBase } = resolveSessionIdToSend({
     backend,
     cliSessionId: params.cliSessionId,
   });
-  const useResume = Boolean(
+
+  // Support for dynamic Codex execution mode switching:
+  // Read the effective mode from session metadata. If it changed, force restart.
+  let isNew = isNewSessionBase;
+  let useResume = Boolean(
     params.cliSessionId &&
     cliSessionIdToSend &&
     backend.resumeArgs &&
     backend.resumeArgs.length > 0,
   );
+
+  if (useResume && params.provider.includes("codex") && params.sessionFile) {
+    try {
+      const { readFile } = await import("node:fs/promises");
+      const content = await readFile(params.sessionFile, "utf-8");
+      const lines = content.trim().split("\n");
+      const lastLine = lines[lines.length - 1];
+      if (lastLine) {
+        const parsed = JSON.parse(lastLine);
+        const previousMode =
+          parsed.metadata?.effectiveCodexExecMode ?? parsed.metadata?.effectiveSandbox;
+        const currentMode = effectiveCodexExecMode;
+        if (!previousMode) {
+          log.info(
+            "Codex execution mode is unknown for the saved session; forcing session restart.",
+          );
+          useResume = false;
+          isNew = true;
+        } else if (previousMode !== currentMode) {
+          log.info(
+            `Codex execution mode changed (${previousMode} -> ${currentMode}); forcing session restart.`,
+          );
+          useResume = false;
+          isNew = true;
+        }
+      }
+    } catch {
+      log.info("Codex session transcript is unavailable; forcing session restart.");
+      useResume = false;
+      isNew = true;
+    }
+  }
+
   const sessionIdSent = cliSessionIdToSend
     ? useResume || Boolean(backend.sessionArg) || Boolean(backend.sessionArgs?.length)
       ? cliSessionIdToSend
@@ -178,8 +216,9 @@ export async function runCliAgent(params: {
     useResume,
   });
 
-  // Inject --mcp-config so agent sessions pick up ANIMA-managed MCP servers
-  // (noxsoft, coherence, etc.) from ~/.claude/mcp.json.
+  // Inject --mcp-config for Claude CLI so agent sessions pick up ANIMA-managed
+  // MCP servers. Other backends (like Codex) use their own internal registries
+  // which are synced separately via syncConfig().
   const mcpConfigPath = join(homedir(), ".claude", "mcp.json");
   if (backend.command === "claude" && existsSync(mcpConfigPath)) {
     // Insert at the beginning of args (before any positional prompt arg)
@@ -301,8 +340,11 @@ export async function runCliAgent(params: {
       }
 
       if (result.code !== 0) {
-        const err = stderr || stdout || "CLI failed.";
-        const reason = classifyFailoverReason(err) ?? "unknown";
+        const timedOut = result.killed && result.signal === "SIGKILL";
+        const err = timedOut
+          ? `Request timed out after ${params.timeoutMs}ms`
+          : stderr || stdout || "CLI failed.";
+        const reason = timedOut ? "timeout" : (classifyFailoverReason(err) ?? "unknown");
         const status = resolveFailoverStatus(reason);
         throw new FailoverError(err, {
           reason,
@@ -337,6 +379,7 @@ export async function runCliAgent(params: {
           provider: params.provider,
           model: modelId,
           usage: output.usage,
+          ...(effectiveCodexExecMode ? { metadata: { effectiveCodexExecMode } } : {}),
         },
       },
     };
@@ -379,6 +422,7 @@ export async function runClaudeCliAgent(params: {
   extraSystemPrompt?: string;
   ownerNumbers?: string[];
   claudeSessionId?: string;
+  sessionExecSecurity?: string;
   images?: ImageContent[];
 }): Promise<EmbeddedPiRunResult> {
   return runCliAgent({
@@ -397,6 +441,7 @@ export async function runClaudeCliAgent(params: {
     extraSystemPrompt: params.extraSystemPrompt,
     ownerNumbers: params.ownerNumbers,
     cliSessionId: params.claudeSessionId,
+    sessionExecSecurity: params.sessionExecSecurity,
     images: params.images,
   });
 }

@@ -65,6 +65,14 @@ const entries: SubCliEntry[] = [
     },
   },
   {
+    name: "models",
+    description: "Model discovery, switching, and provider configuration",
+    register: async (program) => {
+      const mod = await import("../models-cli.js");
+      mod.registerModelsCli(program);
+    },
+  },
+  {
     name: "system",
     description: "System events, heartbeat lifecycle, and presence monitoring",
     register: async (program) => {

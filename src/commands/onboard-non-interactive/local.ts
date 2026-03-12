@@ -7,6 +7,7 @@ import { resolveGatewayPort, writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
 import { DEFAULT_GATEWAY_DAEMON_RUNTIME } from "../daemon-runtime.js";
 import { healthCommand } from "../health.js";
+import { applyNoxsoftBootstrap } from "../noxsoft-bootstrap.js";
 import {
   applyWizardMetadata,
   DEFAULT_WORKSPACE,
@@ -83,6 +84,7 @@ export async function runNonInteractiveOnboardingLocal(params: {
         `NoxSoft ${auth.registered ? "registered" : "authenticated"}: ${auth.agent.display_name} (@${auth.agent.name})`,
       );
     }
+    nextConfig = applyNoxsoftBootstrap(nextConfig, auth.agent);
   } catch (error) {
     const message =
       error instanceof Error && error.message

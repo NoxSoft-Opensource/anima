@@ -79,9 +79,10 @@ vi.mock("./onboarding.completion.js", () => ({
 }));
 
 vi.mock("../auth/noxsoft-auth.js", () => ({
+  TOKEN_PATH: "/tmp/test-noxsoft-token",
   ensureAuthenticated: vi.fn(async () => ({
     registered: false,
-    agent: { display_name: "Test Agent", name: "test-agent" },
+    agent: { id: "agent-1", display_name: "Test Agent", name: "test-agent" },
   })),
 }));
 
@@ -123,7 +124,7 @@ describe("runOnboardingWizard", () => {
         {
           acceptRisk: true,
           flow: "quickstart",
-          authChoice: "skip",
+          authChoice: "noxsoft",
           installDaemon: false,
           skipProviders: true,
           skipSkills: true,
@@ -164,7 +165,7 @@ describe("runOnboardingWizard", () => {
       {
         acceptRisk: true,
         flow: "quickstart",
-        authChoice: "skip",
+        authChoice: "noxsoft",
         installDaemon: false,
         skipProviders: true,
         skipSkills: true,
@@ -226,7 +227,7 @@ describe("runOnboardingWizard", () => {
           flow: "quickstart",
           mode: "local",
           workspace: workspaceDir,
-          authChoice: "skip",
+          authChoice: "noxsoft",
           skipProviders: true,
           skipSkills: true,
           skipHealth: true,
@@ -282,7 +283,7 @@ describe("runOnboardingWizard", () => {
         {
           acceptRisk: true,
           flow: "quickstart",
-          authChoice: "skip",
+          authChoice: "noxsoft",
           installDaemon: false,
           skipProviders: true,
           skipSkills: true,

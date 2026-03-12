@@ -1,4 +1,4 @@
-export type ModelApi = "anthropic-messages";
+export type ModelApi = "anthropic-messages" | "openai-completions";
 
 export type ModelCompatConfig = {
   supportsStore?: boolean;

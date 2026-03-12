@@ -165,9 +165,7 @@ export function extractHookToken(req: IncomingMessage): string | undefined {
     }
   }
   const headerToken =
-    typeof req.headers["x-anima-token"] === "string"
-      ? req.headers["x-anima-token"].trim()
-      : "";
+    typeof req.headers["x-anima-token"] === "string" ? req.headers["x-anima-token"].trim() : "";
   if (headerToken) {
     return headerToken;
   }

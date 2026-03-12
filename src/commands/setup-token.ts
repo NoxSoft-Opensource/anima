@@ -12,14 +12,12 @@
  *   sk-ant-oat01-...  Claude Code OAuth  (auto-detected from an existing Claude Code install)
  */
 
-import type { RuntimeEnv } from "../runtime.js";
 import { intro, outro, text, confirm, spinner, note, cancel } from "@clack/prompts";
+import type { RuntimeEnv } from "../runtime.js";
+import { testAnthropicToken } from "../agents/anthropic-direct-runner.js";
 import { loadAuthProfileStore, saveAuthProfileStore } from "../agents/auth-profiles/store.js";
 import { readClaudeCliCredentials, readOpenClawCredentials } from "../agents/cli-credentials.js";
-import { testAnthropicToken } from "../agents/anthropic-direct-runner.js";
 import { defaultRuntime } from "../runtime.js";
-import { resolveUserPath } from "../utils.js";
-import path from "node:path";
 
 export type SetupTokenOptions = {
   /** Pre-supplied token (skip the prompt) */
@@ -158,10 +156,11 @@ export async function setupTokenCommand(
       message: "Paste your Anthropic API key:",
       placeholder: "sk-ant-api01-...",
       validate: (val) => {
-        if (!val.trim()) {
+        const value = typeof val === "string" ? val.trim() : "";
+        if (!value) {
           return "Token is required.";
         }
-        if (!isValidTokenFormat(val.trim())) {
+        if (!isValidTokenFormat(value)) {
           return "Token should start with sk-ant- (Anthropic format).";
         }
       },

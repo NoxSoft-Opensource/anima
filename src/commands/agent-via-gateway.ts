@@ -36,6 +36,7 @@ const NO_GATEWAY_TIMEOUT_MS = 2_147_000_000;
 export type AgentCliOpts = {
   message: string;
   agent?: string;
+  model?: string;
   to?: string;
   sessionId?: string;
   thinking?: string;
@@ -133,6 +134,7 @@ export async function agentViaGatewayCommand(opts: AgentCliOpts, runtime: Runtim
         params: {
           message: body,
           agentId,
+          model: opts.model,
           to: opts.to,
           replyTo: opts.replyTo,
           sessionId: opts.sessionId,

@@ -128,12 +128,7 @@ describe("pw-tools-core", () => {
     const res = await p;
     const outPath = vi.mocked(saveAs).mock.calls[0]?.[0];
     expect(typeof outPath).toBe("string");
-    const expectedRootedDownloadsDir = path.join(
-      path.sep,
-      "tmp",
-      "anima-preferred",
-      "downloads",
-    );
+    const expectedRootedDownloadsDir = path.join(path.sep, "tmp", "anima-preferred", "downloads");
     const expectedDownloadsTail = `${path.join("tmp", "anima-preferred", "downloads")}${path.sep}`;
     expect(path.dirname(String(outPath))).toBe(expectedRootedDownloadsDir);
     expect(path.basename(String(outPath))).toMatch(/-file\.bin$/);

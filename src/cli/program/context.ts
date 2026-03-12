@@ -5,6 +5,7 @@ export type ProgramContext = {
   programVersion: string;
   channelOptions: string[];
   agentChannelOptions: string;
+  messageChannelOptions: string;
 };
 
 export function createProgramContext(): ProgramContext {
@@ -13,5 +14,6 @@ export function createProgramContext(): ProgramContext {
     programVersion: VERSION,
     channelOptions,
     agentChannelOptions: ["last", ...channelOptions].join("|"),
+    messageChannelOptions: channelOptions.join("|"),
   };
 }

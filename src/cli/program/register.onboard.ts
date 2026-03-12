@@ -52,7 +52,10 @@ export function registerOnboardCommand(program: Command) {
       "Acknowledge that agents are powerful and full system access is risky (required for --non-interactive)",
       false,
     )
-    .option("--auth-choice <choice>", "Auth choice: noxsoft|openaiCodex|apiKey|skip")
+    .option(
+      "--auth-choice <choice>",
+      "Provider auth after required NoxSoft login: noxsoft|openaiCodex|apiKey|geminiApiKey",
+    )
     .option("--anthropic-api-key <key>", "Anthropic API key")
     .option(
       "--noxsoft-agent-name <slug>",

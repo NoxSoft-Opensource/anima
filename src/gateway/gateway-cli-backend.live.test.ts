@@ -24,8 +24,7 @@ const DEFAULT_CODEX_ARGS = [
   "--json",
   "--color",
   "never",
-  "--sandbox",
-  "read-only",
+  "--dangerously-bypass-approvals-and-sandbox",
   "--skip-git-repo-check",
 ];
 const DEFAULT_CLEAR_ENV = ["ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY_OLD"];
@@ -243,9 +242,7 @@ describeLive("gateway live (cli backend)", () => {
 
     const cliCommand = process.env.ANIMA_LIVE_CLI_BACKEND_COMMAND ?? providerDefaults?.command;
     if (!cliCommand) {
-      throw new Error(
-        `ANIMA_LIVE_CLI_BACKEND_COMMAND is required for provider "${providerId}".`,
-      );
+      throw new Error(`ANIMA_LIVE_CLI_BACKEND_COMMAND is required for provider "${providerId}".`);
     }
     const baseCliArgs =
       parseJsonStringArray(

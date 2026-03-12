@@ -49,9 +49,7 @@ async function isPluginConfigured(plugin: ChannelPlugin, cfg: AnimaConfig): Prom
   return false;
 }
 
-export async function listConfiguredMessageChannels(
-  cfg: AnimaConfig,
-): Promise<MessageChannelId[]> {
+export async function listConfiguredMessageChannels(cfg: AnimaConfig): Promise<MessageChannelId[]> {
   const channels: MessageChannelId[] = [];
   for (const plugin of listChannelPlugins()) {
     if (!isKnownChannel(plugin.id)) {

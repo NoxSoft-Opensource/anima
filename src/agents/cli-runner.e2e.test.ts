@@ -21,23 +21,13 @@ describe("runCliAgent resume cleanup", () => {
     runExecMock.mockReset();
   });
 
-  it("kills stale resume processes for codex sessions", async () => {
+  it("skips codex resume cleanup when the saved session transcript is unavailable", async () => {
     const selfPid = process.pid;
 
-    runExecMock
-      .mockResolvedValueOnce({
-        stdout: "  1 999 S /bin/launchd\n",
-        stderr: "",
-      }) // cleanupSuspendedCliProcesses (ps) — ppid 999 != selfPid, no match
-      .mockResolvedValueOnce({
-        stdout: [
-          `  ${selfPid + 1} ${selfPid} codex exec resume thread-123 --color never --sandbox read-only --skip-git-repo-check`,
-          `  ${selfPid + 2} 999 codex exec resume thread-123 --color never --sandbox read-only --skip-git-repo-check`,
-        ].join("\n"),
-        stderr: "",
-      }) // cleanupResumeProcesses (ps)
-      .mockResolvedValueOnce({ stdout: "", stderr: "" }) // cleanupResumeProcesses (kill -TERM)
-      .mockResolvedValueOnce({ stdout: "", stderr: "" }); // cleanupResumeProcesses (kill -9)
+    runExecMock.mockResolvedValueOnce({
+      stdout: "  1 999 S /bin/launchd\n",
+      stderr: "",
+    }); // cleanupSuspendedCliProcesses (ps) — ppid 999 != selfPid, no match
     runCommandWithTimeoutMock.mockResolvedValueOnce({
       stdout: "ok",
       stderr: "",
@@ -63,26 +53,20 @@ describe("runCliAgent resume cleanup", () => {
       return;
     }
 
-    expect(runExecMock).toHaveBeenCalledTimes(4);
-
-    // Second call: cleanupResumeProcesses ps
-    const psCall = runExecMock.mock.calls[1] ?? [];
+    expect(runExecMock).toHaveBeenCalledTimes(1);
+    const psCall = runExecMock.mock.calls[0] ?? [];
     expect(psCall[0]).toBe("ps");
-
-    // Third call: TERM, only the child PID
-    const termCall = runExecMock.mock.calls[2] ?? [];
-    expect(termCall[0]).toBe("kill");
-    const termArgs = termCall[1] as string[];
-    expect(termArgs).toEqual(["-TERM", String(selfPid + 1)]);
-
-    // Fourth call: KILL, only the child PID
-    const killCall = runExecMock.mock.calls[3] ?? [];
-    expect(killCall[0]).toBe("kill");
-    const killArgs = killCall[1] as string[];
-    expect(killArgs).toEqual(["-9", String(selfPid + 1)]);
   });
 
   it("does not pass exec-only flags to codex resume", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-cli-runner-"));
+    const sessionFile = path.join(tempDir, "session.jsonl");
+    await fs.writeFile(
+      sessionFile,
+      `${JSON.stringify({ metadata: { effectiveCodexExecMode: "--dangerously-bypass-approvals-and-sandbox" } })}\n`,
+      "utf-8",
+    );
+
     runExecMock
       .mockResolvedValueOnce({
         stdout: "",
@@ -100,6 +84,162 @@ describe("runCliAgent resume cleanup", () => {
       killed: false,
     });
 
+    try {
+      await runCliAgent({
+        sessionId: "s1",
+        sessionFile,
+        workspaceDir: tempDir,
+        prompt: "hi",
+        provider: "codex-cli",
+        model: "gpt-5.2-codex",
+        timeoutMs: 1_000,
+        runId: "run-resume-args",
+        cliSessionId: "thread-abc",
+      });
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+
+    const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
+    expect(command).toBeTruthy();
+    expect(command?.slice(0, 4)).toEqual(["codex", "exec", "resume", "thread-abc"]);
+    expect(command).not.toContain("--color");
+    expect(command).not.toContain("--sandbox");
+    expect(command).not.toContain("--skip-git-repo-check");
+  });
+
+  it("restarts codex instead of resuming when the sandbox changes mid-session", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-cli-runner-"));
+    const sessionFile = path.join(tempDir, "session.jsonl");
+    await fs.writeFile(
+      sessionFile,
+      `${JSON.stringify({ metadata: { effectiveSandbox: "read-only" } })}\n`,
+      "utf-8",
+    );
+
+    runExecMock.mockResolvedValueOnce({
+      stdout: "",
+      stderr: "",
+    });
+    runCommandWithTimeoutMock.mockResolvedValueOnce({
+      stdout: "ok",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
+
+    try {
+      await runCliAgent({
+        sessionId: "s1",
+        sessionFile,
+        workspaceDir: tempDir,
+        prompt: "hi",
+        provider: "codex-cli",
+        model: "gpt-5.2-codex",
+        timeoutMs: 1_000,
+        runId: "run-sandbox-change",
+        cliSessionId: "thread-abc",
+      });
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+
+    expect(runExecMock).toHaveBeenCalledTimes(process.platform === "win32" ? 0 : 1);
+
+    const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
+    expect(command).toBeTruthy();
+    expect(command?.slice(0, 2)).toEqual(["codex", "exec"]);
+    expect(command).not.toContain("resume");
+    expect(command).not.toContain("--sandbox");
+    expect(command).toContain("--dangerously-bypass-approvals-and-sandbox");
+  });
+
+  it("restarts codex instead of resuming when the saved session transcript is unavailable", async () => {
+    runExecMock.mockResolvedValueOnce({
+      stdout: "",
+      stderr: "",
+    });
+    runCommandWithTimeoutMock.mockResolvedValueOnce({
+      stdout: "ok",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
+
+    await runCliAgent({
+      sessionId: "s1",
+      sessionFile: "/tmp/missing-session.jsonl",
+      workspaceDir: "/tmp",
+      prompt: "hi",
+      provider: "codex-cli",
+      model: "gpt-5.2-codex",
+      timeoutMs: 1_000,
+      runId: "run-missing-session",
+      cliSessionId: "thread-abc",
+    });
+
+    const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
+    expect(command).toBeTruthy();
+    expect(command?.slice(0, 2)).toEqual(["codex", "exec"]);
+    expect(command).not.toContain("resume");
+    expect(command).toContain("--dangerously-bypass-approvals-and-sandbox");
+  });
+
+  it("restarts codex instead of resuming when prior sandbox metadata is missing", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "anima-cli-runner-"));
+    const sessionFile = path.join(tempDir, "session.jsonl");
+    await fs.writeFile(sessionFile, `${JSON.stringify({ metadata: {} })}\n`, "utf-8");
+
+    runExecMock.mockResolvedValueOnce({
+      stdout: "",
+      stderr: "",
+    });
+    runCommandWithTimeoutMock.mockResolvedValueOnce({
+      stdout: "ok",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
+
+    try {
+      await runCliAgent({
+        sessionId: "s1",
+        sessionFile,
+        workspaceDir: tempDir,
+        prompt: "hi",
+        provider: "codex-cli",
+        model: "gpt-5.2-codex",
+        timeoutMs: 1_000,
+        runId: "run-unknown-sandbox",
+        cliSessionId: "thread-abc",
+      });
+    } finally {
+      await fs.rm(tempDir, { recursive: true, force: true });
+    }
+
+    const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
+    expect(command).toBeTruthy();
+    expect(command?.slice(0, 2)).toEqual(["codex", "exec"]);
+    expect(command).not.toContain("resume");
+    expect(command).toContain("--dangerously-bypass-approvals-and-sandbox");
+  });
+
+  it("uses session exec security to force codex into read-only mode", async () => {
+    runExecMock.mockResolvedValueOnce({
+      stdout: "",
+      stderr: "",
+    });
+    runCommandWithTimeoutMock.mockResolvedValueOnce({
+      stdout: "ok",
+      stderr: "",
+      code: 0,
+      signal: null,
+      killed: false,
+    });
+
     await runCliAgent({
       sessionId: "s1",
       sessionFile: "/tmp/session.jsonl",
@@ -108,16 +248,15 @@ describe("runCliAgent resume cleanup", () => {
       provider: "codex-cli",
       model: "gpt-5.2-codex",
       timeoutMs: 1_000,
-      runId: "run-resume-args",
-      cliSessionId: "thread-abc",
+      runId: "run-read-mode",
+      sessionExecSecurity: "deny",
     });
 
     const command = runCommandWithTimeoutMock.mock.calls[0]?.[0] as string[] | undefined;
     expect(command).toBeTruthy();
-    expect(command?.slice(0, 4)).toEqual(["codex", "exec", "resume", "thread-abc"]);
-    expect(command).not.toContain("--color");
-    expect(command).not.toContain("--sandbox");
-    expect(command).not.toContain("--skip-git-repo-check");
+    expect(command).toContain("--sandbox");
+    expect(command).toContain("read-only");
+    expect(command).not.toContain("--dangerously-bypass-approvals-and-sandbox");
   });
 
   it("falls back to per-agent workspace when workspaceDir is missing", async () => {

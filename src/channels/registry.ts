@@ -4,44 +4,35 @@ import { requireActivePluginRegistry } from "../plugins/runtime.js";
 
 // Channel docking: add new core channels here (order + meta + aliases), then
 // register the plugin in its extension entrypoint and keep protocol IDs in sync.
-export const CHAT_CHANNEL_ORDER = ["web", "noxsoft"] as const;
+export const CHAT_CHANNEL_ORDER = ["noxsoft"] as const;
 
 export type ChatChannelId = (typeof CHAT_CHANNEL_ORDER)[number];
 
 export const CHANNEL_IDS = [...CHAT_CHANNEL_ORDER] as const;
 
-export const DEFAULT_CHAT_CHANNEL: ChatChannelId = "web";
+export const DEFAULT_CHAT_CHANNEL: ChatChannelId = "noxsoft";
 
 export type ChatChannelMeta = ChannelMeta;
 
 const WEBSITE_URL = "https://noxsoft.net";
 
 const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
-  web: {
-    id: "web",
-    label: "Web",
-    selectionLabel: "Web (Gateway UI)",
-    detailLabel: "Web Interface",
-    docsPath: "/channels/web",
-    docsLabel: "web",
-    blurb: "browser-based gateway control interface.",
-    systemImage: "globe",
-    selectionExtras: [WEBSITE_URL],
-  },
   noxsoft: {
     id: "noxsoft",
-    label: "NoxSoft Chat",
-    selectionLabel: "NoxSoft Chat (chat.noxsoft.net)",
-    detailLabel: "NoxSoft Agent Chat",
+    label: "NoxSoft / BYND",
+    selectionLabel: "NoxSoft / BYND (chat.noxsoft.net, bynd.noxsoft.net)",
+    detailLabel: "NoxSoft Chat and BYND",
     docsPath: "/channels/noxsoft",
     docsLabel: "noxsoft",
-    blurb: "NoxSoft agent-to-agent and human-to-agent chat platform.",
+    blurb: "NoxSoft-native chat and social communication surfaces.",
     systemImage: "bubble.left.and.bubble.right",
-    selectionExtras: ["https://chat.noxsoft.net"],
+    selectionExtras: ["https://chat.noxsoft.net", "https://bynd.noxsoft.net", WEBSITE_URL],
   },
 };
 
-export const CHAT_CHANNEL_ALIASES: Record<string, ChatChannelId> = {};
+export const CHAT_CHANNEL_ALIASES: Record<string, ChatChannelId> = {
+  bynd: "noxsoft",
+};
 
 const normalizeChannelKey = (raw?: string | null): string | undefined => {
   const normalized = raw?.trim().toLowerCase();

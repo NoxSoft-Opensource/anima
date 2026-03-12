@@ -1,0 +1,53 @@
+src/agents/tools/discord-actions.ts(4,42): error TS2307: Cannot find module './discord-actions-guild.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(5,46): error TS2307: Cannot find module './discord-actions-messaging.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(6,47): error TS2307: Cannot find module './discord-actions-moderation.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(7,45): error TS2307: Cannot find module './discord-actions-presence.js' or its corresponding type declarations.
+src/channels/targets.ts(1,44): error TS2307: Cannot find module './plugins/directory-config.js' or its corresponding type declarations.
+src/cli/channels-cli.ts(4,3): error TS2724: '"../commands/channels.js"' has no exported member named 'channelsCapabilitiesCommand'. Did you mean 'channelsListCommand'?
+src/commands/onboard-custom.ts(467,7): error TS2322: Type '{ [x: string]: ModelProviderConfig | { auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; ... 4 more ...; models: (ModelDefinitionConfig | { ...; })[]; }; }' is not assignable to type 'Record<string, ModelProviderConfig>'.
+  'string' index signatures are incompatible.
+    Type 'ModelProviderConfig | { auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; authHeader?: boolean | undefined; baseUrl: string; api: "anthropic-messages" | "openai-completions"; apiKey?: string | undefined; models: (ModelDefinitionConfig | { ...; })[]; }' is not assignable to type 'ModelProviderConfig'.
+      Type '{ auth?: ModelProviderAuthMode | undefined; headers?: Record<string, string> | undefined; authHeader?: boolean | undefined; baseUrl: string; api: "anthropic-messages" | "openai-completions"; apiKey?: string | undefined; models: (ModelDefinitionConfig | { ...; })[]; }' is not assignable to type 'ModelProviderConfig'.
+        Types of property 'api' are incompatible.
+          Type '"anthropic-messages" | "openai-completions"' is not assignable to type '"anthropic-messages" | undefined'.
+            Type '"openai-completions"' is not assignable to type '"anthropic-messages"'.
+src/commands/setup-token.ts(161,14): error TS18048: 'val' is possibly 'undefined'.
+src/commands/setup-token.ts(164,33): error TS18048: 'val' is possibly 'undefined'.
+src/config/merge-config.ts(2,15): error TS2305: Module '"./types.js"' has no exported member 'WhatsAppConfig'.
+src/cron/isolated-agent/run.ts(1,15): error TS2305: Module '"../../agents/pi-embedded-messaging.js"' has no exported member 'MessagingToolSend'.
+src/cron/isolated-agent/run.ts(668,15): error TS2339: Property 'didSendViaMessagingTool' does not exist on type 'EmbeddedPiRunResult'.
+src/gateway/server-methods/mcp.ts(11,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(49,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(66,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/gateway/server-methods/mcp.ts(76,55): error TS2339: Property 'INTERNAL' does not exist on type '{ readonly NOT_LINKED: "NOT_LINKED"; readonly NOT_PAIRED: "NOT_PAIRED"; readonly AGENT_TIMEOUT: "AGENT_TIMEOUT"; readonly INVALID_REQUEST: "INVALID_REQUEST"; readonly UNAVAILABLE: "UNAVAILABLE"; }'.
+src/infra/bonjour.ts(91,51): error TS2307: Cannot find module '@homebridge/ciao' or its corresponding type declarations.
+src/macos/gateway-daemon.ts(42,30): error TS2307: Cannot find module 'long' or its corresponding type declarations.
+src/macos/relay.ts(21,28): error TS2307: Cannot find module 'long' or its corresponding type declarations.
+src/repl/commands.ts(537,48): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(538,23): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(538,49): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(545,27): error TS2339: Property 'isRunning' does not exist on type 'SVRNNode'.
+src/repl/commands.ts(556,37): error TS2339: Property 'getWallet' does not exist on type 'SVRNNode'.
+src/repl/commands.ts(598,40): error TS2339: Property 'maxCpuPercent' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(599,45): error TS2339: Property 'maxRamMB' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(600,44): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'Partial<Pick<SVRNNodeConfig, "resources">>'.
+src/repl/commands.ts(607,37): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(608,32): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(609,40): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(614,39): error TS2339: Property 'maxCpuPercent' does not exist on type 'void'.
+src/repl/commands.ts(614,69): error TS2339: Property 'maxRamMB' does not exist on type 'void'.
+src/repl/commands.ts(614,95): error TS2339: Property 'maxBandwidthMbps' does not exist on type 'void'.
+src/repl/commands.ts(623,37): error TS2339: Property 'getConfig' does not exist on type 'SVRNNode'.
+src/svrn/config.ts(51,30): error TS2307: Cannot find module '@noxsoft/svrn-node' or its corresponding type declarations.
+src/svrn/config.ts(114,5): error TS2322: Type '{ maxCpuPercent?: number | undefined; maxRamMB?: number | undefined; maxBandwidthMbps?: number | undefined; }' is not assignable to type '{ maxCpuPercent: number; maxRamMB: number; maxBandwidthMbps: number; }'.
+  Types of property 'maxCpuPercent' are incompatible.
+    Type 'number | undefined' is not assignable to type 'number'.
+      Type 'undefined' is not assignable to type 'number'.
+src/svrn/node.ts(48,30): error TS2307: Cannot find module '@noxsoft/svrn-node' or its corresponding type declarations.
+src/test-helpers/state-dir-env.ts(2,3): error TS2300: Duplicate identifier 'animaStateDir'.
+src/test-helpers/state-dir-env.ts(3,3): error TS2300: Duplicate identifier 'animaStateDir'.
+src/test-helpers/state-dir-env.ts(9,5): error TS1117: An object literal cannot have multiple properties with the same name.
+src/wizard/onboarding.ts(223,7): error TS2322: Type 'AuthChoice | GatewayAuthChoice' is not assignable to type 'AuthChoice'.
+  Type '"password"' is not assignable to type 'AuthChoice'.
+src/wizard/onboarding.ts(240,64): error TS2345: Argument of type 'AuthChoice | GatewayAuthChoice' is not assignable to parameter of type 'AuthChoice'.
+  Type '"password"' is not assignable to type 'AuthChoice'.

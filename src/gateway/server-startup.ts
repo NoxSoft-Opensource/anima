@@ -151,23 +151,22 @@ export async function startGatewaySidecars(params: {
     params.log.warn(`ANIMA Gateway plugin services failed to start: ${String(err)}`);
   }
 
-  // Auto-sync MCP registry to ~/.claude/mcp.json so agent sessions have access
-  // to all registered MCP servers (noxsoft, coherence, etc.) without manual setup.
+  // Auto-sync MCP registry to Claude and Codex configs so agent sessions have
+  // access to all registered MCP servers without manual setup.
   try {
     const { syncConfig } = await import("../mcp/config-sync.js");
     const syncResult = await syncConfig();
-    const parts: string[] = [];
-    if (syncResult.added.length) {
-      parts.push(`added ${syncResult.added.join(", ")}`);
-    }
-    if (syncResult.updated.length) {
-      parts.push(`updated ${syncResult.updated.join(", ")}`);
-    }
-    if (syncResult.removed.length) {
-      parts.push(`removed ${syncResult.removed.join(", ")}`);
-    }
-    if (parts.length) {
-      params.log.warn(`MCP config synced: ${parts.join("; ")}`);
+
+    const formatRes = (res: any) =>
+      `${res.added.length} added, ${res.updated.length} updated, ${res.removed.length} removed`;
+
+    const total = syncResult.added.length + syncResult.updated.length + syncResult.removed.length;
+    if (total > 0) {
+      params.log.warn(
+        `MCP config synced: Claude (${formatRes(syncResult.claude)}); Codex (${formatRes(
+          syncResult.codex,
+        )})`,
+      );
     }
   } catch (err) {
     params.log.warn(`MCP config sync failed: ${String(err)}`);

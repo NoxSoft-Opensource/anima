@@ -76,10 +76,10 @@ See [Configuration: Env var substitution](/gateway/configuration#env-var-substit
 
 ## Path-related env vars
 
-| Variable               | Purpose                                                                                                                                                                          |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable            | Purpose                                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ANIMA_HOME`        | Override the home directory used for all internal path resolution (`~/.anima/`, agent dirs, sessions, credentials). Useful when running Anima as a dedicated service user. |
-| `ANIMA_STATE_DIR`   | Override the state directory (default `~/.anima`).                                                                                                                            |
+| `ANIMA_STATE_DIR`   | Override the state directory (default `~/.anima`).                                                                                                                         |
 | `ANIMA_CONFIG_PATH` | Override the config file path (default `~/.anima/anima.json`).                                                                                                             |
 
 ### `ANIMA_HOME`

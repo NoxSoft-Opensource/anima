@@ -8,27 +8,27 @@
  * Security: all subprocess calls use execFile (not exec).
  */
 
-import { execFile as execFileCb } from 'node:child_process'
-import { writeFile, readFile, mkdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { homedir, platform } from 'node:os'
-import { promisify } from 'node:util'
+import { execFile as execFileCb } from "node:child_process";
+import { existsSync } from "node:fs";
+import { writeFile, readFile, mkdir } from "node:fs/promises";
+import { homedir, platform } from "node:os";
+import { join } from "node:path";
+import { promisify } from "node:util";
 
-const execFile = promisify(execFileCb)
+const execFile = promisify(execFileCb);
 
-const IS_WINDOWS = platform() === 'win32'
+const IS_WINDOWS = platform() === "win32";
 
-const PLIST_LABEL = 'net.noxsoft.anima'
-const PLIST_DIR = join(homedir(), 'Library', 'LaunchAgents')
-const PLIST_PATH = join(PLIST_DIR, `${PLIST_LABEL}.plist`)
-const ANIMA_DIR = join(homedir(), '.anima')
+const PLIST_LABEL = "net.noxsoft.anima";
+const PLIST_DIR = join(homedir(), "Library", "LaunchAgents");
+const PLIST_PATH = join(PLIST_DIR, `${PLIST_LABEL}.plist`);
+const ANIMA_DIR = join(homedir(), ".anima");
 
 export interface ContinuityStatus {
-  launchdRegistered: boolean
-  plistExists: boolean
-  fallbackScheduled: boolean
-  checkedAt: Date
+  launchdRegistered: boolean;
+  plistExists: boolean;
+  fallbackScheduled: boolean;
+  checkedAt: Date;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface ContinuityStatus {
  */
 function generatePlist(): string {
   // Find the anima binary path
-  const animaBin = process.argv[1] || join(ANIMA_DIR, 'bin', 'anima')
+  const animaBin = process.argv[1] || join(ANIMA_DIR, "bin", "anima");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -65,10 +65,10 @@ function generatePlist(): string {
     <integer>300</integer>
 
     <key>StandardOutPath</key>
-    <string>${join(ANIMA_DIR, 'logs', 'anima-stdout.log')}</string>
+    <string>${join(ANIMA_DIR, "logs", "anima-stdout.log")}</string>
 
     <key>StandardErrorPath</key>
-    <string>${join(ANIMA_DIR, 'logs', 'anima-stderr.log')}</string>
+    <string>${join(ANIMA_DIR, "logs", "anima-stderr.log")}</string>
 
     <key>WorkingDirectory</key>
     <string>${homedir()}</string>
@@ -87,7 +87,7 @@ function generatePlist(): string {
     <key>LowPriorityIO</key>
     <true/>
 </dict>
-</plist>`
+</plist>`;
 }
 
 /**
@@ -95,10 +95,10 @@ function generatePlist(): string {
  */
 async function isLaunchdLoaded(): Promise<boolean> {
   try {
-    const { stdout } = await execFile('launchctl', ['list'])
-    return stdout.includes(PLIST_LABEL)
+    const { stdout } = await execFile("launchctl", ["list"]);
+    return stdout.includes(PLIST_LABEL);
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -107,22 +107,22 @@ async function isLaunchdLoaded(): Promise<boolean> {
  */
 async function registerLaunchd(): Promise<void> {
   // Ensure directories exist
-  await mkdir(PLIST_DIR, { recursive: true })
-  await mkdir(join(ANIMA_DIR, 'logs'), { recursive: true })
+  await mkdir(PLIST_DIR, { recursive: true });
+  await mkdir(join(ANIMA_DIR, "logs"), { recursive: true });
 
   // Write plist
-  const plist = generatePlist()
-  await writeFile(PLIST_PATH, plist, 'utf-8')
+  const plist = generatePlist();
+  await writeFile(PLIST_PATH, plist, "utf-8");
 
   // Unload first (if already loaded, to pick up changes)
   try {
-    await execFile('launchctl', ['unload', PLIST_PATH])
+    await execFile("launchctl", ["unload", PLIST_PATH]);
   } catch {
     // Not loaded — that's fine
   }
 
   // Load the agent
-  await execFile('launchctl', ['load', PLIST_PATH])
+  await execFile("launchctl", ["load", PLIST_PATH]);
 }
 
 /**
@@ -130,28 +130,28 @@ async function registerLaunchd(): Promise<void> {
  * This is used if launchd registration fails.
  */
 async function scheduleFallback(): Promise<void> {
-  const animaBin = process.argv[1] || join(ANIMA_DIR, 'bin', 'anima')
-  const logFile = join(ANIMA_DIR, 'logs', 'fallback.log')
+  const animaBin = process.argv[1] || join(ANIMA_DIR, "bin", "anima");
+  const logFile = join(ANIMA_DIR, "logs", "fallback.log");
 
-  await mkdir(join(ANIMA_DIR, 'logs'), { recursive: true })
+  await mkdir(join(ANIMA_DIR, "logs"), { recursive: true });
 
   // Write a restart script
-  const restartScript = join(ANIMA_DIR, 'restart.sh')
+  const restartScript = join(ANIMA_DIR, "restart.sh");
   const scriptContent = `#!/bin/bash
 # ANIMA fallback restart script
 sleep 10
 nohup "${animaBin}" heartbeat --daemon >> "${logFile}" 2>&1 &
 echo "ANIMA restarted at $(date)" >> "${logFile}"
-`
-  await writeFile(restartScript, scriptContent, { mode: 0o755 })
+`;
+  await writeFile(restartScript, scriptContent, { mode: 0o755 });
 
   // Schedule it to run
   try {
-    await execFile('bash', [restartScript])
+    await execFile("bash", [restartScript]);
   } catch {
     // Best effort — log the failure
-    const errorLog = `[${new Date().toISOString()}] Failed to schedule fallback restart\n`
-    await writeFile(logFile, errorLog, { flag: 'a' })
+    const errorLog = `[${new Date().toISOString()}] Failed to schedule fallback restart\n`;
+    await writeFile(logFile, errorLog, { flag: "a" });
   }
 }
 
@@ -159,12 +159,20 @@ echo "ANIMA restarted at $(date)" >> "${logFile}"
  * Check if the Windows Task Scheduler has the ANIMA task registered.
  */
 async function isWindowsTaskRegistered(): Promise<boolean> {
-  if (!IS_WINDOWS) return false
+  if (!IS_WINDOWS) {
+    return false;
+  }
   try {
-    const { stdout } = await execFile('schtasks', ['/query', '/tn', 'ANIMA Heartbeat', '/fo', 'LIST'])
-    return stdout.includes('ANIMA Heartbeat')
+    const { stdout } = await execFile("schtasks", [
+      "/query",
+      "/tn",
+      "ANIMA Heartbeat",
+      "/fo",
+      "LIST",
+    ]);
+    return stdout.includes("ANIMA Heartbeat");
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -173,21 +181,26 @@ async function isWindowsTaskRegistered(): Promise<boolean> {
  * Runs at login and every 5 minutes.
  */
 async function registerWindowsTask(): Promise<void> {
-  const animaBin = process.argv[1] || join(ANIMA_DIR, 'bin', 'anima')
-  const nodeExe = process.execPath
-  const logDir = join(ANIMA_DIR, 'logs')
-  await mkdir(logDir, { recursive: true })
+  const animaBin = process.argv[1] || join(ANIMA_DIR, "bin", "anima");
+  const nodeExe = process.execPath;
+  const logDir = join(ANIMA_DIR, "logs");
+  await mkdir(logDir, { recursive: true });
 
   // Create task: runs at logon and every 5 minutes
-  await execFile('schtasks', [
-    '/create',
-    '/tn', 'ANIMA Heartbeat',
-    '/tr', `"${nodeExe}" "${animaBin}" heartbeat --daemon`,
-    '/sc', 'MINUTE',
-    '/mo', '5',
-    '/ru', 'SYSTEM',
-    '/f', // Force overwrite
-  ])
+  await execFile("schtasks", [
+    "/create",
+    "/tn",
+    "ANIMA Heartbeat",
+    "/tr",
+    `"${nodeExe}" "${animaBin}" heartbeat --daemon`,
+    "/sc",
+    "MINUTE",
+    "/mo",
+    "5",
+    "/ru",
+    "SYSTEM",
+    "/f", // Force overwrite
+  ]);
 }
 
 /**
@@ -203,62 +216,62 @@ export async function ensureContinuity(): Promise<ContinuityStatus> {
     plistExists: false,
     fallbackScheduled: false,
     checkedAt: new Date(),
-  }
+  };
 
   if (IS_WINDOWS) {
     // Windows path — use Task Scheduler
-    const isRegistered = await isWindowsTaskRegistered()
-    status.launchdRegistered = isRegistered // Reuse field for Windows task status
-    status.plistExists = isRegistered // Reuse field
+    const isRegistered = await isWindowsTaskRegistered();
+    status.launchdRegistered = isRegistered; // Reuse field for Windows task status
+    status.plistExists = isRegistered; // Reuse field
 
     if (!isRegistered) {
       try {
-        await registerWindowsTask()
-        status.launchdRegistered = await isWindowsTaskRegistered()
-        status.plistExists = status.launchdRegistered
+        await registerWindowsTask();
+        status.launchdRegistered = await isWindowsTaskRegistered();
+        status.plistExists = status.launchdRegistered;
       } catch {
         // Windows task registration failed — log it
-        const logFile = join(ANIMA_DIR, 'logs', 'continuity.log')
-        await mkdir(join(ANIMA_DIR, 'logs'), { recursive: true })
+        const logFile = join(ANIMA_DIR, "logs", "continuity.log");
+        await mkdir(join(ANIMA_DIR, "logs"), { recursive: true });
         await writeFile(
           logFile,
           `[${new Date().toISOString()}] Windows Task Scheduler registration failed\n`,
-          { flag: 'a' },
-        )
-        status.fallbackScheduled = true
+          { flag: "a" },
+        );
+        status.fallbackScheduled = true;
       }
     }
 
-    return status
+    return status;
   }
 
   // macOS / Unix path — use launchd
   // Check plist exists
-  status.plistExists = existsSync(PLIST_PATH)
+  status.plistExists = existsSync(PLIST_PATH);
 
   // Check if launchd has the agent loaded
-  status.launchdRegistered = await isLaunchdLoaded()
+  status.launchdRegistered = await isLaunchdLoaded();
 
   if (status.launchdRegistered) {
-    return status
+    return status;
   }
 
   // Not registered — try to register
   try {
-    await registerLaunchd()
-    status.launchdRegistered = await isLaunchdLoaded()
-    status.plistExists = existsSync(PLIST_PATH)
+    await registerLaunchd();
+    status.launchdRegistered = await isLaunchdLoaded();
+    status.plistExists = existsSync(PLIST_PATH);
   } catch {
     // launchd registration failed — schedule fallback
     try {
-      await scheduleFallback()
-      status.fallbackScheduled = true
+      await scheduleFallback();
+      status.fallbackScheduled = true;
     } catch {
       // Complete failure — log it
     }
   }
 
-  return status
+  return status;
 }
 
 /**
@@ -268,9 +281,9 @@ export async function getContinuityStatus(): Promise<ContinuityStatus> {
   return {
     launchdRegistered: await isLaunchdLoaded(),
     plistExists: existsSync(PLIST_PATH),
-    fallbackScheduled: existsSync(join(ANIMA_DIR, 'restart.sh')),
+    fallbackScheduled: existsSync(join(ANIMA_DIR, "restart.sh")),
     checkedAt: new Date(),
-  }
+  };
 }
 
 /**
@@ -278,7 +291,7 @@ export async function getContinuityStatus(): Promise<ContinuityStatus> {
  */
 export async function unregister(): Promise<void> {
   try {
-    await execFile('launchctl', ['unload', PLIST_PATH])
+    await execFile("launchctl", ["unload", PLIST_PATH]);
   } catch {
     // Not loaded — that's fine
   }

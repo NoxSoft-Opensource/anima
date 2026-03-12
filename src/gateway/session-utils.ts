@@ -421,10 +421,7 @@ function resolveDefaultStoreAgentId(cfg: AnimaConfig): string {
   return normalizeAgentId(resolveDefaultAgentId(cfg));
 }
 
-export function resolveSessionStoreKey(params: {
-  cfg: AnimaConfig;
-  sessionKey: string;
-}): string {
+export function resolveSessionStoreKey(params: { cfg: AnimaConfig; sessionKey: string }): string {
   const raw = params.sessionKey.trim();
   if (!raw) {
     return raw;

@@ -12,10 +12,7 @@ import {
   resolveBrowserExecutableForPlatform,
   stopAnimaChrome,
 } from "./chrome.js";
-import {
-  DEFAULT_ANIMA_BROWSER_COLOR,
-  DEFAULT_ANIMA_BROWSER_PROFILE_NAME,
-} from "./constants.js";
+import { DEFAULT_ANIMA_BROWSER_COLOR, DEFAULT_ANIMA_BROWSER_PROFILE_NAME } from "./constants.js";
 
 async function readJson(filePath: string): Promise<Record<string, unknown>> {
   const raw = await fsp.readFile(filePath, "utf-8");

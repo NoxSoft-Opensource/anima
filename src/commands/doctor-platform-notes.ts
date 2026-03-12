@@ -80,16 +80,13 @@ export async function noteMacLaunchctlGatewayEnvOverrides(
     const lines = [
       "- Deprecated launchctl environment variables detected (ignored).",
       ...deprecatedLaunchctlEntries.map(
-        ([key]) =>
-          `- \`${key}\` is set; use \`ANIMA_${key.slice(key.indexOf("_") + 1)}\` instead.`,
+        ([key]) => `- \`${key}\` is set; use \`ANIMA_${key.slice(key.indexOf("_") + 1)}\` instead.`,
       ),
     ];
     (deps?.noteFn ?? note)(lines.join("\n"), "Gateway (macOS)");
   }
 
-  const tokenEntries = [
-    ["ANIMA_GATEWAY_TOKEN", await getenv("ANIMA_GATEWAY_TOKEN")],
-  ] as const;
+  const tokenEntries = [["ANIMA_GATEWAY_TOKEN", await getenv("ANIMA_GATEWAY_TOKEN")]] as const;
   const passwordEntries = [
     ["ANIMA_GATEWAY_PASSWORD", await getenv("ANIMA_GATEWAY_PASSWORD")],
   ] as const;

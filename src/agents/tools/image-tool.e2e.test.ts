@@ -152,9 +152,7 @@ describe("image tool implicit imageModel config", () => {
   });
 
   it("allows workspace images outside default local media roots", async () => {
-    const workspaceParent = await fs.mkdtemp(
-      path.join(process.cwd(), ".anima-workspace-image-"),
-    );
+    const workspaceParent = await fs.mkdtemp(path.join(process.cwd(), ".anima-workspace-image-"));
     try {
       const workspaceDir = path.join(workspaceParent, "workspace");
       await fs.mkdir(workspaceDir, { recursive: true });
@@ -221,9 +219,7 @@ describe("image tool implicit imageModel config", () => {
   });
 
   it("allows workspace images via createAnimaCodingTools default workspace root", async () => {
-    const workspaceParent = await fs.mkdtemp(
-      path.join(process.cwd(), ".anima-workspace-image-"),
-    );
+    const workspaceParent = await fs.mkdtemp(path.join(process.cwd(), ".anima-workspace-image-"));
     try {
       const workspaceDir = path.join(workspaceParent, "workspace");
       await fs.mkdir(workspaceDir, { recursive: true });

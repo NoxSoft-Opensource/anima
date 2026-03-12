@@ -1,0 +1,31 @@
+
+> @noxsoft/anima@5.1.2 format:check /Users/grimreaper/.hell/anima
+> oxfmt --check
+
+Checking formatting...
+
+src/agents/cli-runner.e2e.test.ts (0ms)
+src/agents/cli-runner.ts (0ms)
+src/agents/gemini-direct-runner.ts (0ms)
+src/agents/model-auto.test.ts (0ms)
+src/agents/model-auto.ts (1ms)
+src/agents/model-fallback.ts (1ms)
+src/agents/model-preference.ts (0ms)
+src/agents/noxsoft-runner.ts (3ms)
+src/auto-reply/reply/agent-runner-memory.ts (0ms)
+src/auto-reply/reply/followup-runner.ts (0ms)
+src/commands/agent.ts (1ms)
+src/commands/agent/model-resolution.test.ts (0ms)
+src/commands/agent/model-resolution.ts (0ms)
+src/commands/models/current.ts (0ms)
+src/gateway/server-methods/anima.ts (0ms)
+src/mcp/config-sync.ts (0ms)
+src/mcp/registry.ts (0ms)
+src/memory/brain-graph.ts (0ms)
+ui/src/App.tsx (0ms)
+ui/src/main.tsx (0ms)
+ui/src/styles.css (246ms)
+
+Format issues found in above 21 files. Run without `--check` to fix.
+Finished in 7296ms on 3421 files using 8 threads.
+ ELIFECYCLE  Command failed with exit code 1.

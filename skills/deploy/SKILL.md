@@ -39,6 +39,7 @@ Deploy the specified platform by pushing to main branch. All NoxSoft platforms a
 ## Safety Checks
 
 Before deploying:
+
 - Verify the build passes locally
 - Check there are no unintended changes staged
 - Confirm the target branch is main

@@ -33,9 +33,7 @@ describe("shared/frontmatter", () => {
 
   test("resolveAnimaManifestBlock returns undefined for invalid input", () => {
     expect(resolveAnimaManifestBlock({ frontmatter: {} })).toBeUndefined();
-    expect(
-      resolveAnimaManifestBlock({ frontmatter: { metadata: "not-json5" } }),
-    ).toBeUndefined();
+    expect(resolveAnimaManifestBlock({ frontmatter: { metadata: "not-json5" } })).toBeUndefined();
     expect(
       resolveAnimaManifestBlock({ frontmatter: { metadata: "{ nope: { a: 1 } }" } }),
     ).toBeUndefined();

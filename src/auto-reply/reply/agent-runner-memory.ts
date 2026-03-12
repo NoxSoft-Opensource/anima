@@ -101,6 +101,11 @@ export async function runMemoryFlushIfNeeded(params: {
       provider: params.followupRun.run.provider,
       model: params.followupRun.run.model,
       agentDir: params.followupRun.run.agentDir,
+      sessionEntry:
+        params.sessionEntry ??
+        (params.sessionKey ? params.sessionStore?.[params.sessionKey] : undefined) ??
+        undefined,
+      thinkLevel: params.followupRun.run.thinkLevel,
       fallbacksOverride: resolveAgentModelFallbacksOverride(
         params.followupRun.run.config,
         resolveAgentIdFromSessionKey(params.followupRun.run.sessionKey),
@@ -147,6 +152,10 @@ export async function runMemoryFlushIfNeeded(params: {
           verboseLevel: params.followupRun.run.verboseLevel,
           reasoningLevel: params.followupRun.run.reasoningLevel,
           execOverrides: params.followupRun.run.execOverrides,
+          execSecurity: (
+            params.sessionEntry ??
+            (params.sessionKey ? params.sessionStore?.[params.sessionKey] : undefined)
+          )?.execSecurity,
           bashElevated: params.followupRun.run.bashElevated,
           timeoutMs: params.followupRun.run.timeoutMs,
           runId: flushRunId,

@@ -23,11 +23,7 @@ import {
 } from "./list.errors.js";
 import { isLocalBaseUrl, modelKey } from "./shared.js";
 
-const hasAuthForProvider = (
-  provider: string,
-  cfg?: AnimaConfig,
-  authStore?: AuthProfileStore,
-) => {
+const hasAuthForProvider = (provider: string, cfg?: AnimaConfig, authStore?: AuthProfileStore) => {
   if (!cfg || !authStore) {
     return false;
   }

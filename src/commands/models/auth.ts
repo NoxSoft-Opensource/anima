@@ -241,6 +241,11 @@ type LoginOptions = {
   setDefault?: boolean;
 };
 
+type GithubCopilotLoginOptions = {
+  profileId?: string;
+  yes?: boolean;
+};
+
 export function resolveRequestedLoginProviderOrThrow(
   providers: ProviderPlugin[],
   rawProvider?: string,
@@ -393,4 +398,11 @@ export async function modelsAuthLoginCommand(opts: LoginOptions, runtime: Runtim
   if (result.notes && result.notes.length > 0) {
     await prompter.note(result.notes.join("\n"), "Provider notes");
   }
+}
+
+export async function githubCopilotLoginCommand(
+  _opts: GithubCopilotLoginOptions,
+  runtime: RuntimeEnv,
+) {
+  await modelsAuthLoginCommand({ provider: "github-copilot" }, runtime);
 }

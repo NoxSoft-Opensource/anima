@@ -12,6 +12,12 @@ import {
   isFailoverError,
   isTimeoutError,
 } from "./failover-error.js";
+import { applyAutoModelRouting, type WorkingMode } from "./model-auto.js";
+import {
+  orderCandidatesByPreference,
+  resolveUsageAwareModelPreference,
+  type ModelRoutingSessionSnapshot,
+} from "./model-preference.js";
 import {
   buildConfiguredAllowlistKeys,
   buildModelAliasIndex,
@@ -217,21 +223,54 @@ function resolveFallbackCandidates(params: {
   return candidates;
 }
 
+function resolveWorkingModeFromSessionEntry(
+  entry?: Pick<ModelRoutingSessionSnapshot, "execSecurity"> | null,
+): WorkingMode | undefined {
+  const execSecurity = entry?.execSecurity?.trim().toLowerCase();
+  if (!execSecurity) {
+    return undefined;
+  }
+  return execSecurity === "deny" ? "read" : "write";
+}
+
 export async function runWithModelFallback<T>(params: {
   cfg: AnimaConfig | undefined;
   provider: string;
   model: string;
   agentDir?: string;
+  sessionEntry?: ModelRoutingSessionSnapshot | null;
+  workingMode?: WorkingMode;
+  thinkLevel?: string | null;
   /** Optional explicit fallbacks list; when provided (even empty), replaces agents.defaults.model.fallbacks. */
   fallbacksOverride?: string[];
   run: (provider: string, model: string) => Promise<T>;
   onError?: ModelFallbackErrorHandler;
 }): Promise<ModelFallbackRunResult<T>> {
-  const candidates = resolveFallbackCandidates({
+  const preservePrimary = Boolean(
+    params.sessionEntry?.providerOverride || params.sessionEntry?.modelOverride,
+  );
+  const resolvedWorkingMode =
+    params.workingMode ?? resolveWorkingModeFromSessionEntry(params.sessionEntry);
+  const baseCandidates = resolveFallbackCandidates({
     cfg: params.cfg,
     provider: params.provider,
     model: params.model,
     fallbacksOverride: params.fallbacksOverride,
+  });
+  const autoRoutingResult = await applyAutoModelRouting({
+    candidates: baseCandidates,
+    cfg: params.cfg,
+    agentDir: params.agentDir,
+    preservePrimary,
+    workingMode: resolvedWorkingMode,
+  });
+  const candidates = orderCandidatesByPreference({
+    candidates: autoRoutingResult.candidates,
+    cfg: params.cfg,
+    preferenceMode: resolveUsageAwareModelPreference({
+      thinkLevel: params.thinkLevel,
+      sessionEntry: params.sessionEntry,
+    }),
   });
   const authStore = params.cfg
     ? ensureAuthProfileStore(params.agentDir, { allowKeychainPrompt: false })

@@ -1,0 +1,6 @@
+src/agents/tools/discord-actions.ts(4,42): error TS2307: Cannot find module './discord-actions-guild.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(5,46): error TS2307: Cannot find module './discord-actions-messaging.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(6,47): error TS2307: Cannot find module './discord-actions-moderation.js' or its corresponding type declarations.
+src/agents/tools/discord-actions.ts(7,45): error TS2307: Cannot find module './discord-actions-presence.js' or its corresponding type declarations.
+src/channels/targets.ts(1,44): error TS2307: Cannot find module './plugins/directory-config.js' or its corresponding type declarations.
+src/cli/channels-cli.ts(4,3): error TS2724: '"../commands/channels.js"' has no exported member named 'channelsCapabilitiesCommand'. Did you mean 'channelsListCommand'?

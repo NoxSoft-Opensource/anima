@@ -112,9 +112,7 @@ export function applyCliProfileEnv(params: {
   // Convenience only: fill defaults, never override explicit env values.
   env.ANIMA_PROFILE = profile;
 
-  const stateDir =
-    env.ANIMA_STATE_DIR?.trim() ||
-    resolveProfileStateDir(profile, env, homedir);
+  const stateDir = env.ANIMA_STATE_DIR?.trim() || resolveProfileStateDir(profile, env, homedir);
   if (!env.ANIMA_STATE_DIR?.trim()) {
     env.ANIMA_STATE_DIR = stateDir;
   }

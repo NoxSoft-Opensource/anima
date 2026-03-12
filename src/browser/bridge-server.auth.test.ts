@@ -1,9 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { startBrowserBridgeServer, stopBrowserBridgeServer } from "./bridge-server.js";
-import {
-  DEFAULT_ANIMA_BROWSER_COLOR,
-  DEFAULT_ANIMA_BROWSER_PROFILE_NAME,
-} from "./constants.js";
+import { DEFAULT_ANIMA_BROWSER_COLOR, DEFAULT_ANIMA_BROWSER_PROFILE_NAME } from "./constants.js";
 
 function buildResolvedConfig() {
   return {

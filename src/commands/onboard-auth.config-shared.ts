@@ -17,10 +17,7 @@ function extractAgentDefaultModelFallbacks(model: unknown): string[] | undefined
   return Array.isArray(fallbacks) ? fallbacks.map((v) => String(v)) : undefined;
 }
 
-export function applyAgentDefaultModelPrimary(
-  cfg: AnimaConfig,
-  primary: string,
-): AnimaConfig {
+export function applyAgentDefaultModelPrimary(cfg: AnimaConfig, primary: string): AnimaConfig {
   const existingFallbacks = extractAgentDefaultModelFallbacks(cfg.agents?.defaults?.model);
   return {
     ...cfg,

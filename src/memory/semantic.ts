@@ -98,7 +98,10 @@ function parseSemanticMarkdown(content: string, filePath: string): SemanticEntry
     if (srcMatch) {
       const raw = srcMatch[1].trim();
       if (raw !== "none") {
-        sources = raw.split(",").map((s) => s.trim()).filter(Boolean);
+        sources = raw
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
       }
     }
     const laMatch = line.match(/^\s*-\s*\*\*Last Accessed:\*\*\s*(.+)$/);
@@ -120,7 +123,13 @@ function parseSemanticMarkdown(content: string, filePath: string): SemanticEntry
   }
 
   const sepIndex = lines.findIndex((l) => l.trim() === "---");
-  const entryContent = sepIndex >= 0 ? lines.slice(sepIndex + 1).join("\n").trim() : "";
+  const entryContent =
+    sepIndex >= 0
+      ? lines
+          .slice(sepIndex + 1)
+          .join("\n")
+          .trim()
+      : "";
 
   return { id, category, content: entryContent, confidence, sources, lastAccessed, createdAt };
 }

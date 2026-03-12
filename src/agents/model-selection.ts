@@ -28,8 +28,18 @@ export function modelKey(provider: string, model: string) {
   return `${provider}/${model}`;
 }
 
+const PROVIDER_ALIASES: Record<string, string> = {
+  "z.ai": "zai",
+  "z-ai": "zai",
+  "opencode-zen": "opencode",
+  qwen: "qwen-portal",
+  "kimi-code": "kimi-coding",
+  codex: "openai-codex",
+};
+
 export function normalizeProviderId(provider: string): string {
-  return provider.trim().toLowerCase();
+  const normalized = provider.trim().toLowerCase();
+  return PROVIDER_ALIASES[normalized] ?? normalized;
 }
 
 const BUILTIN_CLI_PROVIDER_IDS = new Set<string>([
@@ -70,9 +80,20 @@ function normalizeProviderModelId(provider: string, model: string): string {
   return model;
 }
 
+function isOpenAICodexModelId(model: string): boolean {
+  return model.trim().toLowerCase().includes("codex");
+}
+
 export function normalizeModelRef(provider: string, model: string): ModelRef {
-  const normalizedProvider = normalizeProviderId(provider);
-  const normalizedModel = normalizeProviderModelId(normalizedProvider, model.trim());
+  const trimmedModel = model.trim();
+  let normalizedProvider = normalizeProviderId(provider);
+  if (
+    (normalizedProvider === "openai" || normalizedProvider === "codex") &&
+    isOpenAICodexModelId(trimmedModel)
+  ) {
+    normalizedProvider = "openai-codex";
+  }
+  const normalizedModel = normalizeProviderModelId(normalizedProvider, trimmedModel);
   return { provider: normalizedProvider, model: normalizedModel };
 }
 

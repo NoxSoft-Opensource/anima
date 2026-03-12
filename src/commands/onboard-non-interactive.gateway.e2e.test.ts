@@ -3,7 +3,20 @@ import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { TOKEN_PATH } from "../auth/noxsoft-auth.js";
 import { getDeterministicFreePortBlock } from "../test-utils/ports.js";
+
+vi.mock("../auth/noxsoft-auth.js", () => ({
+  TOKEN_PATH: "/tmp/test-noxsoft-token",
+  ensureAuthenticated: vi.fn(async () => ({
+    registered: false,
+    agent: {
+      id: "agent-1",
+      name: "test-agent",
+      display_name: "Test Agent",
+    },
+  })),
+}));
 
 const gatewayClientCalls: Array<{
   url?: string;
@@ -161,7 +174,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
         nonInteractive: true,
         mode: "local",
         workspace,
-        authChoice: "skip",
+        authChoice: "noxsoft",
         skipSkills: true,
         skipHealth: true,
         installDaemon: false,
@@ -177,11 +190,25 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     const cfg = JSON.parse(await fs.readFile(configPath, "utf8")) as {
       gateway?: { auth?: { mode?: string; token?: string } };
       agents?: { defaults?: { workspace?: string } };
+      channels?: {
+        noxsoft?: {
+          enabled?: boolean;
+          tokenFile?: string;
+          signAs?: string;
+        };
+      };
     };
 
     expect(cfg?.agents?.defaults?.workspace).toBe(workspace);
     expect(cfg?.gateway?.auth?.mode).toBe("token");
     expect(cfg?.gateway?.auth?.token).toBe(token);
+    expect(cfg.channels?.noxsoft).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        tokenFile: TOKEN_PATH,
+        signAs: "Test Agent",
+      }),
+    );
 
     const { authorizeGatewayConnect, resolveGatewayAuth } = await import("../gateway/auth.js");
     const auth = resolveGatewayAuth({ authConfig: cfg.gateway?.auth, env: process.env });
@@ -204,7 +231,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
         mode: "remote",
         remoteUrl: `ws://127.0.0.1:${port}`,
         remoteToken: token,
-        authChoice: "skip",
+        authChoice: "noxsoft",
         json: true,
       },
       runtime,
@@ -213,11 +240,18 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
     const { resolveConfigPath } = await import("../config/config.js");
     const cfg = JSON.parse(await fs.readFile(resolveConfigPath(), "utf8")) as {
       gateway?: { mode?: string; remote?: { url?: string; token?: string } };
+      channels?: { noxsoft?: { enabled?: boolean; tokenFile?: string } };
     };
 
     expect(cfg.gateway?.mode).toBe("remote");
     expect(cfg.gateway?.remote?.url).toBe(`ws://127.0.0.1:${port}`);
     expect(cfg.gateway?.remote?.token).toBe(token);
+    expect(cfg.channels?.noxsoft).toEqual(
+      expect.objectContaining({
+        enabled: true,
+        tokenFile: TOKEN_PATH,
+      }),
+    );
 
     gatewayClientCalls.length = 0;
     const { callGateway } = await import("../gateway/call.js");
@@ -248,7 +282,7 @@ describe("onboard (non-interactive): gateway and remote auth", () => {
         nonInteractive: true,
         mode: "local",
         workspace,
-        authChoice: "skip",
+        authChoice: "noxsoft",
         skipSkills: true,
         skipHealth: true,
         installDaemon: false,

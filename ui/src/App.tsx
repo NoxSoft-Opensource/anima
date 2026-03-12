@@ -1,5 +1,6 @@
 import React from "react";
-import { Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { Routes, Route, NavLink, Navigate, useLocation } from "react-router-dom";
+import { trackAmplitudeEvent } from "./amplitude";
 import Dashboard from "./pages/Dashboard";
 import Freedom from "./pages/Freedom";
 import Journal from "./pages/Journal";
@@ -23,6 +24,23 @@ const navItems = [
 ];
 
 export default function App(): React.ReactElement {
+  const location = useLocation();
+  const lastTrackedPathRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    const currentPath = `${location.pathname}${location.search}${location.hash}`;
+    if (lastTrackedPathRef.current === currentPath) {
+      return;
+    }
+
+    lastTrackedPathRef.current = currentPath;
+    trackAmplitudeEvent("page_view", {
+      path: location.pathname,
+      search: location.search,
+      hash: location.hash,
+    });
+  }, [location.hash, location.pathname, location.search]);
+
   return (
     <div className="layout">
       <aside className="sidebar">
@@ -37,6 +55,12 @@ export default function App(): React.ReactElement {
               key={item.path}
               to={item.path}
               className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+              onClick={() =>
+                trackAmplitudeEvent("sidebar_navigation_clicked", {
+                  destination: item.path,
+                  label: item.label,
+                })
+              }
             >
               <span className="nav-icon mono">{item.icon}</span>
               {item.label}

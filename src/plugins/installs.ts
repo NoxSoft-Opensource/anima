@@ -3,10 +3,7 @@ import type { PluginInstallRecord } from "../config/types.plugins.js";
 
 export type PluginInstallUpdate = PluginInstallRecord & { pluginId: string };
 
-export function recordPluginInstall(
-  cfg: AnimaConfig,
-  update: PluginInstallUpdate,
-): AnimaConfig {
+export function recordPluginInstall(cfg: AnimaConfig, update: PluginInstallUpdate): AnimaConfig {
   const { pluginId, ...record } = update;
   const installs = {
     ...cfg.plugins?.installs,

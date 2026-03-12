@@ -20,9 +20,22 @@ export type AgentModelEntryConfig = {
   streaming?: boolean;
 };
 
+export type AgentModelAutoConfig = {
+  enabled?: boolean;
+  providerOrder?: string[];
+  byProvider?: Record<string, { models?: string[] }>;
+  byWorkingMode?: {
+    read?: string[];
+    write?: string[];
+  };
+  usageCheck?: "off" | "prefer-available";
+  usageThresholdPercent?: number;
+};
+
 export type AgentModelListConfig = {
   primary?: string;
   fallbacks?: string[];
+  auto?: AgentModelAutoConfig;
 };
 
 export type AgentContextPruningConfig = {

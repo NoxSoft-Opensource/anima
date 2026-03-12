@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import {
   githubCopilotLoginCommand,
+  modelsCurrentCommand,
   modelsAliasesAddCommand,
   modelsAliasesListCommand,
   modelsAliasesRemoveCommand,
@@ -102,6 +103,31 @@ export function registerModelsCli(program: Command) {
             probeConcurrency: opts.probeConcurrency as string | undefined,
             probeMaxTokens: opts.probeMaxTokens as string | undefined,
             agent,
+          },
+          defaultRuntime,
+        );
+      });
+    });
+
+  models
+    .command("current")
+    .description("Show the current effective model for an agent or session")
+    .option("--agent <id>", "Agent id to inspect")
+    .option("--to <number>", "Resolve the session key from an E.164 recipient")
+    .option("--session-id <id>", "Inspect a specific session id")
+    .option("--session-key <key>", "Inspect a specific session key")
+    .option("--json", "Output JSON", false)
+    .option("--plain", "Plain output", false)
+    .action(async (opts) => {
+      await runModelsCommand(async () => {
+        await modelsCurrentCommand(
+          {
+            agent: opts.agent as string | undefined,
+            to: opts.to as string | undefined,
+            sessionId: opts.sessionId as string | undefined,
+            sessionKey: opts.sessionKey as string | undefined,
+            json: Boolean(opts.json),
+            plain: Boolean(opts.plain),
           },
           defaultRuntime,
         );

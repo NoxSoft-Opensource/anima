@@ -1,3 +1,8 @@
+import type {
+  SVRNNode as ExternalSVRNNode,
+  SVRNNodeConfig as ExternalSVRNNodeConfig,
+} from "@noxsoft/svrn-node";
+
 /**
  * ANIMA SVRNNode adapter.
  *
@@ -30,14 +35,13 @@ export const DEFAULT_SVRN_CONFIG: SVRNNodeConfig = {
 };
 
 // Lazy loader for @noxsoft/svrn-node — caches the result
-let _svrnModule:
-  | {
-      SVRNNode: new (config: SVRNNodeConfig) => any;
-      DEFAULT_CONFIG: SVRNNodeConfig;
-      resolveConfig: (partial: Partial<SVRNNodeConfig>) => SVRNNodeConfig;
-    }
-  | null
-  | undefined; // undefined = not yet attempted, null = failed
+type SVRNModule = {
+  SVRNNode: new (config: ExternalSVRNNodeConfig) => ExternalSVRNNode;
+  DEFAULT_CONFIG: ExternalSVRNNodeConfig;
+  resolveConfig: (partial: Partial<ExternalSVRNNodeConfig>) => ExternalSVRNNodeConfig;
+};
+
+let _svrnModule: SVRNModule | null | undefined; // undefined = not yet attempted, null = failed
 
 async function loadSVRNModule(): Promise<typeof _svrnModule> {
   if (_svrnModule !== undefined) {
@@ -62,7 +66,7 @@ export async function isSVRNAvailable(): Promise<boolean> {
 
 /** Adapter providing the API shape ANIMA's repl expects. */
 export class SVRNNode {
-  private inner: any = null;
+  private inner: ExternalSVRNNode | null = null;
   private config: SVRNNodeConfig;
   private _available = false;
 
@@ -100,6 +104,10 @@ export class SVRNNode {
     await this.inner.stop();
   }
 
+  isRunning(): boolean {
+    return this.getStats().running;
+  }
+
   getNodeId(): string {
     if (!this.inner) {
       return "unavailable";
@@ -109,6 +117,10 @@ export class SVRNNode {
 
   isEnabled(): boolean {
     return this.config.enabled;
+  }
+
+  getConfig(): SVRNNodeConfig {
+    return this.config;
   }
 
   /** Stats shape expected by ANIMA repl commands. */
@@ -146,7 +158,7 @@ export class SVRNNode {
       uptimeMs: status.uptime * 1000,
       tasksCompleted: earnings.tasksThisSession,
       tasksFailed: 0,
-      balance: wallet.balance,
+      balance: wallet.balance ?? wallet.getBalance?.() ?? 0,
       sessionEarnings: earnings.session,
     };
   }
@@ -173,9 +185,44 @@ export class SVRNNode {
     return {
       getTodayEarnings: () =>
         summary.tasksToday > 0 ? { total: summary.today, taskCount: summary.tasksToday } : null,
-      getBalanceValueUSD: () => wallet.balance * 0.001,
+      getBalanceValueUSD: () => (wallet.balance ?? wallet.getBalance?.() ?? 0) * 0.001,
       getAllTimeEarned: () => summary.allTime,
-      getBalance: () => wallet.balance,
+      getBalance: () => wallet.balance ?? wallet.getBalance?.() ?? 0,
+    };
+  }
+
+  getWallet(): {
+    getAddress: () => string;
+    getBalance: () => number;
+    getTotalEarned: () => number;
+    getTotalSpent: () => number;
+    getCreatedAt: () => string | null;
+    getRecentTransactions: (limit: number) => Array<{
+      type: "earn" | "spend";
+      amount: number;
+      description?: string;
+      timestamp: number;
+    }>;
+  } {
+    if (!this.inner) {
+      return {
+        getAddress: () => "unavailable",
+        getBalance: () => 0,
+        getTotalEarned: () => 0,
+        getTotalSpent: () => 0,
+        getCreatedAt: () => null,
+        getRecentTransactions: () => [],
+      };
+    }
+
+    const wallet = this.inner.getWallet();
+    return {
+      getAddress: () => wallet.getAddress?.() ?? "unavailable",
+      getBalance: () => wallet.getBalance?.() ?? wallet.balance ?? 0,
+      getTotalEarned: () => wallet.getTotalEarned?.() ?? 0,
+      getTotalSpent: () => wallet.getTotalSpent?.() ?? 0,
+      getCreatedAt: () => wallet.getCreatedAt?.() ?? null,
+      getRecentTransactions: (limit) => wallet.getRecentTransactions?.(limit) ?? [],
     };
   }
 

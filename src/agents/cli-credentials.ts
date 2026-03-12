@@ -271,7 +271,9 @@ function readMiniMaxCliCredentials(options?: { homeDir?: string }): MiniMaxCliCr
  * OAuth token in ~/.openclaw/agents/main/agent/auth-profiles.json.
  * This is the most reliable source on Windows where the Keychain is unavailable.
  */
-export function readOpenClawCredentials(options?: { homeDir?: string }): ClaudeCliCredential | null {
+export function readOpenClawCredentials(options?: {
+  homeDir?: string;
+}): ClaudeCliCredential | null {
   const baseDir = options?.homeDir ?? resolveUserPath("~");
   const authPath = path.join(baseDir, OPENCLAW_AUTH_PROFILES_PATH);
   const raw = loadJsonFile(authPath);
@@ -293,7 +295,7 @@ export function readOpenClawCredentials(options?: { homeDir?: string }): ClaudeC
 
   // Token-based credential (sk-ant-oat01-... or sk-ant-api01-...)
   if (anthropicProfile.type === "token" && typeof anthropicProfile.token === "string") {
-    const token = anthropicProfile.token as string;
+    const token = anthropicProfile.token;
     log.info("read anthropic credentials from openclaw auth-profiles", { type: "token" });
     return {
       type: "token",
@@ -314,9 +316,9 @@ export function readOpenClawCredentials(options?: { homeDir?: string }): ClaudeC
     return {
       type: "oauth",
       provider: "anthropic",
-      access: anthropicProfile.access as string,
-      refresh: anthropicProfile.refresh as string,
-      expires: anthropicProfile.expires as number,
+      access: anthropicProfile.access,
+      refresh: anthropicProfile.refresh,
+      expires: anthropicProfile.expires,
     };
   }
 

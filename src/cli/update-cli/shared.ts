@@ -125,8 +125,7 @@ export async function isEmptyDir(targetPath: string): Promise<boolean> {
 }
 
 export function resolveGitInstallDir(): string {
-  const override =
-    process.env.ANIMA_GIT_DIR?.trim();
+  const override = process.env.ANIMA_GIT_DIR?.trim();
   if (override) {
     return path.resolve(override);
   }

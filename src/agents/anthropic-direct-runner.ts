@@ -11,7 +11,6 @@
  * is present in the auth store and the claude CLI is unavailable or not logged in.
  */
 
-import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -24,6 +23,7 @@ import { resolveSessionAgentIds } from "./agent-scope.js";
 import { resolveBootstrapContextForRun, makeBootstrapWarn } from "./bootstrap-files.js";
 import { buildSystemPrompt } from "./cli-runner/helpers.js";
 import { resolveAnimaDocsPath } from "./docs-path.js";
+import { appendRunnerCapabilityPrompt } from "./runner-capabilities.js";
 import { resolveRunWorkspaceDir } from "./workspace-run.js";
 
 const log = createSubsystemLogger("agent/anthropic-direct");
@@ -150,12 +150,7 @@ export async function runAnthropicDirectAgent(params: {
     moduleUrl: import.meta.url,
   });
 
-  const extraSystemPrompt = [
-    params.extraSystemPrompt?.trim(),
-    "Tools are disabled in this session. Do not call tools.",
-  ]
-    .filter(Boolean)
-    .join("\n");
+  const extraSystemPrompt = appendRunnerCapabilityPrompt(params.extraSystemPrompt, "disabled");
 
   const systemPrompt = buildSystemPrompt({
     workspaceDir,
@@ -256,7 +251,6 @@ export async function runAnthropicDirectAgent(params: {
     }
 
     // Signal assistant started and stream the reply
-    await params.onAssistantMessageStart?.();
     if (outputText && params.onPartialReply) {
       await params.onPartialReply({ text: outputText });
     }

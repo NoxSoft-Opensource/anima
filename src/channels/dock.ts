@@ -57,14 +57,6 @@ type ChannelDockStreaming = {
 // - add a new entry to `DOCKS`
 // - keep it cheap; push heavy logic into `src/channels/plugins/<id>.ts` or channel modules
 const DOCKS: Record<ChatChannelId, ChannelDock> = {
-  web: {
-    id: "web",
-    capabilities: {
-      chatTypes: ["direct"],
-      media: true,
-    },
-    outbound: { textChunkLimit: 4000 },
-  },
   noxsoft: {
     id: "noxsoft",
     capabilities: {

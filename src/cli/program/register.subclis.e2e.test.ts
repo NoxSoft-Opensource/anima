@@ -9,17 +9,17 @@ const { acpAction, registerAcpCli } = vi.hoisted(() => {
   return { acpAction: action, registerAcpCli: register };
 });
 
-const { nodesAction, registerNodesCli } = vi.hoisted(() => {
+const { modelsAction, registerModelsCli } = vi.hoisted(() => {
   const action = vi.fn();
   const register = vi.fn((program: Command) => {
-    const nodes = program.command("nodes");
-    nodes.command("list").action(action);
+    const models = program.command("models");
+    models.command("list").action(action);
   });
-  return { nodesAction: action, registerNodesCli: register };
+  return { modelsAction: action, registerModelsCli: register };
 });
 
 vi.mock("../acp-cli.js", () => ({ registerAcpCli }));
-vi.mock("../nodes-cli.js", () => ({ registerNodesCli }));
+vi.mock("../models-cli.js", () => ({ registerModelsCli }));
 
 const { registerSubCliByName, registerSubCliCommands } = await import("./register.subclis.js");
 
@@ -32,8 +32,8 @@ describe("registerSubCliCommands", () => {
     delete process.env.ANIMA_DISABLE_LAZY_SUBCOMMANDS;
     registerAcpCli.mockClear();
     acpAction.mockClear();
-    registerNodesCli.mockClear();
-    nodesAction.mockClear();
+    registerModelsCli.mockClear();
+    modelsAction.mockClear();
   });
 
   afterEach(() => {
@@ -62,21 +62,22 @@ describe("registerSubCliCommands", () => {
     const names = program.commands.map((cmd) => cmd.name());
     expect(names).toContain("acp");
     expect(names).toContain("gateway");
+    expect(names).toContain("models");
     expect(registerAcpCli).not.toHaveBeenCalled();
   });
 
   it("re-parses argv for lazy subcommands", async () => {
-    process.argv = ["node", "anima", "nodes", "list"];
+    process.argv = ["node", "anima", "models", "list"];
     const program = new Command();
     program.name("anima");
     registerSubCliCommands(program, process.argv);
 
-    expect(program.commands.map((cmd) => cmd.name())).toEqual(["nodes"]);
+    expect(program.commands.map((cmd) => cmd.name())).toEqual(["models"]);
 
-    await program.parseAsync(["nodes", "list"], { from: "user" });
+    await program.parseAsync(["models", "list"], { from: "user" });
 
-    expect(registerNodesCli).toHaveBeenCalledTimes(1);
-    expect(nodesAction).toHaveBeenCalledTimes(1);
+    expect(registerModelsCli).toHaveBeenCalledTimes(1);
+    expect(modelsAction).toHaveBeenCalledTimes(1);
   });
 
   it("replaces placeholder when registering a subcommand by name", async () => {

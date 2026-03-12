@@ -1,10 +1,11 @@
 import type { AnimaConfig } from "../../config/config.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import type { OnboardOptions } from "../onboard-types.js";
-import { ensureAuthenticated } from "../../auth/noxsoft-auth.js";
+import { ensureAuthenticated, type NoxSoftAuthResult } from "../../auth/noxsoft-auth.js";
 import { formatCliCommand } from "../../cli/command-format.js";
 import { writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
+import { applyNoxsoftBootstrap } from "../noxsoft-bootstrap.js";
 import { applyWizardMetadata } from "../onboard-helpers.js";
 
 export async function runNonInteractiveOnboardingRemote(params: {
@@ -22,8 +23,9 @@ export async function runNonInteractiveOnboardingRemote(params: {
     return;
   }
 
+  let auth: NoxSoftAuthResult;
   try {
-    const auth = await ensureAuthenticated({
+    auth = await ensureAuthenticated({
       name: opts.noxsoftAgentName,
       displayName: opts.noxsoftDisplayName,
       description: "ANIMA non-interactive remote onboarding",
@@ -54,6 +56,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
       },
     },
   };
+  nextConfig = applyNoxsoftBootstrap(nextConfig, auth.agent);
   nextConfig = applyWizardMetadata(nextConfig, { command: "onboard", mode });
   await writeConfigFile(nextConfig);
   logConfigUpdated(runtime);

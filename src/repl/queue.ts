@@ -5,40 +5,40 @@
  * and processed in priority order (urgent > high > normal > low > freedom).
  */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { homedir } from 'node:os'
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
-export type Priority = 'urgent' | 'high' | 'normal' | 'low' | 'freedom'
-export type QueueItemStatus = 'queued' | 'running' | 'completed' | 'failed'
+export type Priority = "urgent" | "high" | "normal" | "low" | "freedom";
+export type QueueItemStatus = "queued" | "running" | "completed" | "failed";
 
 export interface QueueItem {
-  id: string
-  prompt: string
-  priority: Priority
-  status: QueueItemStatus
-  source: string // 'repl' | 'heartbeat' | 'api' | 'channel'
-  createdAt: Date
-  startedAt?: Date
-  completedAt?: Date
-  result?: string
-  error?: string
+  id: string;
+  prompt: string;
+  priority: Priority;
+  status: QueueItemStatus;
+  source: string; // 'repl' | 'heartbeat' | 'api' | 'channel'
+  createdAt: Date;
+  startedAt?: Date;
+  completedAt?: Date;
+  result?: string;
+  error?: string;
 }
 
 /** Serializable form of QueueItem for JSON persistence */
 interface QueueItemJSON {
-  id: string
-  prompt: string
-  priority: Priority
-  status: QueueItemStatus
-  source: string
-  createdAt: string
-  startedAt?: string
-  completedAt?: string
-  result?: string
-  error?: string
+  id: string;
+  prompt: string;
+  priority: Priority;
+  status: QueueItemStatus;
+  source: string;
+  createdAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  result?: string;
+  error?: string;
 }
 
 const PRIORITY_ORDER: Record<Priority, number> = {
@@ -47,14 +47,16 @@ const PRIORITY_ORDER: Record<Priority, number> = {
   normal: 2,
   low: 3,
   freedom: 4,
-}
+};
 
 function comparePriority(a: QueueItem, b: QueueItem): number {
-  const pa = PRIORITY_ORDER[a.priority]
-  const pb = PRIORITY_ORDER[b.priority]
-  if (pa !== pb) return pa - pb
+  const pa = PRIORITY_ORDER[a.priority];
+  const pb = PRIORITY_ORDER[b.priority];
+  if (pa !== pb) {
+    return pa - pb;
+  }
   // Within same priority, FIFO
-  return a.createdAt.getTime() - b.createdAt.getTime()
+  return a.createdAt.getTime() - b.createdAt.getTime();
 }
 
 function itemToJSON(item: QueueItem): QueueItemJSON {
@@ -69,7 +71,7 @@ function itemToJSON(item: QueueItem): QueueItemJSON {
     completedAt: item.completedAt?.toISOString(),
     result: item.result,
     error: item.error,
-  }
+  };
 }
 
 function jsonToItem(json: QueueItemJSON): QueueItem {
@@ -84,16 +86,15 @@ function jsonToItem(json: QueueItemJSON): QueueItem {
     completedAt: json.completedAt ? new Date(json.completedAt) : undefined,
     result: json.result,
     error: json.error,
-  }
+  };
 }
 
 export class RequestQueue {
-  private items: QueueItem[] = []
-  private persistPath: string
+  private items: QueueItem[] = [];
+  private persistPath: string;
 
   constructor(persistPath?: string) {
-    this.persistPath =
-      persistPath || join(homedir(), '.anima', 'queue')
+    this.persistPath = persistPath || join(homedir(), ".anima", "queue");
   }
 
   /**
@@ -104,53 +105,53 @@ export class RequestQueue {
       id: randomUUID().slice(0, 8),
       prompt,
       priority,
-      status: 'queued',
+      status: "queued",
       source,
       createdAt: new Date(),
-    }
+    };
 
-    this.items.push(item)
-    this.items.sort(comparePriority)
-    return item
+    this.items.push(item);
+    this.items.sort(comparePriority);
+    return item;
   }
 
   /**
    * Get next item to process (highest priority queued item).
    */
   dequeue(): QueueItem | null {
-    const next = this.items.find((item) => item.status === 'queued')
-    return next || null
+    const next = this.items.find((item) => item.status === "queued");
+    return next || null;
   }
 
   /**
    * Get all items.
    */
   getAll(): QueueItem[] {
-    return [...this.items]
+    return [...this.items];
   }
 
   /**
    * Get pending (queued) items.
    */
   getPending(): QueueItem[] {
-    return this.items.filter((item) => item.status === 'queued')
+    return this.items.filter((item) => item.status === "queued");
   }
 
   /**
    * Get the currently running item.
    */
   getRunning(): QueueItem | null {
-    return this.items.find((item) => item.status === 'running') || null
+    return this.items.find((item) => item.status === "running") || null;
   }
 
   /**
    * Mark an item as running.
    */
   markRunning(id: string): void {
-    const item = this.items.find((i) => i.id === id)
+    const item = this.items.find((i) => i.id === id);
     if (item) {
-      item.status = 'running'
-      item.startedAt = new Date()
+      item.status = "running";
+      item.startedAt = new Date();
     }
   }
 
@@ -158,11 +159,11 @@ export class RequestQueue {
    * Mark an item as completed.
    */
   markCompleted(id: string, result: string): void {
-    const item = this.items.find((i) => i.id === id)
+    const item = this.items.find((i) => i.id === id);
     if (item) {
-      item.status = 'completed'
-      item.completedAt = new Date()
-      item.result = result
+      item.status = "completed";
+      item.completedAt = new Date();
+      item.result = result;
     }
   }
 
@@ -170,11 +171,11 @@ export class RequestQueue {
    * Mark an item as failed.
    */
   markFailed(id: string, error: string): void {
-    const item = this.items.find((i) => i.id === id)
+    const item = this.items.find((i) => i.id === id);
     if (item) {
-      item.status = 'failed'
-      item.completedAt = new Date()
-      item.error = error
+      item.status = "failed";
+      item.completedAt = new Date();
+      item.error = error;
     }
   }
 
@@ -182,37 +183,39 @@ export class RequestQueue {
    * Persist queue to disk.
    */
   async save(): Promise<void> {
-    await mkdir(this.persistPath, { recursive: true })
+    await mkdir(this.persistPath, { recursive: true });
 
-    const filePath = join(this.persistPath, 'queue.json')
+    const filePath = join(this.persistPath, "queue.json");
     const data = {
       version: 1,
       savedAt: new Date().toISOString(),
       items: this.items.map(itemToJSON),
-    }
+    };
 
-    await writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8')
+    await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
   }
 
   /**
    * Load queue from disk.
    */
   async load(): Promise<void> {
-    const filePath = join(this.persistPath, 'queue.json')
-    if (!existsSync(filePath)) return
+    const filePath = join(this.persistPath, "queue.json");
+    if (!existsSync(filePath)) {
+      return;
+    }
 
     try {
-      const content = await readFile(filePath, 'utf-8')
+      const content = await readFile(filePath, "utf-8");
       const data = JSON.parse(content) as {
-        version: number
-        items: QueueItemJSON[]
-      }
+        version: number;
+        items: QueueItemJSON[];
+      };
 
-      this.items = data.items.map(jsonToItem)
-      this.items.sort(comparePriority)
+      this.items = data.items.map(jsonToItem);
+      this.items.sort(comparePriority);
     } catch {
       // Corrupt file — start fresh
-      this.items = []
+      this.items = [];
     }
   }
 
@@ -220,58 +223,58 @@ export class RequestQueue {
    * Get queue statistics.
    */
   getStats(): {
-    queued: number
-    running: number
-    completed: number
-    failed: number
+    queued: number;
+    running: number;
+    completed: number;
+    failed: number;
   } {
-    let queued = 0
-    let running = 0
-    let completed = 0
-    let failed = 0
+    let queued = 0;
+    let running = 0;
+    let completed = 0;
+    let failed = 0;
 
     for (const item of this.items) {
       switch (item.status) {
-        case 'queued':
-          queued++
-          break
-        case 'running':
-          running++
-          break
-        case 'completed':
-          completed++
-          break
-        case 'failed':
-          failed++
-          break
+        case "queued":
+          queued++;
+          break;
+        case "running":
+          running++;
+          break;
+        case "completed":
+          completed++;
+          break;
+        case "failed":
+          failed++;
+          break;
       }
     }
 
-    return { queued, running, completed, failed }
+    return { queued, running, completed, failed };
   }
 
   /**
    * Get the total number of items.
    */
   get size(): number {
-    return this.items.length
+    return this.items.length;
   }
 
   /**
    * Clear completed and failed items older than the given age (in ms).
    */
   prune(maxAgeMs: number = 24 * 60 * 60 * 1000): number {
-    const cutoff = Date.now() - maxAgeMs
-    const before = this.items.length
+    const cutoff = Date.now() - maxAgeMs;
+    const before = this.items.length;
 
     this.items = this.items.filter((item) => {
-      if (item.status === 'completed' || item.status === 'failed') {
-        const ts = item.completedAt?.getTime() || item.createdAt.getTime()
-        return ts > cutoff
+      if (item.status === "completed" || item.status === "failed") {
+        const ts = item.completedAt?.getTime() || item.createdAt.getTime();
+        return ts > cutoff;
       }
-      return true
-    })
+      return true;
+    });
 
-    return before - this.items.length
+    return before - this.items.length;
   }
 }

@@ -1,4 +1,7 @@
 import type { GatewayRequestHandlers } from "./types.js";
+import { resolveSessionAgentId } from "../../agents/agent-scope.js";
+import { resolveWorkingModeModelSelection } from "../../agents/model-auto.js";
+import { resolveDefaultModelForAgent } from "../../agents/model-selection.js";
 import {
   clearToken,
   getToken,
@@ -25,6 +28,7 @@ import {
   patchMissionControlState,
   writeMissionControlFile,
 } from "../../mission-control/local-store.js";
+import { applyModelOverrideToSessionEntry } from "../../sessions/model-overrides.js";
 import { resolveAssistantIdentity } from "../assistant-identity.js";
 import { ErrorCodes, errorShape } from "../protocol/index.js";
 import { loadSessionEntry } from "../session-utils.js";
@@ -65,6 +69,13 @@ function normalizeMemoryKind(value: unknown): MemoryBrowserKind | null {
 async function setMainWorkingMode(mode: MissionWorkingMode) {
   const cfg = loadConfig();
   const mainKey = resolveMainSessionKey(cfg);
+  const sessionAgentId = resolveSessionAgentId({ sessionKey: mainKey, config: cfg });
+  const defaultModel = resolveDefaultModelForAgent({ cfg, agentId: sessionAgentId });
+  const autoModeSelection = resolveWorkingModeModelSelection({
+    cfg,
+    workingMode: mode,
+    defaultProvider: defaultModel.provider,
+  });
   const { storePath, canonicalKey } = loadSessionEntry(mainKey);
   const execSecurity = mode === "read" ? "deny" : "full";
   const execAsk = mode === "read" ? "off" : "on-miss";
@@ -86,6 +97,23 @@ async function setMainWorkingMode(mode: MissionWorkingMode) {
     if (!applied.ok) {
       throw new Error(applied.error.message);
     }
+    applyModelOverrideToSessionEntry({
+      entry: applied.entry,
+      selection: autoModeSelection
+        ? {
+            provider: autoModeSelection.provider,
+            model: autoModeSelection.model,
+            isDefault:
+              autoModeSelection.provider === defaultModel.provider &&
+              autoModeSelection.model === defaultModel.model,
+          }
+        : {
+            provider: defaultModel.provider,
+            model: defaultModel.model,
+            isDefault: true,
+          },
+    });
+    store[canonicalKey] = applied.entry;
     return applied.entry;
   });
 
@@ -95,6 +123,8 @@ async function setMainWorkingMode(mode: MissionWorkingMode) {
     execSecurity,
     execAsk,
     elevatedLevel,
+    modelProvider: autoModeSelection?.provider ?? defaultModel.provider,
+    model: autoModeSelection?.model ?? defaultModel.model,
   };
 }
 

@@ -12,10 +12,10 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { createSubsystemLogger } from "../logging/subsystem.js";
 import type { Episode, EpisodicMemory } from "./episodic.js";
-import type { SemanticEntry, SemanticMemory } from "./semantic.js";
 import type { ProceduralMemory } from "./procedural.js";
+import type { SemanticEntry, SemanticMemory } from "./semantic.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 
 const log = createSubsystemLogger("memory-consolidation");
 
@@ -62,11 +62,7 @@ const SACRED_PATTERNS = [
   "WISHES",
 ];
 
-function isProtected(
-  content: string,
-  tags: string[],
-  additionalPatterns: string[],
-): boolean {
+function isProtected(content: string, tags: string[], additionalPatterns: string[]): boolean {
   const lower = content.toLowerCase();
   const allPatterns = [...SACRED_PATTERNS, ...additionalPatterns];
 
@@ -109,8 +105,7 @@ export class MemoryConsolidator {
       procedureStaleDays: config.procedureStaleDays ?? 30,
       protectedPatterns: config.protectedPatterns ?? [],
       reportsDir:
-        config.reportsDir ??
-        path.join(os.homedir(), ".anima", "memory", "consolidation-reports"),
+        config.reportsDir ?? path.join(os.homedir(), ".anima", "memory", "consolidation-reports"),
     };
   }
 
@@ -171,18 +166,15 @@ export class MemoryConsolidator {
 
     const reports = files
       .filter((f) => f.endsWith(".json"))
-      .sort()
-      .reverse();
+      .toSorted()
+      .toReversed();
 
     if (reports.length === 0) {
       return null;
     }
 
     try {
-      const content = await fs.readFile(
-        path.join(this.config.reportsDir, reports[0]),
-        "utf-8",
-      );
+      const content = await fs.readFile(path.join(this.config.reportsDir, reports[0]), "utf-8");
       return JSON.parse(content) as ConsolidationReport;
     } catch {
       return null;
@@ -322,10 +314,7 @@ export class MemoryConsolidator {
   private async saveReport(report: ConsolidationReport): Promise<void> {
     try {
       await fs.mkdir(this.config.reportsDir, { recursive: true });
-      const filePath = path.join(
-        this.config.reportsDir,
-        `consolidation-${report.date}.json`,
-      );
+      const filePath = path.join(this.config.reportsDir, `consolidation-${report.date}.json`);
       await fs.writeFile(filePath, JSON.stringify(report, null, 2), "utf-8");
       log.info(`consolidation report saved to ${filePath}`);
     } catch (err) {

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { resolveAnimaPackageRoot } from "./anima-root.js";
 import {
   resolveControlUiDistIndexHealth,
   resolveControlUiDistIndexPath,
@@ -10,7 +11,6 @@ import {
   resolveControlUiRootOverrideSync,
   resolveControlUiRootSync,
 } from "./control-ui-assets.js";
-import { resolveAnimaPackageRoot } from "./anima-root.js";
 
 /** Try to create a symlink; returns false if the OS denies it (Windows CI without Developer Mode). */
 async function trySymlink(target: string, linkPath: string): Promise<boolean> {

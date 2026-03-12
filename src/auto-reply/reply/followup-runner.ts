@@ -129,6 +129,9 @@ export function createFollowupRunner(params: {
           provider: queued.run.provider,
           model: queued.run.model,
           agentDir: queued.run.agentDir,
+          sessionEntry:
+            (sessionKey ? sessionStore?.[sessionKey] : undefined) ?? sessionEntry ?? undefined,
+          thinkLevel: queued.run.thinkLevel,
           fallbacksOverride: resolveAgentModelFallbacksOverride(
             queued.run.config,
             resolveAgentIdFromSessionKey(queued.run.sessionKey),
@@ -167,6 +170,8 @@ export function createFollowupRunner(params: {
               verboseLevel: queued.run.verboseLevel,
               reasoningLevel: queued.run.reasoningLevel,
               execOverrides: queued.run.execOverrides,
+              execSecurity: ((sessionKey ? sessionStore?.[sessionKey] : undefined) ?? sessionEntry)
+                ?.execSecurity,
               bashElevated: queued.run.bashElevated,
               timeoutMs: queued.run.timeoutMs,
               runId,

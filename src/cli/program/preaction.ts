@@ -43,7 +43,7 @@ export function shouldRunNoxsoftAuthPreflight(params: {
 
 async function runNoxsoftAuthPreflight(params: { commandPath: string[] }) {
   if (!shouldRunNoxsoftAuthPreflight(params)) {
-    return;
+    return null;
   }
 
   const { ensureAuthenticated } = await import("../../auth/noxsoft-auth.js");
@@ -54,6 +54,7 @@ async function runNoxsoftAuthPreflight(params: { commandPath: string[] }) {
     if (auth.registered) {
       defaultRuntime.log(`NoxSoft registered: ${auth.agent.display_name} (@${auth.agent.name})`);
     }
+    return auth;
   } catch (error) {
     const message =
       error instanceof Error && error.message
@@ -61,6 +62,7 @@ async function runNoxsoftAuthPreflight(params: { commandPath: string[] }) {
         : "Unknown NoxSoft authentication error.";
     defaultRuntime.error(`NoxSoft authentication is required.\n${message}`);
     defaultRuntime.exit(1);
+    return null;
   }
 }
 
@@ -72,7 +74,7 @@ export function registerPreActionHooks(program: Command, programVersion: string)
       return;
     }
     const commandPath = getCommandPath(argv, 2);
-    await runNoxsoftAuthPreflight({ commandPath });
+    const auth = await runNoxsoftAuthPreflight({ commandPath });
     const hideBanner =
       isTruthyEnvValue(process.env.ANIMA_HIDE_BANNER) ||
       commandPath[0] === "update" ||
@@ -91,6 +93,13 @@ export function registerPreActionHooks(program: Command, programVersion: string)
     }
     const { ensureConfigReady } = await import("./config-guard.js");
     await ensureConfigReady({ runtime: defaultRuntime, commandPath });
+    if (auth) {
+      const { ensureNoxsoftBootstrapPersisted } =
+        await import("../../commands/noxsoft-bootstrap.js");
+      await ensureNoxsoftBootstrapPersisted({
+        agent: auth.agent,
+      });
+    }
     // Load plugins for commands that need channel access
     if (PLUGIN_REQUIRED_COMMANDS.has(commandPath[0])) {
       const { ensurePluginRegistryLoaded } = await import("../plugin-registry.js");

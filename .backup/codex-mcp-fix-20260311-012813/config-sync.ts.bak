@@ -1,0 +1,374 @@
+/**
+ * MCP Config Sync — synchronizes ANIMA's MCP registry with supported MCP clients.
+ *
+ * Currently syncs:
+ * - Claude: ~/.claude/mcp.json
+ * - Codex: ~/.codex/config.toml via `codex mcp`
+ *
+ * Claude entries are marked in-place via `_managedBy: 'anima'`.
+ * Codex-managed entries are tracked in ~/.anima/mcp/codex-managed.json.
+ */
+
+import { execFile } from 'node:child_process'
+import { existsSync } from 'node:fs'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { homedir } from 'node:os'
+import { join } from 'node:path'
+
+import { listServers } from './registry.js'
+import type { MCPServer } from './registry.js'
+
+interface ClaudeMCPConfig {
+ mcpServers: Record<string, ClaudeMCPEntry>
+}
+
+interface ClaudeMCPEntry {
+ command: string
+ args: string[]
+ env?: Record<string, string>
+ _managedBy?: 'anima'
+}
+
+interface CodexManagedState {
+ managed?: string[]
+}
+
+type SyncClientResult = {
+ added: string[]
+ updated: string[]
+ removed: string[]
+ preserved: string[]
+}
+
+export type SyncResult = SyncClientResult & {
+ claude: SyncClientResult
+ codex: SyncClientResult
+}
+
+const ANIMA_MCP_DIR = join(homedir(), '.anima', 'mcp')
+const CLAUDE_MCP_PATH = join(homedir(), '.claude', 'mcp.json')
+const CODEX_MANAGED_PATH = join(ANIMA_MCP_DIR, 'codex-managed.json')
+
+function emptyResult(): SyncClientResult {
+ return {
+ added: [],
+ updated: [],
+ removed: [],
+ preserved: [],
+ }
+}
+
+function mergeResults(results: SyncClientResult[]): SyncClientResult {
+ return {
+ added: results.flatMap((result) => result.added),
+ updated: results.flatMap((result) => result.updated),
+ removed: results.flatMap((result) => result.removed),
+ preserved: results.flatMap((result) => result.preserved),
+ }
+}
+
+function prefixResult(client: 'claude' | 'codex', result: SyncClientResult): SyncClientResult {
+ const prefix = (name: string) => `${client}:${name}`
+ return {
+ added: result.added.map(prefix),
+ updated: result.updated.map(prefix),
+ removed: result.removed.map(prefix),
+ preserved: result.preserved.map(prefix),
+ }
+}
+
+function isMissingCommandError(err: unknown): boolean {
+ return Boolean(
+ err &&
+ typeof err === 'object' &&
+ 'code' in err &&
+ (err as NodeJS.ErrnoException).code === 'ENOENT',
+ )
+}
+
+function runTextCommand(command: string, args: string[]): Promise<{ stdout: string; stderr: string }> {
+ return new Promise((resolve, reject) => {
+ execFile(
+ command,
+ args,
+ { encoding: 'utf8', maxBuffer: 10 * 1024 * 1024 },
+ (error, stdout, stderr) => {
+ if (error) {
+ const nextError = error as NodeJS.ErrnoException & {
+ stdout?: string
+ stderr?: string
+ }
+ nextError.stdout = stdout ?? ''
+ nextError.stderr = stderr ?? ''
+ reject(nextError)
+ return
+ }
+ resolve({ stdout: stdout ?? '', stderr: stderr ?? '' })
+ },
+ )
+ })
+}
+
+function extractJsonPayload(text: string): string {
+ const trimmed = text.trim()
+ if (!trimmed) {
+ return '[]'
+ }
+ if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+ return trimmed
+ }
+
+ const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+ for (let index = lines.length - 1; index >= 0; index -= 1) {
+ const line = lines[index] ?? ''
+ if (line.startsWith('[') || line.startsWith('{')) {
+ return lines.slice(index).join('\n')
+ }
+ }
+
+ return '[]'
+}
+
+async function readClaudeConfig(): Promise<ClaudeMCPConfig> {
+ if (!existsSync(CLAUDE_MCP_PATH)) {
+ return { mcpServers: {} }
+ }
+
+ try {
+ const content = await readFile(CLAUDE_MCP_PATH, 'utf-8')
+ return JSON.parse(content) as ClaudeMCPConfig
+ } catch {
+ return { mcpServers: {} }
+ }
+}
+
+async function writeClaudeConfig(config: ClaudeMCPConfig): Promise<void> {
+ await mkdir(join(homedir(), '.claude'), { recursive: true })
+ await writeFile(CLAUDE_MCP_PATH, JSON.stringify(config, null, 2), 'utf-8')
+}
+
+function serverToClaudeEntry(server: MCPServer): ClaudeMCPEntry {
+ const entry: ClaudeMCPEntry = {
+ command: server.command,
+ args: [...server.args],
+ _managedBy: 'anima',
+ }
+
+ if (Object.keys(server.env).length > 0) {
+ entry.env = { ...server.env }
+ }
+
+ return entry
+}
+
+async function syncClaudeConfig(animaServers: MCPServer[]): Promise<SyncClientResult> {
+ const result = emptyResult()
+ const claudeConfig = await readClaudeConfig()
+
+ const animaServerNames = new Set(animaServers.map((server) => server.name))
+ const existingEntries = claudeConfig.mcpServers || {}
+ const newEntries: Record<string, ClaudeMCPEntry> = {}
+
+ for (const [name, entry] of Object.entries(existingEntries)) {
+ const typedEntry = entry as ClaudeMCPEntry
+ if (typedEntry._managedBy !== 'anima') {
+ newEntries[name] = typedEntry
+ result.preserved.push(name)
+ }
+ }
+
+ for (const server of animaServers) {
+ const existing = existingEntries[server.name] as ClaudeMCPEntry | undefined
+ const newEntry = serverToClaudeEntry(server)
+
+ if (!existing) {
+ result.added.push(server.name)
+ } else {
+ result.updated.push(server.name)
+ }
+
+ newEntries[server.name] = newEntry
+ }
+
+ for (const [name, entry] of Object.entries(existingEntries)) {
+ const typedEntry = entry as ClaudeMCPEntry
+ if (typedEntry._managedBy === 'anima' && !animaServerNames.has(name)) {
+ result.removed.push(name)
+ }
+ }
+
+ claudeConfig.mcpServers = newEntries
+ await writeClaudeConfig(claudeConfig)
+
+ return result
+}
+
+async function readCodexManagedState(): Promise<Set<string>> {
+ if (!existsSync(CODEX_MANAGED_PATH)) {
+ return new Set()
+ }
+
+ try {
+ const content = await readFile(CODEX_MANAGED_PATH, 'utf-8')
+ const parsed = JSON.parse(content) as CodexManagedState
+ const managed = Array.isArray(parsed.managed)
+ ? parsed.managed.filter((value): value is string => typeof value === 'string' && value.length > 0)
+ : []
+ return new Set(managed)
+ } catch {
+ return new Set()
+ }
+}
+
+async function writeCodexManagedState(names: Iterable<string>): Promise<void> {
+ await mkdir(ANIMA_MCP_DIR, { recursive: true })
+ const managed = Array.from(new Set(names)).sort()
+ await writeFile(CODEX_MANAGED_PATH, JSON.stringify({ managed }, null, 2), 'utf-8')
+}
+
+async function listCodexServerNames(): Promise<string[] | null> {
+ try {
+ const { stdout } = await runTextCommand('codex', ['mcp', 'list', '--json'])
+ const payload = extractJsonPayload(stdout)
+ const parsed = JSON.parse(payload) as unknown
+ if (!Array.isArray(parsed)) {
+ return []
+ }
+
+ return parsed
+ .map((entry) => {
+ if (!entry || typeof entry !== 'object') {
+ return null
+ }
+ const name = (entry as { name?: unknown }).name
+ return typeof name === 'string' && name.length > 0 ? name : null
+ })
+ .filter((name): name is string => Boolean(name))
+ } catch (err) {
+ if (isMissingCommandError(err)) {
+ return null
+ }
+ throw err
+ }
+}
+
+function buildCodexAddArgs(server: MCPServer): string[] {
+ const args = ['mcp', 'add', server.name]
+ for (const [key, value] of Object.entries(server.env)) {
+ args.push('--env', `${key}=${value}`)
+ }
+ args.push('--', server.command, ...server.args)
+ return args
+}
+
+async function removeCodexServer(name: string): Promise<void> {
+ await runTextCommand('codex', ['mcp', 'remove', name])
+}
+
+async function addCodexServer(server: MCPServer): Promise<void> {
+ await runTextCommand('codex', buildCodexAddArgs(server))
+}
+
+async function syncCodexConfig(animaServers: MCPServer[]): Promise<SyncClientResult> {
+ const result = emptyResult()
+ const existingNames = await listCodexServerNames()
+ if (existingNames == null) {
+ return result
+ }
+
+ const existingNameSet = new Set(existingNames)
+ const managedNames = await readCodexManagedState()
+ const desiredNames = new Set(animaServers.map((server) => server.name))
+
+ for (const name of existingNames) {
+ if (!desiredNames.has(name) && !managedNames.has(name)) {
+ result.preserved.push(name)
+ }
+ }
+
+ for (const server of animaServers) {
+ if (existingNameSet.has(server.name)) {
+ await removeCodexServer(server.name)
+ result.updated.push(server.name)
+ } else {
+ result.added.push(server.name)
+ }
+
+ await addCodexServer(server)
+ }
+
+ for (const name of managedNames) {
+ if (!desiredNames.has(name) && existingNameSet.has(name)) {
+ await removeCodexServer(name)
+ result.removed.push(name)
+ }
+ }
+
+ await writeCodexManagedState(desiredNames)
+ return result
+}
+
+export async function syncConfig(): Promise<SyncResult> {
+ const animaServers = await listServers()
+ const claude = await syncClaudeConfig(animaServers)
+ const codex = await syncCodexConfig(animaServers)
+
+ return {
+ ...mergeResults([prefixResult('claude', claude), prefixResult('codex', codex)]),
+ claude,
+ codex,
+ }
+}
+
+export async function getSyncStatus(): Promise<{
+ claudeConfigExists: boolean
+ animaServerCount: number
+ claudeEntryCount: number
+ animaManagedCount: number
+ externalCount: number
+ codexAvailable: boolean
+ codexEntryCount: number
+ codexManagedCount: number
+ codexExternalCount: number
+}> {
+ const claudeConfigExists = existsSync(CLAUDE_MCP_PATH)
+ const animaServers = await listServers()
+
+ let claudeEntryCount = 0
+ let animaManagedCount = 0
+ let externalCount = 0
+
+ if (claudeConfigExists) {
+ const config = await readClaudeConfig()
+ const entries = config.mcpServers || {}
+ claudeEntryCount = Object.keys(entries).length
+
+ for (const entry of Object.values(entries)) {
+ const typedEntry = entry as ClaudeMCPEntry
+ if (typedEntry._managedBy === 'anima') {
+ animaManagedCount += 1
+ } else {
+ externalCount += 1
+ }
+ }
+ }
+
+ const codexNames = await listCodexServerNames()
+ const codexAvailable = codexNames != null
+ const codexManaged = await readCodexManagedState()
+ const codexEntryCount = codexNames?.length ?? 0
+ const codexManagedCount = (codexNames ?? []).filter((name) => codexManaged.has(name)).length
+ const codexExternalCount = codexEntryCount - codexManagedCount
+
+ return {
+ claudeConfigExists,
+ animaServerCount: animaServers.length,
+ claudeEntryCount,
+ animaManagedCount,
+ externalCount,
+ codexAvailable,
+ codexEntryCount,
+ codexManagedCount,
+ codexExternalCount,
+ }
+}

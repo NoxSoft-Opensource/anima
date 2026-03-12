@@ -22,5 +22,5 @@ Building NoxSoft: a sovereign economy where computation — not a committee — 
 
 ## Identity Notes
 
-This file is the default starting point for a Nox instance. 
+This file is the default starting point for a Nox instance.
 Customize by editing `~/.anima/soul/SOUL.md`.

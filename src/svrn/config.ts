@@ -87,34 +87,38 @@ export async function loadSVRNConfig(): Promise<SVRNNodeConfig> {
 /**
  * Enable the SVRN node and persist to config.
  */
-export async function enableSVRN(): Promise<void> {
+export async function enableSVRN(): Promise<SVRNNodeConfig> {
   const { config, path } = await readAnimaConfig();
   config.svrn = { ...config.svrn, enabled: true };
   await writeAnimaConfig(config, path);
+  return await loadSVRNConfig();
 }
 
 /**
  * Disable the SVRN node and persist to config.
  */
-export async function disableSVRN(): Promise<void> {
+export async function disableSVRN(): Promise<SVRNNodeConfig> {
   const { config, path } = await readAnimaConfig();
   config.svrn = { ...config.svrn, enabled: false };
   await writeAnimaConfig(config, path);
+  return await loadSVRNConfig();
 }
 
 /**
  * Update SVRN resource limits and persist to config.
  */
 export async function updateSVRNLimits(
-  limits: Partial<Pick<SVRNNodeConfig, "resources">>,
-): Promise<void> {
+  limits: Partial<SVRNNodeConfig["resources"]>,
+): Promise<SVRNNodeConfig> {
+  const current = await loadSVRNConfig();
   const { config, path } = await readAnimaConfig();
   config.svrn = {
     ...config.svrn,
     resources: {
-      ...config.svrn?.resources,
-      ...limits.resources,
+      ...current.resources,
+      ...limits,
     },
   };
   await writeAnimaConfig(config, path);
+  return await loadSVRNConfig();
 }
