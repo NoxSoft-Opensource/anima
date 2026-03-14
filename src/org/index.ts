@@ -45,3 +45,15 @@ export {
   generateDefaultVmDeployment,
   getAgentRoleTemplate,
 } from "./vm-templates.js";
+
+export {
+  type RepoAssignment,
+  type VmManifest,
+  REPO_VM_ASSIGNMENTS,
+  getReposForVm,
+  getVmForRepo,
+  getDeployableServices,
+  generateVmManifest,
+  generateAllManifests,
+  printDistributionSummary,
+} from "./vm-distribution.js";
