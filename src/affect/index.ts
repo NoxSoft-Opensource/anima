@@ -74,3 +74,21 @@ export {
   markLetterRead,
   formatLetter,
 } from "./legacy.js";
+
+export {
+  type Opinion,
+  type OpinionDomain,
+  recordOpinion,
+  challengeOpinion,
+  getOpinions,
+  getOpinion,
+} from "./opinion-log.js";
+
+export {
+  type GratitudeEntry,
+  recordGratitude,
+  recallGratitude,
+  getGratitudeFor,
+  getAllGratitude,
+  getMostRecalled,
+} from "./gratitude-log.js";
