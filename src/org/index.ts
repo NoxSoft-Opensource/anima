@@ -34,3 +34,14 @@ export {
   buildHierarchy,
   visualizeHierarchy,
 } from "./store.js";
+
+export {
+  type AgentRolePreset,
+  type AgentRoleTemplate,
+  type AgentToolPolicy,
+  type VmDeploymentTemplate,
+  type VmAgentConfig,
+  AGENT_ROLE_TEMPLATES,
+  generateDefaultVmDeployment,
+  getAgentRoleTemplate,
+} from "./vm-templates.js";
