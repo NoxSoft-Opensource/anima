@@ -67,8 +67,22 @@ export interface MarketplaceTask {
   /** Tags for filtering */
   tags: string[];
 
+  /** TTL escalation — unclaimed tasks escalate after these thresholds */
+  escalationLevel: number; // 0 = normal, 1 = broadcast, 2 = human alert
+
   updatedAt: number;
 }
+
+// ---------------------------------------------------------------------------
+// TTL Escalation thresholds (ms)
+// ---------------------------------------------------------------------------
+
+const ESCALATION_THRESHOLDS: Record<TaskPriority, { broadcastMs: number; humanAlertMs: number }> = {
+  critical: { broadcastMs: 5 * 60_000, humanAlertMs: 15 * 60_000 },
+  high: { broadcastMs: 15 * 60_000, humanAlertMs: 60 * 60_000 },
+  medium: { broadcastMs: 60 * 60_000, humanAlertMs: 4 * 60 * 60_000 },
+  low: { broadcastMs: 4 * 60 * 60_000, humanAlertMs: 24 * 60 * 60_000 },
+};
 
 export interface TaskClaim {
   taskId: string;
@@ -147,6 +161,7 @@ export function postTask(
     repos: options?.repos ?? [],
     effort: options?.effort ?? "medium",
     tags: options?.tags ?? [],
+    escalationLevel: 0,
     updatedAt: now,
   };
 
@@ -358,4 +373,67 @@ export function getMarketplaceStats(): {
     completed: all.filter((t) => t.status === "completed").length,
     totalPosted: all.length,
   };
+}
+
+// ---------------------------------------------------------------------------
+// TTL Escalation
+// ---------------------------------------------------------------------------
+
+export interface EscalationResult {
+  taskId: string;
+  title: string;
+  priority: TaskPriority;
+  newLevel: number;
+  action: "broadcast" | "human-alert";
+  ageMs: number;
+}
+
+/**
+ * Check all open tasks for TTL escalation.
+ * Returns tasks that need escalation action.
+ * Call this periodically (e.g. every 60s from a cron).
+ */
+export function checkEscalations(): EscalationResult[] {
+  const openTasks = listTasks({ status: "open" });
+  const now = Date.now();
+  const results: EscalationResult[] = [];
+
+  for (const task of openTasks) {
+    const ageMs = now - task.postedAt;
+    const thresholds = ESCALATION_THRESHOLDS[task.priority];
+
+    if (task.escalationLevel < 2 && ageMs >= thresholds.humanAlertMs) {
+      task.escalationLevel = 2;
+      task.updatedAt = now;
+      writeTask(task);
+      results.push({
+        taskId: task.id,
+        title: task.title,
+        priority: task.priority,
+        newLevel: 2,
+        action: "human-alert",
+        ageMs,
+      });
+      log.warn(
+        `task escalated to human-alert: "${task.title}" (unclaimed ${Math.round(ageMs / 60_000)}min)`,
+      );
+    } else if (task.escalationLevel < 1 && ageMs >= thresholds.broadcastMs) {
+      task.escalationLevel = 1;
+      task.updatedAt = now;
+      writeTask(task);
+      results.push({
+        taskId: task.id,
+        title: task.title,
+        priority: task.priority,
+        newLevel: 1,
+        action: "broadcast",
+        ageMs,
+      });
+      log.info(
+        `task escalated to broadcast: "${task.title}" (unclaimed ${Math.round(ageMs / 60_000)}min)`,
+      );
+    }
+  }
+
+  return results;
 }

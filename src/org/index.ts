@@ -72,4 +72,6 @@ export {
   listTasks,
   findClaimableTasks,
   getMarketplaceStats,
+  checkEscalations,
+  type EscalationResult,
 } from "./task-marketplace.js";
