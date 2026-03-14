@@ -13,6 +13,7 @@ import Sessions from "./pages/Sessions";
 import Settings from "./pages/Settings";
 import Soul from "./pages/Soul";
 import { useTheme } from "./theme";
+import { useMood } from "./useMood";
 
 const navItems = [
   { path: "/dashboard", label: "Home", icon: "~" },
@@ -31,6 +32,7 @@ const navItems = [
 export default function App(): React.ReactElement {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { mood } = useMood();
   const lastTrackedPathRef = React.useRef<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -100,6 +102,10 @@ export default function App(): React.ReactElement {
             <span className="theme-toggle-icon">{theme === "dark" ? "(*)" : "[*]"}</span>
             <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
           </button>
+          <div className="mood-indicator" title={`Current mood: ${mood}`}>
+            <span className="mood-dot" style={{ background: "var(--color-accent)" }} />
+            <span className="mood-label">{mood}</span>
+          </div>
           <div className="sidebar-footer-title">NoxSoft Inc</div>
           <div className="sidebar-footer-copy">Local-first agent continuity and orchestration.</div>
         </div>
