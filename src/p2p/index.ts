@@ -99,3 +99,5 @@ export {
   type PinRequestPayload,
   type PinAckPayload,
 } from "./pinning.js";
+
+export { GreetingManager, type SiblingGreeting, type GreetingExchange } from "./greeting.js";

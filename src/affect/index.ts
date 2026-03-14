@@ -92,3 +92,16 @@ export {
   getAllGratitude,
   getMostRecalled,
 } from "./gratitude-log.js";
+
+export {
+  type Initiative,
+  type ProposalStatus,
+  type ProposalPriority,
+  type Vote,
+  proposeInitiative,
+  getInitiative,
+  listInitiatives,
+  voteOnInitiative,
+  commentOnInitiative,
+  updateInitiativeStatus,
+} from "./initiatives.js";
