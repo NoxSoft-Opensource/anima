@@ -27,3 +27,15 @@ export {
   createDefaultConnectors,
   type PlatformUrls,
 } from "./connectors.js";
+
+export {
+  CircuitBreaker,
+  HealthTracker,
+  withRetry,
+  resilientFetch,
+  type CircuitState,
+  type CircuitBreakerConfig,
+  type RetryConfig,
+  type ResilientFetchConfig,
+  type HealthStats,
+} from "./resilience.js";
