@@ -1059,6 +1059,24 @@ export async function getSVRNStatus(): Promise<SVRNStatus> {
   return request<SVRNStatus>("/api/svrn/status");
 }
 
+export interface SVRNWalletDetails {
+  address: string;
+  balance: number;
+  totalEarned: number;
+  totalSpent: number;
+  createdAt: string | null;
+  recentTransactions: Array<{
+    type: "earn" | "spend";
+    amount: number;
+    description?: string;
+    timestamp: number;
+  }>;
+}
+
+export async function getSVRNWalletBalance(): Promise<SVRNWalletDetails> {
+  return request<SVRNWalletDetails>("/api/svrn/wallet/balance");
+}
+
 export async function getConfigSnapshot(): Promise<ConfigSnapshot> {
   return await callGatewayMethod<ConfigSnapshot>("config.get", {});
 }
