@@ -43,6 +43,25 @@ interface StoredOrg {
   version: 1;
   org: NoxOrganization;
   members: OrgMember[];
+  invites: OrgInvite[];
+}
+
+// ---------------------------------------------------------------------------
+// Invite types
+// ---------------------------------------------------------------------------
+
+export interface OrgInvite {
+  id: string;
+  code: string; // secret invite code (e.g. "NOXSOFT-ALPHA-7X3K")
+  passcode: string; // secret passcode (hashed with SHA-256)
+  orgId: string;
+  createdBy: string; // member ID who created the invite
+  createdAt: number;
+  expiresAt: number; // unix ms, 0 = never
+  maxUses: number; // 0 = unlimited
+  uses: number;
+  role: OrgRole; // role assigned on join
+  active: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -121,7 +140,7 @@ export function createOrganization(
     permissions: DEFAULT_ROLE_PERMISSIONS.owner,
   };
 
-  writeOrgFile(orgId, { version: 1, org, members: [ownerMember] });
+  writeOrgFile(orgId, { version: 1, org, members: [ownerMember], invites: [] });
   log.info(`created organization: ${name} (${orgId})`);
   return org;
 }
