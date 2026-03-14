@@ -507,14 +507,16 @@ body,
 }
 
 .live-chat-feed {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: clamp(240px, 38vh, 420px);
+  max-height: min(62vh, 720px);
   overflow-y: auto;
+  overscroll-behavior: contain;
   margin-top: 8px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 12px;
   background: var(--color-bg);
-  min-height: 420px;
 }
 
 .live-chat-row {
