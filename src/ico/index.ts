@@ -38,3 +38,19 @@ export {
   transferTokens,
   getIcoDashboard,
 } from "./launch-platform.js";
+
+export {
+  type PbcJurisdiction,
+  type VerificationStatus,
+  type PbcVerification,
+  type VerificationDocument,
+  type Affiliation,
+  type PlatformTax,
+  PLATFORM_TAX_RATE,
+  calculatePlatformTax,
+  isEligibleToLaunch,
+  createVerification,
+  approvePbcVerification,
+  addVerificationDocument,
+  addAffiliation,
+} from "./verification.js";
