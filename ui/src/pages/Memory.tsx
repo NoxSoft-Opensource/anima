@@ -34,7 +34,7 @@ export default function Memory(): React.ReactElement {
       async () => {
         setLoading(true);
         try {
-          const nextEntries = await listMemory(activeKind, query.trim() || undefined, 120);
+          const nextEntries = await listMemory(activeKind, query.trim() || undefined, 200);
           if (cancelled) {
             return;
           }

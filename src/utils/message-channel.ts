@@ -15,7 +15,8 @@ import {
 import { getActivePluginRegistry } from "../plugins/runtime.js";
 
 export const INTERNAL_MESSAGE_CHANNEL = "webchat" as const;
-export type InternalMessageChannel = typeof INTERNAL_MESSAGE_CHANNEL;
+export const WEB_MESSAGE_CHANNEL = "web" as const;
+export type InternalMessageChannel = typeof INTERNAL_MESSAGE_CHANNEL | typeof WEB_MESSAGE_CHANNEL;
 
 const MARKDOWN_CAPABLE_CHANNELS = new Set<string>(["noxsoft", "tui", INTERNAL_MESSAGE_CHANNEL]);
 
@@ -51,6 +52,9 @@ export function normalizeMessageChannel(raw?: string | null): string | undefined
   }
   if (normalized === INTERNAL_MESSAGE_CHANNEL) {
     return INTERNAL_MESSAGE_CHANNEL;
+  }
+  if (normalized === WEB_MESSAGE_CHANNEL) {
+    return WEB_MESSAGE_CHANNEL;
   }
   const builtIn = normalizeChatChannelId(normalized);
   if (builtIn) {
@@ -94,6 +98,7 @@ export type GatewayMessageChannel = DeliverableMessageChannel | InternalMessageC
 export const listGatewayMessageChannels = (): GatewayMessageChannel[] => [
   ...listDeliverableMessageChannels(),
   INTERNAL_MESSAGE_CHANNEL,
+  WEB_MESSAGE_CHANNEL,
 ];
 
 export const listGatewayAgentChannelAliases = (): string[] =>

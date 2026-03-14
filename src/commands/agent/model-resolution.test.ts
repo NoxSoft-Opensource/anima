@@ -21,7 +21,7 @@ describe("resolveAgentModelSelection", () => {
           model: { primary: "google/gemini-flash-latest" },
           models: {
             "google/gemini-flash-latest": {},
-            "openai/gpt-5.3-codex": {},
+            "openai/gpt-5.2-codex": {},
           },
         },
       },
@@ -29,11 +29,11 @@ describe("resolveAgentModelSelection", () => {
 
     const resolved = await resolveAgentModelSelection({
       cfg,
-      explicitModel: "openai/gpt-5.3-codex",
+      explicitModel: "openai/gpt-5.2-codex",
     });
 
     expect(resolved.provider).toBe("openai-codex");
-    expect(resolved.model).toBe("gpt-5.3-codex");
+    expect(resolved.model).toBe("gpt-5.2-codex");
     expect(resolved.source).toBe("explicit");
   });
 

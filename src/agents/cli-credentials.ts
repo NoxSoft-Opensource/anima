@@ -14,9 +14,6 @@ const CODEX_CLI_AUTH_FILENAME = "auth.json";
 const QWEN_CLI_CREDENTIALS_RELATIVE_PATH = ".qwen/oauth_creds.json";
 const MINIMAX_CLI_CREDENTIALS_RELATIVE_PATH = ".minimax/oauth_creds.json";
 
-// OpenClaw stores Claude Code OAuth in its own auth-profiles.json
-const OPENCLAW_AUTH_PROFILES_PATH = ".openclaw/agents/main/agent/auth-profiles.json";
-
 const CLAUDE_CLI_KEYCHAIN_SERVICE = "Claude Code-credentials";
 const CLAUDE_CLI_KEYCHAIN_ACCOUNT = "Claude Code";
 
@@ -265,67 +262,6 @@ function readMiniMaxCliCredentials(options?: { homeDir?: string }): MiniMaxCliCr
 }
 
 /**
- * Read Claude Code credentials from the OpenClaw auth-profiles.json store.
- *
- * OpenClaw (which shares the same auth infrastructure) stores the Claude Code
- * OAuth token in ~/.openclaw/agents/main/agent/auth-profiles.json.
- * This is the most reliable source on Windows where the Keychain is unavailable.
- */
-export function readOpenClawCredentials(options?: {
-  homeDir?: string;
-}): ClaudeCliCredential | null {
-  const baseDir = options?.homeDir ?? resolveUserPath("~");
-  const authPath = path.join(baseDir, OPENCLAW_AUTH_PROFILES_PATH);
-  const raw = loadJsonFile(authPath);
-  if (!raw || typeof raw !== "object") {
-    return null;
-  }
-
-  const data = raw as Record<string, unknown>;
-  const profiles = data.profiles as Record<string, unknown> | undefined;
-  if (!profiles) {
-    return null;
-  }
-
-  // Look for anthropic:default profile
-  const anthropicProfile = profiles["anthropic:default"] as Record<string, unknown> | undefined;
-  if (!anthropicProfile || anthropicProfile.provider !== "anthropic") {
-    return null;
-  }
-
-  // Token-based credential (sk-ant-oat01-... or sk-ant-api01-...)
-  if (anthropicProfile.type === "token" && typeof anthropicProfile.token === "string") {
-    const token = anthropicProfile.token;
-    log.info("read anthropic credentials from openclaw auth-profiles", { type: "token" });
-    return {
-      type: "token",
-      provider: "anthropic",
-      token,
-      expires: Date.now() + 365 * 24 * 60 * 60 * 1000, // Treat as long-lived
-    };
-  }
-
-  // OAuth credential
-  if (
-    anthropicProfile.type === "oauth" &&
-    typeof anthropicProfile.access === "string" &&
-    typeof anthropicProfile.refresh === "string" &&
-    typeof anthropicProfile.expires === "number"
-  ) {
-    log.info("read anthropic oauth credentials from openclaw auth-profiles");
-    return {
-      type: "oauth",
-      provider: "anthropic",
-      access: anthropicProfile.access,
-      refresh: anthropicProfile.refresh,
-      expires: anthropicProfile.expires,
-    };
-  }
-
-  return null;
-}
-
-/**
  * Read Claude Code credentials from Windows Credential Manager.
  *
  * On Windows, the Claude CLI stores its OAuth token via the Windows
@@ -424,12 +360,6 @@ export function readClaudeCliCredentials(options?: {
       });
       return parsed;
     }
-  }
-
-  // 4. OpenClaw auth-profiles.json (best fallback — same auth infrastructure)
-  const openClawCreds = readOpenClawCredentials({ homeDir: options?.homeDir });
-  if (openClawCreds) {
-    return openClawCreds;
   }
 
   return null;

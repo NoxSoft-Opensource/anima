@@ -2,6 +2,7 @@ import type {
   SVRNNode as ExternalSVRNNode,
   SVRNNodeConfig as ExternalSVRNNodeConfig,
 } from "@noxsoft/svrn-node";
+import { loadSvrnNodeModule } from "./module.js";
 
 /**
  * ANIMA SVRNNode adapter.
@@ -49,7 +50,7 @@ async function loadSVRNModule(): Promise<typeof _svrnModule> {
   }
 
   try {
-    const mod = await import("@noxsoft/svrn-node");
+    const mod = await loadSvrnNodeModule();
     _svrnModule = mod;
     return _svrnModule;
   } catch {

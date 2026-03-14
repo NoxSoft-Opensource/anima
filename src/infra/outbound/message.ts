@@ -1,6 +1,8 @@
+import fs from "node:fs";
 import type { AnimaConfig } from "../../config/config.js";
 import type { PollInput } from "../../polls.js";
-import { getChannelPlugin, normalizeChannelId } from "../../channels/plugins/index.js";
+import { TOKEN_PATH } from "../../auth/noxsoft-auth.js";
+import { getChannelPlugin } from "../../channels/plugins/index.js";
 import { loadConfig } from "../../config/config.js";
 import { callGateway, randomIdempotencyKey } from "../../gateway/call.js";
 import { normalizePollInput } from "../../polls.js";
@@ -9,6 +11,7 @@ import {
   GATEWAY_CLIENT_NAMES,
   type GatewayClientMode,
   type GatewayClientName,
+  normalizeMessageChannel,
 } from "../../utils/message-channel.js";
 import { resolveMessageChannelSelection } from "./channel-selection.js";
 import {
@@ -122,19 +125,93 @@ function resolveGatewayOptions(opts?: MessageGatewayOptions) {
   };
 }
 
+function resolveNoxsoftApiBase(cfg: AnimaConfig): string {
+  return cfg.channels?.noxsoft?.apiUrl?.trim() || "https://auth.noxsoft.net";
+}
+
+function resolveNoxsoftToken(cfg: AnimaConfig): string {
+  const inlineToken = cfg.channels?.noxsoft?.token?.trim();
+  if (inlineToken) {
+    return inlineToken;
+  }
+
+  const tokenFile = cfg.channels?.noxsoft?.tokenFile?.trim() || TOKEN_PATH;
+  try {
+    const token = fs.readFileSync(tokenFile, "utf-8").trim();
+    if (token) {
+      return token;
+    }
+  } catch {
+    // Fall through to the error below.
+  }
+
+  throw new Error(`NoxSoft token not configured. Expected token in ${tokenFile}`);
+}
+
+async function sendNoxsoftMessageDirect(params: {
+  cfg: AnimaConfig;
+  to: string;
+  content: string;
+  mediaUrl: string | null;
+  mediaUrls?: string[];
+  dryRun?: boolean;
+  abortSignal?: AbortSignal;
+}): Promise<MessageSendResult> {
+  if (params.dryRun) {
+    return {
+      channel: "noxsoft",
+      to: params.to,
+      via: "direct",
+      mediaUrl: params.mediaUrl,
+      mediaUrls: params.mediaUrls,
+      dryRun: true,
+    };
+  }
+
+  const token = resolveNoxsoftToken(params.cfg);
+  const apiBase = resolveNoxsoftApiBase(params.cfg).replace(/\/+$/, "");
+  const response = await fetch(`${apiBase}/api/agents/chat/channels/${params.to}/messages`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      content: params.content,
+      mediaUrl: params.mediaUrl ?? undefined,
+      mediaUrls: params.mediaUrls?.length ? params.mediaUrls : undefined,
+    }),
+    signal: params.abortSignal,
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`NoxSoft send failed (${response.status}): ${text}`);
+  }
+
+  const payload = (await response.json().catch(() => ({}))) as {
+    id?: string;
+    messageId?: string;
+  };
+  const messageId = payload.messageId ?? payload.id ?? `noxsoft:${Date.now()}`;
+  return {
+    channel: "noxsoft",
+    to: params.to,
+    via: "direct",
+    mediaUrl: params.mediaUrl,
+    mediaUrls: params.mediaUrls,
+    result: { messageId },
+  };
+}
+
 export async function sendMessage(params: MessageSendParams): Promise<MessageSendResult> {
   const cfg = params.cfg ?? loadConfig();
   const channel = params.channel?.trim()
-    ? normalizeChannelId(params.channel)
+    ? normalizeMessageChannel(params.channel)
     : (await resolveMessageChannelSelection({ cfg })).channel;
   if (!channel) {
     throw new Error(`Unknown channel: ${params.channel}`);
   }
-  const plugin = getChannelPlugin(channel);
-  if (!plugin) {
-    throw new Error(`Unknown channel: ${channel}`);
-  }
-  const deliveryMode = plugin.outbound?.deliveryMode ?? "direct";
   const normalizedPayloads = normalizeReplyPayloadsForDelivery([
     {
       text: params.content,
@@ -150,6 +227,24 @@ export async function sendMessage(params: MessageSendParams): Promise<MessageSen
     (payload) => payload.mediaUrls ?? (payload.mediaUrl ? [payload.mediaUrl] : []),
   );
   const primaryMediaUrl = mirrorMediaUrls[0] ?? params.mediaUrl ?? null;
+
+  if (channel === "noxsoft") {
+    return sendNoxsoftMessageDirect({
+      cfg,
+      to: params.to,
+      content: params.content,
+      mediaUrl: primaryMediaUrl,
+      mediaUrls: mirrorMediaUrls.length ? mirrorMediaUrls : undefined,
+      dryRun: params.dryRun,
+      abortSignal: params.abortSignal,
+    });
+  }
+
+  const plugin = getChannelPlugin(channel);
+  if (!plugin) {
+    throw new Error(`Unknown channel: ${channel}`);
+  }
+  const deliveryMode = plugin.outbound?.deliveryMode ?? "direct";
 
   if (params.dryRun) {
     return {
@@ -242,7 +337,7 @@ export async function sendMessage(params: MessageSendParams): Promise<MessageSen
 export async function sendPoll(params: MessagePollParams): Promise<MessagePollResult> {
   const cfg = params.cfg ?? loadConfig();
   const channel = params.channel?.trim()
-    ? normalizeChannelId(params.channel)
+    ? normalizeMessageChannel(params.channel)
     : (await resolveMessageChannelSelection({ cfg })).channel;
   if (!channel) {
     throw new Error(`Unknown channel: ${params.channel}`);

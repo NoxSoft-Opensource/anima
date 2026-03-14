@@ -28,12 +28,25 @@ declare module "long" {
 declare module "@noxsoft/svrn-node" {
   export type SVRNNodeConfig = {
     enabled: boolean;
+    nodeId?: string;
     dataDir?: string;
+    coordinatorUrl?: string;
     resources: {
       maxCpuPercent: number;
       maxRamMB: number;
       maxBandwidthMbps: number;
+      maxDiskGB?: number;
     };
+    taskTypes?: Array<"ping" | "relay" | "compute" | "store" | "validate">;
+    autoUpdate?: {
+      enabled?: boolean;
+      checkIntervalHours?: number;
+      autoRestart?: boolean;
+      channel?: "stable" | "beta";
+    };
+    heartbeatIntervalSec?: number;
+    showEarnings?: boolean;
+    activeHours?: { start?: number; end?: number };
     [key: string]: unknown;
   };
 
@@ -51,6 +64,7 @@ declare module "@noxsoft/svrn-node" {
       today: number;
       allTime: number;
       session: number;
+      estimatedMonthlySavingsUSD?: number;
     };
     getWallet(): {
       balance?: number;
@@ -66,6 +80,6 @@ declare module "@noxsoft/svrn-node" {
         timestamp: number;
       }>;
     };
-    getResources(): { cpuPercent: number; ramMB: number };
+    getResources(): { cpuPercent: number; ramMB: number; bandwidthMbps?: number };
   }
 }

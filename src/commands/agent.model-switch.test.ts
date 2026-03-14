@@ -55,7 +55,7 @@ describe("agentCommand --model", () => {
       payloads: [{ text: "ok" }],
       meta: {
         durationMs: 5,
-        agentMeta: { sessionId: "s1", provider: "openai-codex", model: "gpt-5.3-codex" },
+        agentMeta: { sessionId: "s1", provider: "openai-codex", model: "gpt-5.2-codex" },
       },
     });
   });
@@ -69,21 +69,21 @@ describe("agentCommand --model", () => {
         {
           message: "build anima 6",
           agentId: "main",
-          model: "openai/gpt-5.3-codex",
+          model: "openai/gpt-5.2-codex",
         },
         runtime,
       );
 
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
       expect(callArgs?.provider).toBe("openai-codex");
-      expect(callArgs?.model).toBe("gpt-5.3-codex");
+      expect(callArgs?.model).toBe("gpt-5.2-codex");
 
       const saved = JSON.parse(fs.readFileSync(store, "utf-8")) as Record<
         string,
         { providerOverride?: string; modelOverride?: string }
       >;
       expect(saved["agent:main:main"]?.providerOverride).toBe("openai-codex");
-      expect(saved["agent:main:main"]?.modelOverride).toBe("gpt-5.3-codex");
+      expect(saved["agent:main:main"]?.modelOverride).toBe("gpt-5.2-codex");
     });
   });
 });

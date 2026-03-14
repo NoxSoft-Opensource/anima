@@ -41,9 +41,14 @@ function checkPluginVersions() {
   }
 
   const extensionsDir = resolve("extensions");
-  const entries = readdirSync(extensionsDir, { withFileTypes: true }).filter((entry) =>
-    entry.isDirectory(),
-  );
+  let entries: import("node:fs").Dirent[] = [];
+  try {
+    entries = readdirSync(extensionsDir, { withFileTypes: true }).filter((entry) =>
+      entry.isDirectory(),
+    );
+  } catch {
+    // extensions directory may not exist — skip version sync check
+  }
 
   const mismatches: string[] = [];
 

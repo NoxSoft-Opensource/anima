@@ -259,7 +259,7 @@ describe("agentCommand", () => {
     });
   });
 
-  it("defaults thinking to low for reasoning-capable models", async () => {
+  it("defaults thinking to medium for reasoning-capable models", async () => {
     await withTempHome(async (home) => {
       const store = path.join(home, "sessions.json");
       mockConfig(home, store);
@@ -275,7 +275,7 @@ describe("agentCommand", () => {
       await agentCommand({ message: "hi", to: "+1555" }, runtime);
 
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
-      expect(callArgs?.thinkLevel).toBe("low");
+      expect(callArgs?.thinkLevel).toBe("medium");
     });
   });
 

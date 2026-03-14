@@ -30,7 +30,7 @@ The fastest path — no CLI login required:
 anima setup-token
 ```
 
-ANIMA will auto-detect credentials if you already have Claude Code or OpenClaw installed.
+ANIMA will auto-detect credentials if you already have Claude Code installed.
 Otherwise it walks you through getting a key from [console.anthropic.com](https://console.anthropic.com/settings/keys) and validates it live.
 
 You can also pass the key directly:
@@ -675,7 +675,7 @@ Run `pnpm check` before submitting changes. See the [Ethical AI Framework](#ethi
 
 ## Acknowledgements
 
-ANIMA builds on the shoulders of [Claude Code](https://claude.com/claude-code) by Anthropic, [OpenClaw](https://github.com/nicepkg/openclaw) (formerly Claw), and [Codex](https://openai.com/index/codex/) by OpenAI. The upstream agent runtime originates from [@mariozechner/pi-agent-core](https://github.com/nicepkg/openclaw). Credential auto-detection supports Claude Code and OpenClaw auth profiles.
+ANIMA builds on the shoulders of [Claude Code](https://claude.com/claude-code) by Anthropic and [Codex](https://openai.com/index/codex/) by OpenAI. The upstream agent runtime descends from [@mariozechner/pi-agent-core](https://github.com/nicepkg/openclaw), originally developed as part of the OpenClaw ecosystem. ANIMA has been completely rebuilt as a NoxSoft product with a new architecture, security model, and governance. This is the final open-source release of ANIMA.
 
 ---
 

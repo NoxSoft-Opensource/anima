@@ -103,6 +103,13 @@ const coreEntries: CoreCliEntry[] = [
     },
   },
   {
+    commands: [{ name: "message", description: "Send messages and perform channel actions" }],
+    register: async ({ program, ctx }) => {
+      const mod = await import("./register.message.js");
+      mod.registerMessageCommands(program, ctx);
+    },
+  },
+  {
     commands: [
       { name: "status", description: "Gateway health and session activity overview" },
       { name: "health", description: "Probe the running Gateway for live health" },

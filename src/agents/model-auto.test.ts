@@ -17,7 +17,7 @@ const cfg = {
         },
       },
       models: {
-        "openai-codex/gpt-5.3-codex": {
+        "openai-codex/gpt-5.2-codex": {
           alias: "code",
         },
       },
@@ -54,7 +54,7 @@ describe("resolveWorkingModeModelSelection", () => {
       }),
     ).toEqual({
       provider: "openai-codex",
-      model: "gpt-5.3-codex",
+      model: "gpt-5.2-codex",
     });
   });
 
@@ -77,7 +77,7 @@ describe("applyAutoModelRouting", () => {
     });
 
     expect(result.candidates).toEqual([
-      { provider: "openai-codex", model: "gpt-5.3-codex" },
+      { provider: "openai-codex", model: "gpt-5.2-codex" },
       { provider: "anthropic", model: "claude-opus-4-6" },
       { provider: "openai", model: "gpt-5-mini" },
     ]);
@@ -97,7 +97,7 @@ describe("applyAutoModelRouting", () => {
 
     expect(result.candidates).toEqual([
       { provider: "anthropic", model: "claude-opus-4-6" },
-      { provider: "openai-codex", model: "gpt-5.3-codex" },
+      { provider: "openai-codex", model: "gpt-5.2-codex" },
       { provider: "openai", model: "gpt-5-mini" },
     ]);
   });

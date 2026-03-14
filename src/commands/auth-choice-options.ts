@@ -56,7 +56,7 @@ const BASE_AUTH_CHOICE_OPTIONS: ReadonlyArray<AuthChoiceOption> = [
   {
     value: "openaiCodex",
     label: "OpenAI Codex OAuth",
-    hint: "Use Codex CLI credentials (gpt-5.3-codex)",
+    hint: "Use Codex CLI credentials (gpt-5.2-codex)",
   },
   { value: "apiKey", label: "Anthropic API key" },
   { value: "geminiApiKey", label: "Google Gemini API key", hint: "For Gemini 2.0 models" },

@@ -93,7 +93,7 @@ describe("applyNonInteractiveAuthChoice", () => {
     );
     expect(applyPrimaryModel).toHaveBeenCalledWith(
       expect.objectContaining({ __authProfileApplied: true }),
-      "openai-codex/gpt-5.3-codex",
+      "openai-codex/gpt-5.2-codex",
     );
     expect(result).toEqual(expect.objectContaining({ __modelApplied: true }));
   });

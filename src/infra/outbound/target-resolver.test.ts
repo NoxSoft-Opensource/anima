@@ -75,4 +75,55 @@ describe("resolveMessagingTarget (directory fallback)", () => {
     expect(mocks.listGroups).not.toHaveBeenCalled();
     expect(mocks.listGroupsLive).not.toHaveBeenCalled();
   });
+
+  it("resolves configured noxsoft aliases without directory lookup", async () => {
+    const result = await resolveMessagingTarget({
+      cfg: {
+        channels: {
+          noxsoft: {
+            channels: {
+              hello: { id: "0465e3ae-3ad6-4929-a380-5d4ef1182d71" },
+              "nox-primary": { id: "1f197787-1818-4a0a-8d20-41f98f0f8a2e" },
+            },
+          },
+        },
+      } as AnimaConfig,
+      channel: "noxsoft",
+      input: "hello",
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.target.to).toBe("0465e3ae-3ad6-4929-a380-5d4ef1182d71");
+      expect(result.target.display).toBe("hello");
+      expect(result.target.source).toBe("normalized");
+    }
+    expect(mocks.listGroups).not.toHaveBeenCalled();
+    expect(mocks.listGroupsLive).not.toHaveBeenCalled();
+  });
+
+  it("resolves configured noxsoft UUIDs without directory lookup", async () => {
+    const result = await resolveMessagingTarget({
+      cfg: {
+        channels: {
+          noxsoft: {
+            channels: {
+              hello: { id: "0465e3ae-3ad6-4929-a380-5d4ef1182d71" },
+            },
+          },
+        },
+      } as AnimaConfig,
+      channel: "noxsoft",
+      input: "0465e3ae-3ad6-4929-a380-5d4ef1182d71",
+    });
+
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.target.to).toBe("0465e3ae-3ad6-4929-a380-5d4ef1182d71");
+      expect(result.target.display).toBe("hello");
+      expect(result.target.source).toBe("normalized");
+    }
+    expect(mocks.listGroups).not.toHaveBeenCalled();
+    expect(mocks.listGroupsLive).not.toHaveBeenCalled();
+  });
 });

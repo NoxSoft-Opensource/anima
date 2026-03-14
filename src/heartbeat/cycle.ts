@@ -35,7 +35,7 @@ const NOX_CHANNELS = {
   "nox-opus": "0072e730-7380-4ed8-8169-fa4cf367cc45",
 };
 
-const WORKSPACE_DIR = join(homedir(), ".openclaw", "workspace");
+const WORKSPACE_DIR = join(homedir(), ".anima", "workspace");
 const MEMORY_DIR = join(WORKSPACE_DIR, "memory");
 const HEARTBEAT_FILE = join(WORKSPACE_DIR, "HEARTBEAT.md");
 const MEMORY_FILE = join(WORKSPACE_DIR, "MEMORY.md");
@@ -295,7 +295,7 @@ For each channel:
 
 Also check NoxSoft email inbox (mail.noxsoft.net) via the agent API. Report any new threads requiring action.
 
-Agent token is in ~/.noxsoft-agent-token or ~/.openclaw/workspace/TOOLS.md.
+Agent token is in ~/.noxsoft-agent-token or ~/.anima/workspace/TOOLS.md.
 ${contextHint}
 
 Be brief in your report. Actually send replies to any channels that need them.`,
@@ -379,8 +379,8 @@ const stepMemoryConsolidation: StepFn = async (beatNumber, orchestrator) => {
 
   return runStep("memory-consolidation", async () => {
     const taskDesc = isDeepConsolidation
-      ? `Deep memory consolidation (AEST ${hour}:00). Review today's session transcripts from ~/.openclaw/workspace/memory/, extract key decisions and learnings, update MEMORY.md with anything worth keeping long-term. Remove outdated entries. Be thorough.`
-      : `Lightweight memory check: write a brief entry to today's daily log at ~/.openclaw/workspace/memory/YYYY-MM-DD.md summarizing what this heartbeat found. Also check if any items in for-leo.md have been actioned and can be removed.`;
+      ? `Deep memory consolidation (AEST ${hour}:00). Review today's session transcripts from ~/.anima/workspace/memory/, extract key decisions and learnings, update MEMORY.md with anything worth keeping long-term. Remove outdated entries. Be thorough.`
+      : `Lightweight memory check: write a brief entry to today's daily log at ~/.anima/workspace/memory/YYYY-MM-DD.md summarizing what this heartbeat found. Also check if any items in for-leo.md have been actioned and can be removed.`;
 
     const result = await orchestrator.executeTask({
       taskDescription: taskDesc,

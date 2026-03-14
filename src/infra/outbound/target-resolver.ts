@@ -328,6 +328,38 @@ function pickAmbiguousMatch(
   return best ?? entries[0] ?? null;
 }
 
+function resolveConfiguredNoxsoftTarget(params: {
+  cfg: AnimaConfig;
+  input: string;
+}): ResolvedMessagingTarget | null {
+  const trimmed = params.input.trim();
+  if (!trimmed) {
+    return null;
+  }
+  const configured = params.cfg.channels?.noxsoft?.channels;
+  if (!configured) {
+    return null;
+  }
+
+  const lower = trimmed.toLowerCase();
+  for (const [name, entry] of Object.entries(configured)) {
+    const channelId = entry?.id?.trim();
+    if (!channelId) {
+      continue;
+    }
+    if (lower === name.trim().toLowerCase() || trimmed === channelId) {
+      return {
+        to: channelId,
+        kind: "channel",
+        display: name,
+        source: "normalized",
+      };
+    }
+  }
+
+  return null;
+}
+
 export async function resolveMessagingTarget(params: {
   cfg: AnimaConfig;
   channel: ChannelId;
@@ -346,6 +378,12 @@ export async function resolveMessagingTarget(params: {
   const hint = plugin?.messaging?.targetResolver?.hint;
   const kind = detectTargetKind(params.channel, raw, params.preferredKind);
   const normalized = normalizeTargetForProvider(params.channel, raw) ?? raw;
+  if (params.channel === "noxsoft") {
+    const configuredTarget = resolveConfiguredNoxsoftTarget({ cfg: params.cfg, input: raw });
+    if (configuredTarget) {
+      return { ok: true, target: configuredTarget };
+    }
+  }
   const looksLikeTargetId = (): boolean => {
     const trimmed = raw.trim();
     if (!trimmed) {

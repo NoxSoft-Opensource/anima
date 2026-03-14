@@ -529,7 +529,7 @@ describe("runCronIsolatedAgentTurn", () => {
     });
   });
 
-  it("defaults thinking to low for reasoning-capable models", async () => {
+  it("defaults thinking to medium for reasoning-capable models", async () => {
     await withTempHome(async (home) => {
       const storePath = await writeSessionStore(home);
       const deps: CliDeps = {
@@ -565,7 +565,7 @@ describe("runCronIsolatedAgentTurn", () => {
       });
 
       const callArgs = vi.mocked(runEmbeddedPiAgent).mock.calls.at(-1)?.[0];
-      expect(callArgs?.thinkLevel).toBe("low");
+      expect(callArgs?.thinkLevel).toBe("medium");
     });
   });
 

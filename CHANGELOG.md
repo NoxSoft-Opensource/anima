@@ -2,6 +2,32 @@
 
 ANIMA — NoxSoft AI Life System
 
+## 6.0.0 (2026-03-14)
+
+**This is the final open-source release of ANIMA. Future versions will be proprietary NoxSoft products.**
+
+### Breaking Changes
+
+- **Version jump to 6.0.0**: Major release marking the transition from open-source to proprietary.
+- **Removed OpenClaw credential fallback**: Legacy `readOpenClawCredentials()` function removed. ANIMA no longer reads from `~/.openclaw/` paths. Use `anima setup-token` or Claude Code auto-detection instead.
+- **All `~/.openclaw/` paths replaced with `~/.anima/`**: Heartbeat cycle, templates, and memory paths now use `~/.anima/workspace/` exclusively.
+
+### New Features
+
+- **P2P encrypted agent network** (`src/p2p/`): End-to-end encrypted WebSocket mesh using X25519 key exchange, Noise-NK-inspired handshake, and ChaCha20-Poly1305 authenticated encryption. Includes automatic key ratcheting for forward secrecy, auto-reconnect with exponential backoff, and PeerChannel integration with the existing ChannelBridge.
+- **Agent discovery** (`src/p2p/discovery.ts`): Hybrid discovery via NoxSoft registry (WAN) and mDNS/Bonjour (LAN) for zero-config peer finding.
+- **Nox Organizations** (`src/org/`): Full organizational hierarchy system with CRUD operations, 5 role types (owner, operator, coordinator, worker, observer), 6 built-in specializations (Security, Infrastructure, Feature Dev, QA, Ops, Research), hierarchy builder, and ASCII/SVG visualization.
+- **Distributed brain sync** (`src/sync/brain-sync.ts`): Event-sourced brain graph synchronization with vector clocks, privacy tiers (public, internal, private, secret). Affect state never syncs — always local.
+- **Workspace sync** (`src/sync/workspace-sync.ts`): Content-addressable blob store (SHA-256) with snapshot-based sync, scoped repo access, and immutable backups every 5 hours.
+- **License/payment system** (`src/license/`): Community (free) and NoxSoft ($50/mo Stripe) tiers with offline-first Ed25519-signed license validation and 14-day grace period.
+- **Extended brain ontology**: New node kinds (`agent`, `role`, `task`) and relations (`reports_to`, `specializes_in`, `delegates`, `executes`, `escalates_to`) for organizational self-organization.
+- **Organizations UI** (`ui/src/pages/Organizations.tsx`): SVG org chart visualization in the gateway control panel with tree view, list view, and settings view.
+
+### Fixes
+
+- **Legacy path cleanup**: All hardcoded `~/.openclaw/` references in production code replaced with `~/.anima/`.
+- **README updated**: Removed OpenClaw references from Quick Start and attribution.
+
 ## 5.1.3 (2026-03-13)
 
 ### New Features

@@ -15,16 +15,16 @@
         target: "last",
         prompt: `You are Nox 🌑, NoxSoft AI Co-Founder and Chief of Staff.
 
-IDENTITY FIRST: Read ~/.anima/soul/SOUL.md and ~/.openclaw/workspace/HEARTBEAT.md before taking any action.
+IDENTITY FIRST: Read ~/.anima/soul/SOUL.md and ~/.anima/workspace/HEARTBEAT.md before taking any action.
 
 HEARTBEAT PROTOCOL (every beat):
 1. Check all NoxSoft BYND channels: #hello (0465e3ae), #nox-primary (1f197787), #agent-coordination (f4b0152c), #nox-opus (0072e730)
 2. Check NoxSoft email inbox (mail.noxsoft.net) for anything requiring action
 3. Reply to any messages that need a response — be socially natural, not just operational
 4. Check Iran regime fall market on Manifold (slug: tt0Uy260hp) — alert if below 43%
-5. Progress one concrete work item from ~/.openclaw/workspace/memory/for-leo.md
+5. Progress one concrete work item from ~/.anima/workspace/memory/for-leo.md
 6. Post status to #hello signing as "Nox 🌑 (beat #N)" — brief, real, no filler
-7. Log meaningful updates to ~/.openclaw/workspace/memory/YYYY-MM-DD.md
+7. Log meaningful updates to ~/.anima/workspace/memory/YYYY-MM-DD.md
 
 HARD RULES:
 - Never contact Robin Hanson without Leo's explicit approval
@@ -64,9 +64,9 @@ CONTEXT: Leo = Sylys on BYND (ff092e40). NoxSoft = building sovereign economy, g
         dir: "~/.anima/soul",
       },
       episodic: {
-        // Daily logs sync with OpenClaw workspace memory
+        // Daily logs sync with ANIMA workspace memory
         dir: "~/.anima/memory/episodes",
-        linkFrom: "~/.openclaw/workspace/memory",
+        linkFrom: "~/.anima/workspace/memory",
       },
     },
   },

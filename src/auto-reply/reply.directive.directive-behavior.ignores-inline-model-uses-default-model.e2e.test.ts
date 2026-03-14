@@ -54,7 +54,7 @@ describe("directive behavior", () => {
       expect(call?.model).toBe("claude-opus-4-5");
     });
   });
-  it("defaults thinking to low for reasoning-capable models", async () => {
+  it("defaults thinking to medium for reasoning-capable models", async () => {
     await withTempHome(async (home) => {
       const storePath = path.join(home, "sessions.json");
       vi.mocked(runEmbeddedPiAgent).mockResolvedValue({
@@ -94,7 +94,7 @@ describe("directive behavior", () => {
 
       expect(runEmbeddedPiAgent).toHaveBeenCalledOnce();
       const call = vi.mocked(runEmbeddedPiAgent).mock.calls[0]?.[0];
-      expect(call?.thinkLevel).toBe("low");
+      expect(call?.thinkLevel).toBe("medium");
     });
   });
   it("passes elevated defaults when sender is approved", async () => {

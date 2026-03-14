@@ -16,7 +16,7 @@ import { intro, outro, text, confirm, spinner, note, cancel } from "@clack/promp
 import type { RuntimeEnv } from "../runtime.js";
 import { testAnthropicToken } from "../agents/anthropic-direct-runner.js";
 import { loadAuthProfileStore, saveAuthProfileStore } from "../agents/auth-profiles/store.js";
-import { readClaudeCliCredentials, readOpenClawCredentials } from "../agents/cli-credentials.js";
+import { readClaudeCliCredentials } from "../agents/cli-credentials.js";
 import { defaultRuntime } from "../runtime.js";
 
 export type SetupTokenOptions = {
@@ -56,7 +56,6 @@ export function hasAnthropicToken(): boolean {
  *   1. ANTHROPIC_API_KEY env var
  *   2. CLAUDE_API_KEY env var
  *   3. Claude Code CLI credentials (Keychain / Windows Credential Manager / file)
- *   4. OpenClaw auth-profiles.json (same auth infrastructure)
  */
 function autoDetectToken(): string | null {
   const envKey = process.env.ANTHROPIC_API_KEY ?? process.env.CLAUDE_API_KEY;
@@ -71,16 +70,6 @@ function autoDetectToken(): string | null {
     }
     if (cliCred.type === "oauth" && cliCred.access) {
       return cliCred.access;
-    }
-  }
-
-  const openClawCred = readOpenClawCredentials();
-  if (openClawCred) {
-    if (openClawCred.type === "token" && openClawCred.token) {
-      return openClawCred.token;
-    }
-    if (openClawCred.type === "oauth" && openClawCred.access) {
-      return openClawCred.access;
     }
   }
 

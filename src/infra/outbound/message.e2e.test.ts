@@ -16,13 +16,18 @@ vi.mock("../../gateway/call.js", () => ({
   randomIdempotencyKey: () => "idem-1",
 }));
 
+const fetchMock = vi.fn();
+
 describe("sendMessage channel normalization", () => {
   beforeEach(() => {
     callGatewayMock.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
     setRegistry(emptyRegistry);
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     setRegistry(emptyRegistry);
   });
 
@@ -82,10 +87,13 @@ describe("sendMessage channel normalization", () => {
 describe("sendMessage replyToId threading", () => {
   beforeEach(() => {
     callGatewayMock.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
     setRegistry(emptyRegistry);
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     setRegistry(emptyRegistry);
   });
 
@@ -135,10 +143,13 @@ describe("sendMessage replyToId threading", () => {
 describe("sendPoll channel normalization", () => {
   beforeEach(() => {
     callGatewayMock.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
     setRegistry(emptyRegistry);
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     setRegistry(emptyRegistry);
   });
 
@@ -176,10 +187,13 @@ describe("sendPoll channel normalization", () => {
 describe("gateway url override hardening", () => {
   beforeEach(() => {
     callGatewayMock.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
     setRegistry(emptyRegistry);
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     setRegistry(emptyRegistry);
   });
 
@@ -220,6 +234,75 @@ describe("gateway url override hardening", () => {
         timeoutMs: 5000,
       }),
     );
+  });
+});
+
+describe("sendMessage noxsoft direct delivery", () => {
+  beforeEach(() => {
+    callGatewayMock.mockReset();
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+    setRegistry(emptyRegistry);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    setRegistry(emptyRegistry);
+  });
+
+  it("sends directly to the NoxSoft REST API without a channel plugin", async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ messageId: "nox-1" }),
+    });
+
+    const result = await sendMessage({
+      cfg: {
+        channels: {
+          noxsoft: {
+            token: "test-token",
+            apiUrl: "https://auth.noxsoft.net",
+          },
+        },
+      },
+      to: "0465e3ae-3ad6-4929-a380-5d4ef1182d71",
+      content: "hello",
+      channel: "noxsoft",
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://auth.noxsoft.net/api/agents/chat/channels/0465e3ae-3ad6-4929-a380-5d4ef1182d71/messages",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({
+          Authorization: "Bearer test-token",
+          "Content-Type": "application/json",
+        }),
+      }),
+    );
+    expect(result).toMatchObject({
+      channel: "noxsoft",
+      to: "0465e3ae-3ad6-4929-a380-5d4ef1182d71",
+      via: "direct",
+      result: { messageId: "nox-1" },
+    });
+  });
+
+  it("supports noxsoft dry-run without a plugin", async () => {
+    const result = await sendMessage({
+      cfg: {},
+      to: "0465e3ae-3ad6-4929-a380-5d4ef1182d71",
+      content: "hello",
+      channel: "noxsoft",
+      dryRun: true,
+    });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(result).toMatchObject({
+      channel: "noxsoft",
+      via: "direct",
+      dryRun: true,
+    });
   });
 });
 

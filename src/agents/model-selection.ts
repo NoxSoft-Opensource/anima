@@ -425,11 +425,17 @@ export function resolveThinkingDefault(params: {
   if (configured) {
     return configured;
   }
+  const normalizedProvider = normalizeProviderId(params.provider);
+  const normalizedModel = params.model.trim().toLowerCase();
   const candidate = params.catalog?.find(
     (entry) => entry.provider === params.provider && entry.id === params.model,
   );
   if (candidate?.reasoning) {
-    return "low";
+    return "medium";
+  }
+  // Keep GPT-5.4 on medium even when the bundled model catalog lags behind.
+  if (normalizedProvider === "openai" && normalizedModel.startsWith("gpt-5.4")) {
+    return "medium";
   }
   return "off";
 }

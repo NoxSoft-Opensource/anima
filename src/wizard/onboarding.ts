@@ -174,7 +174,6 @@ export async function runOnboardingWizard(
   //   1. macOS Keychain (darwin)
   //   2. Windows Credential Manager (win32)
   //   3. ~/.claude/.credentials.json (cross-platform)
-  //   4. OpenClaw auth-profiles.json (same infrastructure, best Windows fallback)
   //
   // If found, we skip the auth prompt entirely and configure ANIMA silently.
   // The user can always re-run `anima configure` to change the provider.

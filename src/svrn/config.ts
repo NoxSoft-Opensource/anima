@@ -10,6 +10,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import type { SVRNNodeConfig } from "./node.js";
 import { resolveStateDir } from "../config/paths.js";
+import { loadSvrnNodeModule } from "./module.js";
 import { DEFAULT_SVRN_CONFIG } from "./node.js";
 
 const CONFIG_FILENAME = "anima.json";
@@ -48,7 +49,10 @@ async function loadResolveConfig(): Promise<
   ((partial: Partial<SVRNNodeConfig>) => SVRNNodeConfig) | null
 > {
   try {
-    const mod = await import("@noxsoft/svrn-node");
+    const mod = await loadSvrnNodeModule();
+    if (!mod) {
+      return null;
+    }
     return mod.resolveConfig;
   } catch {
     return null;

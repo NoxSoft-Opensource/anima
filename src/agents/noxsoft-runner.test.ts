@@ -180,7 +180,7 @@ describe("noxsoft-runner", () => {
         meta: {
           agentMeta: {
             provider: "openai-codex",
-            model: "gpt-5.3-codex",
+            model: "gpt-5.2-codex",
           },
         },
       }),
@@ -191,15 +191,15 @@ describe("noxsoft-runner", () => {
       sessionFile: "/tmp/s1.jsonl",
       workspaceDir: "/tmp",
       prompt: "hi",
-      provider: "openai/gpt-5.3-codex".split("/")[0],
-      model: "gpt-5.3-codex",
+      provider: "openai/gpt-5.2-codex".split("/")[0],
+      model: "gpt-5.2-codex",
       execSecurity: "deny",
     });
 
     expect(runCliAgent).toHaveBeenCalledOnce();
     expect(runCliAgent.mock.calls[0]?.[0]).toMatchObject({
       provider: "openai-codex",
-      model: "gpt-5.3-codex",
+      model: "gpt-5.2-codex",
       sessionExecSecurity: "deny",
     });
     expect(result.meta.agentMeta?.provider).toBe("openai-codex");

@@ -425,6 +425,11 @@ async function resolveDirectStrategy(
       store: ensureAuthProfileStore(agentDir, { allowKeychainPrompt: false }),
     });
     if (auth.apiKey) {
+      // Anthropic's Messages API does not support OAuth tokens (sk-ant-oat01-...).
+      // These must go through the Claude CLI backend instead.
+      if (directProvider === "anthropic" && auth.apiKey.startsWith("sk-ant-oat01-")) {
+        return null;
+      }
       return {
         kind: directProvider === "google" ? "gemini-direct" : "anthropic-direct",
         provider,

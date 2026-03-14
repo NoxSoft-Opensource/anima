@@ -2,15 +2,14 @@ import type { ChannelId } from "../channels/plugins/types.js";
 import type { NativeCommandsSetting } from "./types.js";
 import { normalizeChannelId } from "../channels/plugins/index.js";
 
+const NATIVE_SKILLS_AUTO_ENABLED = new Set<string>(["noxsoft", "discord", "telegram"]);
+
 function resolveAutoDefault(providerId?: ChannelId): boolean {
-  const id = normalizeChannelId(providerId);
-  if (!id) {
+  const raw = providerId?.trim().toLowerCase();
+  if (!raw) {
     return false;
   }
-  if (id === "noxsoft") {
-    return true;
-  }
-  return false;
+  return NATIVE_SKILLS_AUTO_ENABLED.has(raw);
 }
 
 export function resolveNativeSkillsEnabled(params: {

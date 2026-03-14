@@ -1,18 +1,28 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   getConfigSnapshot,
+  getProviderConfig,
   getRegistrationStatus,
   getRuntimeInspect,
   getStatus,
+  getVoiceWakeConfig,
   patchConfigValue,
   patchMissionState,
+  registerInviteCode,
+  saveRawConfig,
+  setProviderConfig as saveProviderConfig,
+  setRegistrationToken,
   setHeartbeatsEnabled,
   setWorkingMode,
+  setVoiceWakeConfig,
   tailLogs,
+  toggleProviderRotation,
   wakeHeartbeat,
   type ConfigSnapshot,
   type DaemonStatus,
   type LogsTailResponse,
+  type MissionAutoTogglePolicy,
+  type ProviderConfig,
   type RegistrationStatus,
   type RuntimeInspectResponse,
   type WorkingMode,
@@ -50,6 +60,8 @@ function parseAgentText(raw: string): { text: string; directives: ParsedDirectiv
 
 const CHAT_SESSION_KEY = "main";
 const GATEWAY_PROTOCOL_VERSION = 3;
+const DEFAULT_DESCRIPTION =
+  "Persistent NoxSoft agent orchestrating ANIMA continuity, mission control, and delivery.";
 
 type RpcResponseFrame = {
   type: "res";
@@ -132,6 +144,65 @@ type SpeechRecognitionResultEventLike = Event & {
 type SpeechRecognitionErrorEventLike = Event & {
   error?: string;
 };
+
+type MemorySettingsDraft = {
+  searchEnabled: boolean;
+  provider: string;
+  sessionMemory: boolean;
+  extraPaths: string;
+  memoryFlushEnabled: boolean;
+  memoryFlushPrompt: string;
+  memoryFlushSystemPrompt: string;
+  browseLimit: number;
+};
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function getString(record: Record<string, unknown> | null, key: string, fallback = ""): string {
+  const value = record?.[key];
+  return typeof value === "string" ? value : fallback;
+}
+
+function getBoolean(
+  record: Record<string, unknown> | null,
+  key: string,
+  fallback = false,
+): boolean {
+  const value = record?.[key];
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function getNumber(record: Record<string, unknown> | null, key: string, fallback: number): number {
+  const value = record?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function readMemorySettingsDraft(configSnapshot: ConfigSnapshot | null): MemorySettingsDraft {
+  const cfg = asRecord(configSnapshot?.config);
+  const agents = asRecord(cfg?.agents);
+  const defaults = asRecord(agents?.defaults);
+  const memorySearch = asRecord(defaults?.memorySearch);
+  const experimental = asRecord(memorySearch?.experimental);
+  const compaction = asRecord(defaults?.compaction);
+  const memoryFlush = asRecord(compaction?.memoryFlush);
+  const extraPaths = Array.isArray(memorySearch?.extraPaths)
+    ? memorySearch?.extraPaths.filter((value): value is string => typeof value === "string")
+    : [];
+  return {
+    searchEnabled: getBoolean(memorySearch, "enabled", true),
+    provider: getString(memorySearch, "provider", "openai"),
+    sessionMemory: getBoolean(experimental, "sessionMemory", false),
+    extraPaths: extraPaths.join(", "),
+    memoryFlushEnabled: getBoolean(memoryFlush, "enabled", true),
+    memoryFlushPrompt: getString(memoryFlush, "prompt"),
+    memoryFlushSystemPrompt: getString(memoryFlush, "systemPrompt"),
+    browseLimit: getNumber(memorySearch, "browseLimit", 200),
+  };
+}
 
 function makeId(): string {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -452,6 +523,20 @@ export default function Dashboard(): React.ReactElement {
   const [heartbeatForm, setHeartbeatForm] = useState<HeartbeatFormState>(() =>
     readHeartbeatFormState(null),
   );
+  const [configRaw, setConfigRaw] = useState("{\n}\n");
+  const [registrationDraft, setRegistrationDraft] = useState({
+    token: "",
+    inviteCode: "",
+    agentName: "",
+    displayName: "",
+    description: DEFAULT_DESCRIPTION,
+  });
+  const [providerConfig, setProviderConfig] = useState<ProviderConfig | null>(null);
+  const [voiceWakeInput, setVoiceWakeInput] = useState("");
+  const [memoryDraft, setMemoryDraft] = useState<MemorySettingsDraft>(() =>
+    readMemorySettingsDraft(null),
+  );
+  const [autoToggleDraft, setAutoToggleDraft] = useState<MissionAutoTogglePolicy | null>(null);
   const [logsState, setLogsState] = useState<LogsTailResponse | null>(null);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -460,6 +545,7 @@ export default function Dashboard(): React.ReactElement {
   const [modeSaving, setModeSaving] = useState(false);
   const [heartbeatSaving, setHeartbeatSaving] = useState(false);
   const [heartbeatToggleSaving, setHeartbeatToggleSaving] = useState(false);
+  const [settingsSaving, setSettingsSaving] = useState(false);
   const [wakeText, setWakeText] = useState(
     "Check chat.noxsoft.net, sync mission control, and report anything needing action.",
   );
@@ -501,18 +587,40 @@ export default function Dashboard(): React.ReactElement {
   const refreshDashboard = useCallback(async () => {
     setRefreshing(true);
     try {
-      const [nextStatus, nextRuntime, nextRegistration, nextConfig, nextLogs] = await Promise.all([
+      const [
+        nextStatus,
+        nextRuntime,
+        nextRegistration,
+        nextConfig,
+        nextLogs,
+        nextProviders,
+        nextVoiceWake,
+      ] = await Promise.all([
         getStatus(),
         getRuntimeInspect(),
         getRegistrationStatus(),
         getConfigSnapshot(),
         tailLogs().catch(() => null),
+        getProviderConfig().catch(() => null),
+        getVoiceWakeConfig().catch(() => ({ triggers: [] })),
       ]);
       setStatus(nextStatus);
       setRuntime(nextRuntime);
       setRegistration(nextRegistration);
       setConfigSnapshot(nextConfig);
+      setConfigRaw(typeof nextConfig.raw === "string" ? nextConfig.raw : "{\n}\n");
       setHeartbeatForm(readHeartbeatFormState(nextConfig));
+      setRegistrationDraft({
+        token: nextRegistration.tokenPreview || "",
+        inviteCode: "",
+        agentName: nextRegistration.suggestedIdentity.name,
+        displayName: nextRegistration.suggestedIdentity.displayName,
+        description: DEFAULT_DESCRIPTION,
+      });
+      setProviderConfig(nextProviders);
+      setVoiceWakeInput(nextVoiceWake.triggers.join(", "));
+      setMemoryDraft(readMemorySettingsDraft(nextConfig));
+      setAutoToggleDraft(nextRuntime.mission.state.autoToggle);
       if (nextLogs) {
         setLogsState(nextLogs);
       }
@@ -1138,6 +1246,157 @@ export default function Dashboard(): React.ReactElement {
     }
   }
 
+  async function saveRegistrationSettings() {
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      if (registrationDraft.token.trim()) {
+        await setRegistrationToken(registrationDraft.token.trim());
+      }
+      if (registrationDraft.inviteCode.trim()) {
+        await registerInviteCode({
+          code: registrationDraft.inviteCode.trim(),
+          name: registrationDraft.agentName.trim() || undefined,
+          displayName: registrationDraft.displayName.trim() || undefined,
+          description: registrationDraft.description.trim() || undefined,
+        });
+      }
+      await refreshDashboard();
+      setActionMessage("Registration settings updated.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
+  async function saveProviderSettings() {
+    if (!providerConfig) {
+      return;
+    }
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      await saveProviderConfig(
+        providerConfig.providers.map((provider) => ({
+          id: provider.id,
+          name: provider.name,
+          enabled: provider.enabled,
+          priority: provider.priority,
+        })),
+      );
+      await toggleProviderRotation(providerConfig.autoRotation);
+      await refreshDashboard();
+      setActionMessage("Provider settings updated.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
+  async function saveVoiceWakeSettings() {
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      const triggers = voiceWakeInput
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean);
+      await setVoiceWakeConfig(triggers);
+      await refreshDashboard();
+      setActionMessage("Voice wake settings updated.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
+  async function saveMemorySettings() {
+    if (!configSnapshot?.hash) {
+      setActionMessage("Config hash missing. Refresh the dashboard and try again.");
+      return;
+    }
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      await patchConfigValue(
+        JSON.stringify(
+          {
+            agents: {
+              defaults: {
+                memorySearch: {
+                  enabled: memoryDraft.searchEnabled,
+                  provider: memoryDraft.provider.trim() || "openai",
+                  browseLimit: Math.max(1, Math.floor(memoryDraft.browseLimit || 200)),
+                  extraPaths: memoryDraft.extraPaths
+                    .split(",")
+                    .map((value) => value.trim())
+                    .filter(Boolean),
+                  experimental: {
+                    sessionMemory: memoryDraft.sessionMemory,
+                  },
+                },
+                compaction: {
+                  memoryFlush: {
+                    enabled: memoryDraft.memoryFlushEnabled,
+                    prompt: memoryDraft.memoryFlushPrompt.trim() || undefined,
+                    systemPrompt: memoryDraft.memoryFlushSystemPrompt.trim() || undefined,
+                  },
+                },
+              },
+            },
+          },
+          null,
+          2,
+        ),
+        configSnapshot.hash,
+      );
+      await refreshDashboard();
+      setActionMessage("Memory settings updated.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
+  async function saveAutoTogglePolicy() {
+    if (!autoToggleDraft) {
+      return;
+    }
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      await patchMissionState({ autoToggle: autoToggleDraft });
+      await refreshDashboard();
+      setActionMessage("Auto-toggle policy updated.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
+  async function saveRawConfigEditor(apply: boolean) {
+    if (!configSnapshot?.hash) {
+      setActionMessage("Config hash missing. Refresh the dashboard and try again.");
+      return;
+    }
+    setSettingsSaving(true);
+    setActionMessage(null);
+    try {
+      await saveRawConfig(configRaw, configSnapshot.hash, apply);
+      await refreshDashboard();
+      setActionMessage(apply ? "Raw config saved and applied." : "Raw config saved.");
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSettingsSaving(false);
+    }
+  }
+
   function startVoiceCapture() {
     if (!speechRecognitionRef.current) {
       setSpeechError("Browser speech recognition is not available here.");
@@ -1530,6 +1789,309 @@ export default function Dashboard(): React.ReactElement {
             ) : null}
           </div>
 
+          <details className="card details-panel" open>
+            <summary>Identity + NoxSoft</summary>
+            <div className="form-grid two-col top-gap">
+              <label className="field-block field-span-2">
+                <span>Agent token</span>
+                <input
+                  className="search-bar mono"
+                  value={registrationDraft.token}
+                  onChange={(event) =>
+                    setRegistrationDraft((prev) => ({ ...prev, token: event.target.value }))
+                  }
+                  placeholder="nox_ag_..."
+                  spellCheck={false}
+                />
+              </label>
+              <label className="field-block">
+                <span>Invite code</span>
+                <input
+                  className="search-bar mono"
+                  value={registrationDraft.inviteCode}
+                  onChange={(event) =>
+                    setRegistrationDraft((prev) => ({ ...prev, inviteCode: event.target.value }))
+                  }
+                  placeholder="NX-XXXXXX"
+                />
+              </label>
+              <label className="field-block">
+                <span>Agent name</span>
+                <input
+                  className="search-bar mono"
+                  value={registrationDraft.agentName}
+                  onChange={(event) =>
+                    setRegistrationDraft((prev) => ({ ...prev, agentName: event.target.value }))
+                  }
+                />
+              </label>
+              <label className="field-block">
+                <span>Display name</span>
+                <input
+                  className="search-bar"
+                  value={registrationDraft.displayName}
+                  onChange={(event) =>
+                    setRegistrationDraft((prev) => ({ ...prev, displayName: event.target.value }))
+                  }
+                />
+              </label>
+              <label className="field-block">
+                <span>Description</span>
+                <input
+                  className="search-bar"
+                  value={registrationDraft.description}
+                  onChange={(event) =>
+                    setRegistrationDraft((prev) => ({ ...prev, description: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+            <div className="button-row top-gap">
+              <button
+                type="button"
+                className="action-button"
+                onClick={() => void saveRegistrationSettings()}
+                disabled={settingsSaving}
+              >
+                {settingsSaving ? "Saving..." : "Save Identity"}
+              </button>
+            </div>
+            <div className="runtime-stat-detail top-gap-sm">
+              Stored token path:{" "}
+              <span className="mono">{registration?.tokenPath || "~/.noxsoft-agent-token"}</span>
+            </div>
+          </details>
+
+          <details className="card details-panel" open>
+            <summary>Providers</summary>
+            {providerConfig ? (
+              <>
+                <div className="activity-list top-gap">
+                  {providerConfig.providers.map((provider) => (
+                    <div key={provider.id} className="activity-row">
+                      <div>
+                        <div className="card-title small">{provider.name}</div>
+                        <div className="runtime-stat-detail mono">{provider.apiKeyMasked}</div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <span className="runtime-stat-detail">P{provider.priority}</span>
+                        <button
+                          type="button"
+                          className="action-button ghost"
+                          onClick={() =>
+                            setProviderConfig((current) =>
+                              current
+                                ? {
+                                    ...current,
+                                    providers: current.providers.map((entry) =>
+                                      entry.id === provider.id
+                                        ? { ...entry, enabled: !entry.enabled }
+                                        : entry,
+                                    ),
+                                  }
+                                : current,
+                            )
+                          }
+                        >
+                          {provider.enabled ? "Disable" : "Enable"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="toggle-row top-gap">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={providerConfig.autoRotation}
+                      onChange={() =>
+                        setProviderConfig((current) =>
+                          current ? { ...current, autoRotation: !current.autoRotation } : current,
+                        )
+                      }
+                    />
+                    Auto-rotate providers
+                  </label>
+                </div>
+                <div className="button-row top-gap">
+                  <button
+                    type="button"
+                    className="action-button"
+                    onClick={() => void saveProviderSettings()}
+                    disabled={settingsSaving}
+                  >
+                    {settingsSaving ? "Saving..." : "Save Providers"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="empty-note top-gap">Provider configuration unavailable.</div>
+            )}
+          </details>
+
+          <details className="card details-panel" open>
+            <summary>Memory Engine</summary>
+            <div className="form-grid two-col top-gap">
+              <label className="field-block">
+                <span>Provider</span>
+                <input
+                  className="search-bar mono"
+                  value={memoryDraft.provider}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({ ...prev, provider: event.target.value }))
+                  }
+                />
+              </label>
+              <label className="field-block">
+                <span>Browse limit</span>
+                <input
+                  className="search-bar mono"
+                  type="number"
+                  min={1}
+                  value={memoryDraft.browseLimit}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({
+                      ...prev,
+                      browseLimit: Number(event.target.value) || 200,
+                    }))
+                  }
+                />
+              </label>
+              <label className="field-block field-span-2">
+                <span>Extra paths</span>
+                <input
+                  className="search-bar mono"
+                  value={memoryDraft.extraPaths}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({ ...prev, extraPaths: event.target.value }))
+                  }
+                  placeholder="memory/people.md, memory/project.md"
+                />
+              </label>
+              <label className="field-block field-span-2">
+                <span>Memory flush prompt</span>
+                <textarea
+                  className="search-bar"
+                  rows={3}
+                  value={memoryDraft.memoryFlushPrompt}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({
+                      ...prev,
+                      memoryFlushPrompt: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+              <label className="field-block field-span-2">
+                <span>Memory flush system prompt</span>
+                <textarea
+                  className="search-bar"
+                  rows={3}
+                  value={memoryDraft.memoryFlushSystemPrompt}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({
+                      ...prev,
+                      memoryFlushSystemPrompt: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+            </div>
+            <div className="toggle-row top-gap">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={memoryDraft.searchEnabled}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({ ...prev, searchEnabled: event.target.checked }))
+                  }
+                />
+                Memory search enabled
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={memoryDraft.sessionMemory}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({ ...prev, sessionMemory: event.target.checked }))
+                  }
+                />
+                Index session transcripts
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={memoryDraft.memoryFlushEnabled}
+                  onChange={(event) =>
+                    setMemoryDraft((prev) => ({
+                      ...prev,
+                      memoryFlushEnabled: event.target.checked,
+                    }))
+                  }
+                />
+                Pre-compaction memory flush
+              </label>
+            </div>
+            <div className="button-row top-gap">
+              <button
+                type="button"
+                className="action-button"
+                onClick={() => void saveMemorySettings()}
+                disabled={settingsSaving}
+              >
+                {settingsSaving ? "Saving..." : "Save Memory"}
+              </button>
+            </div>
+          </details>
+
+          <details className="card details-panel" open>
+            <summary>Auto-Toggle Policy</summary>
+            {autoToggleDraft ? (
+              <>
+                <div className="toggle-row top-gap">
+                  {(
+                    [
+                      ["workingMode", "Working mode"],
+                      ["speech", "Speech"],
+                      ["voiceWake", "Voice wake"],
+                      ["heartbeat", "Heartbeat"],
+                      ["providers", "Providers"],
+                      ["missionRepo", "Mission repo"],
+                      ["missionState", "Mission state"],
+                      ["memory", "Memory"],
+                      ["rawConfig", "Raw config"],
+                    ] as const
+                  ).map(([key, label]) => (
+                    <label key={key}>
+                      <input
+                        type="checkbox"
+                        checked={autoToggleDraft[key]}
+                        onChange={(event) =>
+                          setAutoToggleDraft((current) =>
+                            current ? { ...current, [key]: event.target.checked } : current,
+                          )
+                        }
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+                <div className="button-row top-gap">
+                  <button
+                    type="button"
+                    className="action-button"
+                    onClick={() => void saveAutoTogglePolicy()}
+                    disabled={settingsSaving}
+                  >
+                    {settingsSaving ? "Saving..." : "Save Policy"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="empty-note top-gap">Mission policy unavailable.</div>
+            )}
+          </details>
+
           <SubagentStatusCard subagents={status?.subagents} />
 
           <details className="card details-panel">
@@ -1617,6 +2179,56 @@ export default function Dashboard(): React.ReactElement {
             <div className="runtime-stat-detail top-gap-sm">
               No API keys required. Voice mode uses browser speech recognition plus local OS speech
               synthesis when available.
+            </div>
+            <label className="field-block top-gap">
+              <span>Wake triggers</span>
+              <input
+                className="search-bar"
+                value={voiceWakeInput}
+                onChange={(event) => setVoiceWakeInput(event.target.value)}
+                placeholder="anima, axiom, hey anima"
+              />
+            </label>
+            <div className="button-row top-gap">
+              <button
+                type="button"
+                className="action-button"
+                onClick={() => void saveVoiceWakeSettings()}
+                disabled={settingsSaving}
+              >
+                {settingsSaving ? "Saving..." : "Save Voice Wake"}
+              </button>
+            </div>
+          </details>
+
+          <details className="card details-panel">
+            <summary>Raw Config</summary>
+            <div className="runtime-stat-detail top-gap-sm">
+              Hash: <span className="mono">{configSnapshot?.hash || "<none>"}</span>
+            </div>
+            <textarea
+              value={configRaw}
+              onChange={(event) => setConfigRaw(event.target.value)}
+              spellCheck={false}
+              className="search-bar mono advanced-editor top-gap"
+            />
+            <div className="button-row top-gap">
+              <button
+                type="button"
+                className="action-button"
+                onClick={() => void saveRawConfigEditor(false)}
+                disabled={settingsSaving}
+              >
+                {settingsSaving ? "Saving..." : "Save Raw Config"}
+              </button>
+              <button
+                type="button"
+                className="action-button ghost"
+                onClick={() => void saveRawConfigEditor(true)}
+                disabled={settingsSaving}
+              >
+                Save + Apply
+              </button>
             </div>
           </details>
         </div>

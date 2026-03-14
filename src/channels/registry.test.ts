@@ -7,13 +7,13 @@ import {
 
 describe("channel registry", () => {
   it("normalizes known channel IDs", () => {
-    expect(normalizeChatChannelId("web")).toBe("web");
+    expect(normalizeChatChannelId("noxsoft")).toBe("noxsoft");
     expect(normalizeChatChannelId("unknown")).toBeNull();
   });
 
-  it("keeps web first in the default order", () => {
+  it("keeps noxsoft first in the default order", () => {
     const channels = listChatChannels();
-    expect(channels[0]?.id).toBe("web");
+    expect(channels[0]?.id).toBe("noxsoft");
   });
 
   it("formats selection lines with docs labels", () => {
@@ -25,7 +25,7 @@ describe("channel registry", () => {
     const line = formatChannelSelectionLine(first, (path, label) =>
       [label, path].filter(Boolean).join(":"),
     );
-    expect(line).toContain("/channels/web");
-    expect(line).toContain("https://noxsoft.net");
+    expect(line).toContain("/channels/noxsoft");
+    expect(line).toContain("https://chat.noxsoft.net");
   });
 });

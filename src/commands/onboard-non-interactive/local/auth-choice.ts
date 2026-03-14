@@ -12,7 +12,7 @@ import { resolveNonInteractiveApiKey } from "../api-keys.js";
 
 const OPENAI_CODEX_PROVIDER = "openai-codex";
 const OPENAI_CODEX_PROFILE_ID = "openai-codex:default";
-const OPENAI_CODEX_DEFAULT_MODEL = "openai-codex/gpt-5.3-codex";
+const OPENAI_CODEX_DEFAULT_MODEL = "openai-codex/gpt-5.2-codex";
 const OPENAI_CODEX_LOGIN_COMMAND = "anima models auth login --provider openai-codex";
 
 export async function applyNonInteractiveAuthChoice(params: {

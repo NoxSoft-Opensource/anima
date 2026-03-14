@@ -36,7 +36,7 @@ function mockConfig(
         model: { primary: "google/gemini-flash-latest" },
         models: {
           "google/gemini-flash-latest": {},
-          "openai/gpt-5.3-codex": {},
+          "openai/gpt-5.2-codex": {},
         },
         workspace: path.join(home, "anima"),
         ...agentOverrides,
@@ -64,9 +64,9 @@ describe("modelsCurrentCommand", () => {
               sessionId: "s1",
               updatedAt: Date.now(),
               providerOverride: "openai",
-              modelOverride: "gpt-5.3-codex",
+              modelOverride: "gpt-5.2-codex",
               modelProvider: "openai-codex",
-              model: "gpt-5.3-codex",
+              model: "gpt-5.2-codex",
             },
           },
           null,
@@ -77,9 +77,9 @@ describe("modelsCurrentCommand", () => {
 
       await modelsCurrentCommand({ sessionKey: "agent:main:main" }, runtime);
 
-      expect(runtime.log).toHaveBeenCalledWith("Current model: openai-codex/gpt-5.3-codex");
+      expect(runtime.log).toHaveBeenCalledWith("Current model: openai-codex/gpt-5.2-codex");
       expect(runtime.log).toHaveBeenCalledWith("Source: session");
-      expect(runtime.log).toHaveBeenCalledWith("Last used: openai-codex/gpt-5.3-codex");
+      expect(runtime.log).toHaveBeenCalledWith("Last used: openai-codex/gpt-5.2-codex");
     });
   });
 

@@ -97,7 +97,7 @@ describe("applyAuthChoiceOpenAICodex", () => {
     );
     expect(applyPrimaryModel).toHaveBeenCalledWith(
       expect.objectContaining({ __authProfileApplied: true }),
-      "openai-codex/gpt-5.3-codex",
+      "openai-codex/gpt-5.2-codex",
     );
     expect(result).toEqual({
       config: expect.objectContaining({ __modelApplied: true }),
@@ -124,7 +124,7 @@ describe("applyAuthChoiceOpenAICodex", () => {
     expect(applyPrimaryModel).not.toHaveBeenCalled();
     expect(result).toEqual({
       config: expect.objectContaining({ __authProfileApplied: true }),
-      agentModelOverride: "openai-codex/gpt-5.3-codex",
+      agentModelOverride: "openai-codex/gpt-5.2-codex",
     });
   });
 });
