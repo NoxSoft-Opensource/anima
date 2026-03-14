@@ -105,3 +105,13 @@ export {
   commentOnInitiative,
   updateInitiativeStatus,
 } from "./initiatives.js";
+
+export {
+  type ActivityType,
+  type StatusUpdate,
+  setStatus,
+  getStatus,
+  getStatusHistory,
+  formatStatus,
+  formatCompactStatus,
+} from "./status-broadcast.js";
