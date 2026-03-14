@@ -1394,6 +1394,37 @@ export async function getOrgHierarchy(orgId: string): Promise<OrgHierarchyNode[]
   return Array.isArray(result.hierarchy) ? result.hierarchy : [];
 }
 
+export async function joinOrgWithInvite(params: {
+  inviteCode: string;
+  passcode: string;
+  displayName: string;
+  kind: OrgMemberKind;
+  description: string;
+  specializations: string[];
+}): Promise<{ org: NoxOrganization; member: OrgMember }> {
+  return callGatewayMethod<{ org: NoxOrganization; member: OrgMember }>("org.join", params);
+}
+
+export async function validateOrgInvite(params: {
+  inviteCode: string;
+  passcode: string;
+}): Promise<{ org: NoxOrganization; role: OrgRoleType }> {
+  return callGatewayMethod<{ org: NoxOrganization; role: OrgRoleType }>(
+    "org.validateInvite",
+    params,
+  );
+}
+
+export async function createOrgInvite(params: {
+  orgId: string;
+  passcode: string;
+  role?: OrgRoleType;
+  maxUses?: number;
+  expiresInMs?: number;
+}): Promise<{ code: string; passcode: string }> {
+  return callGatewayMethod<{ code: string; passcode: string }>("org.createInvite", params);
+}
+
 // --- WebSocket ---
 
 export function connectWebSocket(
