@@ -57,3 +57,19 @@ export {
   generateAllManifests,
   printDistributionSummary,
 } from "./vm-distribution.js";
+
+export {
+  type MarketplaceTask,
+  type TaskPriority,
+  type TaskStatus,
+  type TaskClaim,
+  type TaskFilter,
+  postTask,
+  claimTask,
+  submitForReview,
+  reviewTask,
+  cancelTask,
+  listTasks,
+  findClaimableTasks,
+  getMarketplaceStats,
+} from "./task-marketplace.js";
