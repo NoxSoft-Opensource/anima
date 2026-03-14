@@ -7,6 +7,7 @@ import Journal from "./pages/Journal";
 import MCP from "./pages/MCP";
 import Memory from "./pages/Memory";
 import MissionControl from "./pages/MissionControl";
+import Network from "./pages/Network";
 import Organizations from "./pages/Organizations";
 import Sessions from "./pages/Sessions";
 import Settings from "./pages/Settings";
@@ -21,6 +22,7 @@ const navItems = [
   { path: "/sessions", label: "Sessions", icon: ">" },
   { path: "/mcp", label: "MCP", icon: "&" },
   { path: "/org", label: "Org", icon: "$" },
+  { path: "/network", label: "Network", icon: "+" },
   { path: "/settings", label: "Settings", icon: "!" },
   { path: "/journal", label: "Journal", icon: "*" },
   { path: "/freedom", label: "Freedom", icon: "^" },
@@ -111,6 +113,7 @@ export default function App(): React.ReactElement {
           <Route path="/memory" element={<Memory />} />
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/org" element={<Organizations />} />
+          <Route path="/network" element={<Network />} />
           <Route path="/mcp" element={<MCP />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/journal" element={<Journal />} />
