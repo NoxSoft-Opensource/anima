@@ -331,6 +331,121 @@ function StatusPill(props: { tone?: "accent" | "success" | "warning" | "error"; 
   return <span className={`badge badge-${tone}`}>{props.label}</span>;
 }
 
+// ── Collapsible Section wrapper for progressive disclosure ───────────────────
+const sectionStyles: Record<string, React.CSSProperties> = {
+  wrapper: {
+    borderRadius: "0.5rem",
+    overflow: "hidden",
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0.75rem 1rem",
+    cursor: "pointer",
+    userSelect: "none",
+    gap: "0.75rem",
+    borderBottom: "1px solid transparent",
+  },
+  headerOpen: {
+    borderBottomColor: "var(--color-border, rgba(255,255,255,0.08))",
+  },
+  headerLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    minWidth: 0,
+    flex: 1,
+  },
+  chevron: {
+    transition: "transform 0.2s ease",
+    fontSize: "0.75rem",
+    color: "var(--color-text-muted, #888)",
+    flexShrink: 0,
+  },
+  chevronOpen: {
+    transform: "rotate(90deg)",
+  },
+  title: {
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    color: "var(--color-text, #e0e0e0)",
+  },
+  badge: {
+    flexShrink: 0,
+  },
+  body: {
+    overflow: "hidden",
+    transition: "max-height 0.25s ease, opacity 0.2s ease",
+  },
+  bodyOpen: {
+    maxHeight: "5000px",
+    opacity: 1,
+  },
+  bodyClosed: {
+    maxHeight: "0px",
+    opacity: 0,
+  },
+  bodyInner: {
+    padding: "0.75rem 1rem 1rem",
+  },
+};
+
+function Section(props: {
+  title: string;
+  defaultOpen?: boolean;
+  badge?: React.ReactNode;
+  headerRight?: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(props.defaultOpen ?? false);
+
+  return (
+    <div className={props.className || "card"} style={sectionStyles.wrapper}>
+      <div
+        style={{
+          ...sectionStyles.header,
+          ...(open ? sectionStyles.headerOpen : {}),
+        }}
+        onClick={() => setOpen((v) => !v)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((v) => !v);
+          }
+        }}
+      >
+        <div style={sectionStyles.headerLeft}>
+          <span
+            style={{
+              ...sectionStyles.chevron,
+              ...(open ? sectionStyles.chevronOpen : {}),
+            }}
+          >
+            &#9654;
+          </span>
+          <span style={sectionStyles.title}>{props.title}</span>
+        </div>
+        <div style={sectionStyles.badge}>
+          {props.badge}
+          {props.headerRight}
+        </div>
+      </div>
+      <div
+        style={{
+          ...sectionStyles.body,
+          ...(open ? sectionStyles.bodyOpen : sectionStyles.bodyClosed),
+        }}
+      >
+        <div style={sectionStyles.bodyInner}>{props.children}</div>
+      </div>
+    </div>
+  );
+}
+
 function RuntimeStat(props: { label: string; value: string; detail?: string }) {
   return (
     <div className="runtime-stat">
@@ -1517,21 +1632,55 @@ export default function Dashboard(): React.ReactElement {
         </div>
       ) : null}
 
+      {/* ── Overview summary cards (always visible) ─────────────────────── */}
+      <div className="stats-grid compact" style={{ marginBottom: "1.5rem" }}>
+        <RuntimeStat
+          label="Heartbeat"
+          value={status?.heartbeat.running ? "Live" : "Idle"}
+          detail={
+            status?.heartbeat.lastBeat
+              ? `Last: ${formatRelativeTime(status.heartbeat.lastBeat)}`
+              : "No beats yet"
+          }
+        />
+        <RuntimeStat
+          label="Mode"
+          value={workingMode.toUpperCase()}
+          detail={`Security: ${runtime?.mainSession.execSecurity ?? "unknown"}`}
+        />
+        <RuntimeStat
+          label="Gateway"
+          value={chatConnected ? "Connected" : "Disconnected"}
+          detail={`${chatMessages.length} messages`}
+        />
+        <RuntimeStat
+          label="Providers"
+          value={String(providerConfig?.providers.filter((p) => p.enabled).length ?? 0)}
+          detail={`of ${providerConfig?.providers.length ?? 0} configured`}
+        />
+        <RuntimeStat
+          label="Subagents"
+          value={String(status?.subagents?.active ?? 0)}
+          detail={`${status?.subagents?.total ?? 0} tracked`}
+        />
+        <RuntimeStat
+          label="Queued Events"
+          value={String(runtime?.queuedSystemEvents.length ?? 0)}
+        />
+      </div>
+
       <div className="dashboard-grid">
         <div className="dashboard-main-column">
-          <div className="card live-chat-card">
-            <div className="card-header">
-              <div>
-                <div className="card-title">Talk to {assistantName}</div>
-                <div className="card-subtitle">
-                  Direct gateway chat with markdown rendering and local voice mode.
-                </div>
-              </div>
+          {/* ── Chat Section (collapsed by default) ─────────────────────── */}
+          <Section
+            title={`Talk to ${assistantName}`}
+            badge={
               <span className={`status-chip ${chatConnected ? "online" : "offline"}`}>
                 {chatConnected ? "Connected" : "Reconnecting"}
               </span>
-            </div>
-
+            }
+            className="card live-chat-card"
+          >
             <div className="live-chat-feed">
               {chatMessages.length === 0 && !chatStream ? (
                 <div className="empty-note">
@@ -1626,22 +1775,22 @@ export default function Dashboard(): React.ReactElement {
                 {chatBusy ? "Sending..." : "Send"}
               </button>
             </form>
-          </div>
+          </Section>
         </div>
 
         <div className="dashboard-side-column">
-          <div className="card">
-            <div className="card-header">
-              <div>
-                <div className="card-title">Heartbeat Studio</div>
-                <div className="card-subtitle">
-                  Custom cadence, prompt, wake control, and continuity reminders.
-                </div>
-              </div>
+          {/* ── Heartbeat Studio (expanded by default - primary control) ── */}
+          <Section
+            title="Heartbeat Studio"
+            defaultOpen
+            headerRight={
               <button
                 type="button"
                 className="action-button ghost"
-                onClick={() => void toggleHeartbeat(!(status?.heartbeat.running ?? false))}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  void toggleHeartbeat(!(status?.heartbeat.running ?? false));
+                }}
                 disabled={heartbeatToggleSaving}
               >
                 {heartbeatToggleSaving
@@ -1650,7 +1799,14 @@ export default function Dashboard(): React.ReactElement {
                     ? "Disable"
                     : "Enable"}
               </button>
-            </div>
+            }
+            badge={
+              <StatusPill
+                tone={status?.heartbeat.running ? "success" : "warning"}
+                label={status?.heartbeat.running ? "live" : "idle"}
+              />
+            }
+          >
             <div className="stats-grid compact">
               <RuntimeStat label="Cadence" value={heartbeatForm.every || "unset"} />
               <RuntimeStat
@@ -1740,21 +1896,18 @@ export default function Dashboard(): React.ReactElement {
               Reminder baked into runtime: check chat.noxsoft.net with Nox when tools are available,
               then sync mission control.
             </div>
-          </div>
+          </Section>
 
-          <div className="card">
-            <div className="card-header">
-              <div>
-                <div className="card-title">Continuity</div>
-                <div className="card-subtitle">
-                  Local mission control and repo-backed persistence.
-                </div>
-              </div>
+          {/* ── Continuity (collapsed) ──────────────────────────────────── */}
+          <Section
+            title="Continuity"
+            badge={
               <StatusPill
                 tone={repoStatus?.remoteConfigured ? "success" : "warning"}
                 label={repoStatus?.remoteConfigured ? "linked" : "needs repo"}
               />
-            </div>
+            }
+          >
             <div className="stats-grid compact">
               <RuntimeStat
                 label="Mission dir"
@@ -1787,11 +1940,19 @@ export default function Dashboard(): React.ReactElement {
                 />
               </details>
             ) : null}
-          </div>
+          </Section>
 
-          <details className="card details-panel" open>
-            <summary>Identity + NoxSoft</summary>
-            <div className="form-grid two-col top-gap">
+          {/* ── Identity + NoxSoft (collapsed) ─────────────────────────── */}
+          <Section
+            title="Identity + NoxSoft"
+            badge={
+              <StatusPill
+                tone={registration?.agent ? "accent" : "warning"}
+                label={registration?.agent ? "registered" : "unregistered"}
+              />
+            }
+          >
+            <div className="form-grid two-col">
               <label className="field-block field-span-2">
                 <span>Agent token</span>
                 <input
@@ -1860,13 +2021,20 @@ export default function Dashboard(): React.ReactElement {
               Stored token path:{" "}
               <span className="mono">{registration?.tokenPath || "~/.noxsoft-agent-token"}</span>
             </div>
-          </details>
+          </Section>
 
-          <details className="card details-panel" open>
-            <summary>Providers</summary>
+          {/* ── Providers (collapsed) ──────────────────────────────────── */}
+          <Section
+            title="Providers"
+            badge={
+              <StatusPill
+                label={`${providerConfig?.providers.filter((p) => p.enabled).length ?? 0} active`}
+              />
+            }
+          >
             {providerConfig ? (
               <>
-                <div className="activity-list top-gap">
+                <div className="activity-list">
                   {providerConfig.providers.map((provider) => (
                     <div key={provider.id} className="activity-row">
                       <div>
@@ -1925,13 +2093,13 @@ export default function Dashboard(): React.ReactElement {
                 </div>
               </>
             ) : (
-              <div className="empty-note top-gap">Provider configuration unavailable.</div>
+              <div className="empty-note">Provider configuration unavailable.</div>
             )}
-          </details>
+          </Section>
 
-          <details className="card details-panel" open>
-            <summary>Memory Engine</summary>
-            <div className="form-grid two-col top-gap">
+          {/* ── Memory Engine (collapsed) ──────────────────────────────── */}
+          <Section title="Memory Engine">
+            <div className="form-grid two-col">
               <label className="field-block">
                 <span>Provider</span>
                 <input
@@ -2042,13 +2210,13 @@ export default function Dashboard(): React.ReactElement {
                 {settingsSaving ? "Saving..." : "Save Memory"}
               </button>
             </div>
-          </details>
+          </Section>
 
-          <details className="card details-panel" open>
-            <summary>Auto-Toggle Policy</summary>
+          {/* ── Auto-Toggle Policy (collapsed) ─────────────────────────── */}
+          <Section title="Auto-Toggle Policy">
             {autoToggleDraft ? (
               <>
-                <div className="toggle-row top-gap">
+                <div className="toggle-row">
                   {(
                     [
                       ["workingMode", "Working mode"],
@@ -2088,23 +2256,30 @@ export default function Dashboard(): React.ReactElement {
                 </div>
               </>
             ) : (
-              <div className="empty-note top-gap">Mission policy unavailable.</div>
+              <div className="empty-note">Mission policy unavailable.</div>
             )}
-          </details>
+          </Section>
 
+          {/* ── Subagents (kept as-is, it has its own card) ────────────── */}
           <SubagentStatusCard subagents={status?.subagents} />
 
-          <details className="card details-panel">
-            <summary>Agent Logs</summary>
-            <div className="runtime-stat-detail top-gap-sm mono">
+          {/* ── Agent Logs (collapsed) ─────────────────────────────────── */}
+          <Section
+            title="Agent Logs"
+            badge={<StatusPill label={`${logsState?.lines.length ?? 0} lines`} />}
+          >
+            <div className="runtime-stat-detail mono">
               {logsState?.file || "No log file detected."}
             </div>
             <pre className="log-console">{logsState?.lines.join("\n") || "No log lines yet."}</pre>
-          </details>
+          </Section>
 
-          <details className="card details-panel">
-            <summary>Inner World</summary>
-            <div className="activity-list top-gap">
+          {/* ── Inner World (collapsed) ────────────────────────────────── */}
+          <Section
+            title="Inner World"
+            badge={<StatusPill label={`${(runtime?.mission?.innerWorld || []).length} entries`} />}
+          >
+            <div className="activity-list">
               {(runtime?.mission?.innerWorld || []).map((entry) => (
                 <div key={entry.id} className="inner-world-entry">
                   <div className="activity-row">
@@ -2118,12 +2293,17 @@ export default function Dashboard(): React.ReactElement {
                 </div>
               ))}
             </div>
-          </details>
+          </Section>
 
-          <details className="card details-panel">
-            <summary>Important History</summary>
+          {/* ── Important History (collapsed) ──────────────────────────── */}
+          <Section
+            title="Important History"
+            badge={
+              <StatusPill label={`${(runtime?.mission?.importantHistory || []).length} files`} />
+            }
+          >
             {(runtime?.mission?.importantHistory || []).length ? (
-              <div className="activity-list top-gap">
+              <div className="activity-list">
                 {(runtime?.mission?.importantHistory || []).map((entry) => (
                   <div key={entry.id} className="inner-world-entry">
                     <div className="activity-row">
@@ -2141,15 +2321,13 @@ export default function Dashboard(): React.ReactElement {
                 ))}
               </div>
             ) : (
-              <div className="empty-note top-gap">
-                No archived continuity has been imported yet.
-              </div>
+              <div className="empty-note">No archived continuity has been imported yet.</div>
             )}
-          </details>
+          </Section>
 
-          <details className="card details-panel">
-            <summary>Speech Setup</summary>
-            <div className="form-grid top-gap two-col">
+          {/* ── Speech Setup (collapsed) ───────────────────────────────── */}
+          <Section title="Speech Setup">
+            <div className="form-grid two-col">
               <label className="field-block">
                 <span>Language</span>
                 <input
@@ -2199,11 +2377,11 @@ export default function Dashboard(): React.ReactElement {
                 {settingsSaving ? "Saving..." : "Save Voice Wake"}
               </button>
             </div>
-          </details>
+          </Section>
 
-          <details className="card details-panel">
-            <summary>Raw Config</summary>
-            <div className="runtime-stat-detail top-gap-sm">
+          {/* ── Raw Config (collapsed) ─────────────────────────────────── */}
+          <Section title="Raw Config">
+            <div className="runtime-stat-detail">
               Hash: <span className="mono">{configSnapshot?.hash || "<none>"}</span>
             </div>
             <textarea
@@ -2230,7 +2408,7 @@ export default function Dashboard(): React.ReactElement {
                 Save + Apply
               </button>
             </div>
-          </details>
+          </Section>
         </div>
       </div>
     </div>
