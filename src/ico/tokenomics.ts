@@ -4,18 +4,24 @@
  * Dual ICO: SVRN chain + Ethereum
  * Bonding curve to $2M cap, then free market
  * This is our runway for 2 years.
+ *
+ * IMPORTANT: These are REVENUE TOKENS, not equity.
+ * Token holders receive a share of platform revenue, not ownership.
+ * No lending mechanism — lending concept was scratched.
  */
 
 // ---------------------------------------------------------------------------
 // Token Allocation
 // ---------------------------------------------------------------------------
 
+export type TokenType = "revenue"; // Revenue tokens only — NOT equity, NO lending
+
 export interface TokenAllocation {
   /** Team allocation (personal spending, proportional to stock) */
   team: number;
   /** Company round (raise for operations) */
   companyRound: number;
-  /** Revenue share for holders */
+  /** Revenue share for holders — holders get % of platform revenue */
   revenueShare: number;
   /** Universal Basic Compute generation */
   ubc: number;
