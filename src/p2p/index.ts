@@ -58,3 +58,44 @@ export {
 export { PeerMesh, type PeerMeshConfig } from "./mesh.js";
 
 export { PeerChannel } from "./peer-channel.js";
+
+export {
+  ContentRouter,
+  type ContentRouterConfig,
+  type ContentChunk,
+  type ContentManifest,
+  type ContentAnnouncePayload,
+  type ContentRequestPayload,
+  type ContentResponsePayload,
+} from "./content-router.js";
+
+export {
+  PrivateDns,
+  type PrivateDnsConfig,
+  type DnsRecord,
+  type DnsRecordType,
+  type SrvRecord,
+  type DnsRegisterPayload,
+  type DnsQueryPayload,
+  type DnsResponsePayload,
+} from "./private-dns.js";
+
+export {
+  RelayManager,
+  type RelayConfig,
+  type RelaySession,
+  type BandwidthRecord,
+  type RelayRequestPayload,
+  type RelayBridgePayload,
+  type RelayDataPayload,
+} from "./relay.js";
+
+export {
+  PinningManager,
+  type PinningConfig,
+  type PinAgreement,
+  type PinnerStatus,
+  type PinPriority,
+  type PinRequestPayload,
+  type PinAckPayload,
+} from "./pinning.js";

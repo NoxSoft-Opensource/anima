@@ -18,7 +18,22 @@ export type PeerMessageType =
   | "presence" // Heartbeat/presence announcement
   | "sync" // Brain state sync
   | "delegate" // Task delegation
-  | "escalate"; // Task escalation
+  | "escalate" // Task escalation
+  // Content routing
+  | "content.announce" // Announce locally stored content hashes
+  | "content.request" // Request content by hash
+  | "content.response" // Response with content data
+  // Private DNS
+  | "dns.query" // Query a name in the org namespace
+  | "dns.response" // DNS query response
+  | "dns.register" // Register/refresh a DNS record
+  // Relay
+  | "relay.request" // Request a peer to relay traffic
+  | "relay.bridge" // Relay acceptance/rejection
+  | "relay.data" // Relayed data frame (forwarded ciphertext)
+  // Pinning
+  | "pin.request" // Request peers to pin content
+  | "pin.ack"; // Acknowledge/decline a pin request
 
 export interface PeerMessage {
   type: PeerMessageType;
