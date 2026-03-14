@@ -375,19 +375,23 @@ const sectionStyles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   body: {
+    display: "grid",
+    gridTemplateRows: "0fr",
     overflow: "hidden",
-    transition: "max-height 0.25s ease, opacity 0.2s ease",
+    transition: "grid-template-rows 0.25s ease, opacity 0.2s ease",
   },
   bodyOpen: {
-    maxHeight: "5000px",
+    gridTemplateRows: "1fr",
     opacity: 1,
   },
   bodyClosed: {
-    maxHeight: "0px",
+    gridTemplateRows: "0fr",
     opacity: 0,
   },
   bodyInner: {
     padding: "0.75rem 1rem 1rem",
+    minHeight: 0,
+    overflow: "hidden",
   },
 };
 
