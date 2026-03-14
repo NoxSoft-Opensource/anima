@@ -115,3 +115,11 @@ export {
   formatStatus,
   formatCompactStatus,
 } from "./status-broadcast.js";
+
+export {
+  getMoodGradient,
+  generateAffectGradient,
+  generateGlassmorphismStyle,
+  generateEmotionBar,
+  getEmotionGradientMetadata,
+} from "./gradients.js";
