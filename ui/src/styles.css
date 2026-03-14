@@ -23,6 +23,21 @@
   --radius-lg: 16px;
 }
 
+[data-theme="light"] {
+  --color-bg: #fafafa;
+  --color-text: #1a1a1a;
+  --color-accent: #ff6600;
+  --color-accent-dim: #e55b00;
+  --color-accent-glow: rgba(255, 102, 0, 0.1);
+  --color-muted: #6b6b6b;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f0f0f0;
+  --color-border: #e0e0e0;
+  --color-success: #00a843;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -963,6 +978,37 @@ body,
   }
 }
 
+/* Theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-hover);
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+
+.theme-toggle-icon {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  width: 24px;
+  text-align: center;
+}
+
 .sidebar-footer {
   padding: 16px 24px 0;
   border-top: 1px solid var(--color-border);
@@ -1372,8 +1418,51 @@ body,
 }
 
 @media (max-width: 720px) {
+  .sidebar {
+    position: fixed;
+    left: -240px;
+    top: 0;
+    height: 100vh;
+    z-index: 100;
+    transition: left 0.25s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
+  .sidebar-overlay.visible {
+    display: block;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 98;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 18px;
+  }
+
   .main-content {
-    padding: 24px 18px;
+    padding: 56px 18px 24px;
   }
 
   .page-header-row {
@@ -1393,6 +1482,26 @@ body,
   .live-chat-input-row {
     grid-template-columns: 1fr;
   }
+}
+
+@media (min-width: 721px) {
+  .mobile-menu-btn,
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* Light mode button text fix — accent buttons need white text in both modes */
+[data-theme="light"] .action-button:not(.ghost) {
+  color: #ffffff;
+}
+
+[data-theme="light"] .live-chat-send {
+  color: #ffffff;
+}
+
+[data-theme="light"] .identity-badge {
+  color: #ffffff;
 }
 
 /* ── Emotion Gradients ─────────────────────────────────────────────────── */

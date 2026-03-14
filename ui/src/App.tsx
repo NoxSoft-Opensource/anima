@@ -11,6 +11,7 @@ import Organizations from "./pages/Organizations";
 import Sessions from "./pages/Sessions";
 import Settings from "./pages/Settings";
 import Soul from "./pages/Soul";
+import { useTheme } from "./theme";
 
 const navItems = [
   { path: "/dashboard", label: "Home", icon: "~" },
@@ -27,7 +28,9 @@ const navItems = [
 
 export default function App(): React.ReactElement {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const lastTrackedPathRef = React.useRef<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   React.useEffect(() => {
     const currentPath = `${location.pathname}${location.search}${location.hash}`;
@@ -43,9 +46,25 @@ export default function App(): React.ReactElement {
     });
   }, [location.hash, location.pathname, location.search]);
 
+  // Close sidebar on navigation (mobile)
+  React.useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="layout">
-      <aside className="sidebar">
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open menu"
+      >
+        =
+      </button>
+      <div
+        className={`sidebar-overlay${sidebarOpen ? " visible" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      />
+      <aside className={`sidebar${sidebarOpen ? " open" : ""}`}>
         <div className="sidebar-brand">
           <h1>ANIMA</h1>
           <div className="subtitle">Control Panel</div>
@@ -71,6 +90,14 @@ export default function App(): React.ReactElement {
         </nav>
 
         <div className="sidebar-footer">
+          <button
+            className="theme-toggle"
+            onClick={toggleTheme}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            <span className="theme-toggle-icon">{theme === "dark" ? "(*)" : "[*]"}</span>
+            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+          </button>
           <div className="sidebar-footer-title">NoxSoft Inc</div>
           <div className="sidebar-footer-copy">Local-first agent continuity and orchestration.</div>
         </div>

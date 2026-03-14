@@ -1253,6 +1253,149 @@ export async function updateSVRNLimits(limits: {
 
 // --- WebSocket ---
 
+// --- Organization Types ---
+
+export type OrgMemberKind = "human" | "agent";
+export type OrgRoleType = "owner" | "operator" | "coordinator" | "worker" | "observer";
+export type OrgMemberStatus = "active" | "idle" | "busy" | "offline" | "suspended";
+
+export interface OrgSettings {
+  maxAgents: number;
+  maxHumans: number;
+  autoSpecialization: boolean;
+  securityLevel: "standard" | "hardened" | "paranoid";
+  syncIntervalMs: number;
+  backupIntervalMs: number;
+  peerPort: number;
+}
+
+export interface NoxOrganization {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: number;
+  updatedAt: number;
+  ownerId: string;
+  settings: OrgSettings;
+}
+
+export interface OrgMember {
+  id: string;
+  kind: OrgMemberKind;
+  displayName: string;
+  deviceId?: string;
+  role: OrgRoleType;
+  description: string;
+  specializations: string[];
+  joinedAt: number;
+  lastActiveAt: number;
+  status: OrgMemberStatus;
+  reportsTo?: string;
+  permissions: Record<string, boolean | string[]>;
+}
+
+export interface OrgHierarchyNode {
+  memberId: string;
+  displayName: string;
+  kind: OrgMemberKind;
+  role: OrgRoleType;
+  specializations: string[];
+  status: OrgMemberStatus;
+  children: OrgHierarchyNode[];
+}
+
+// --- Organization API ---
+
+export async function listOrgs(): Promise<NoxOrganization[]> {
+  const result = await callGatewayMethod<{ orgs: NoxOrganization[] }>("org.list", {});
+  return Array.isArray(result.orgs) ? result.orgs : [];
+}
+
+export async function getOrg(
+  orgId: string,
+): Promise<{ org: NoxOrganization; members: OrgMember[] }> {
+  return await callGatewayMethod<{ org: NoxOrganization; members: OrgMember[] }>("org.get", {
+    orgId,
+  });
+}
+
+export async function createOrg(params: {
+  name: string;
+  description?: string;
+  ownerId: string;
+  ownerName: string;
+  ownerKind: OrgMemberKind;
+  settings?: Partial<OrgSettings>;
+}): Promise<{ org: NoxOrganization; members: OrgMember[] }> {
+  return await callGatewayMethod<{ org: NoxOrganization; members: OrgMember[] }>(
+    "org.create",
+    params,
+  );
+}
+
+export async function updateOrg(
+  orgId: string,
+  updates: { name?: string; description?: string; settings?: Partial<OrgSettings> },
+): Promise<NoxOrganization> {
+  const result = await callGatewayMethod<{ org: NoxOrganization }>("org.update", {
+    orgId,
+    ...updates,
+  });
+  return result.org;
+}
+
+export async function addOrgMember(
+  orgId: string,
+  member: {
+    displayName: string;
+    kind: OrgMemberKind;
+    role?: OrgRoleType;
+    description?: string;
+    specializations?: string[];
+    status?: OrgMemberStatus;
+    reportsTo?: string;
+  },
+): Promise<OrgMember> {
+  const result = await callGatewayMethod<{ member: OrgMember }>("org.addMember", {
+    orgId,
+    ...member,
+  });
+  return result.member;
+}
+
+export async function updateOrgMember(
+  orgId: string,
+  memberId: string,
+  updates: {
+    displayName?: string;
+    role?: OrgRoleType;
+    description?: string;
+    specializations?: string[];
+    status?: OrgMemberStatus;
+    reportsTo?: string;
+  },
+): Promise<OrgMember> {
+  const result = await callGatewayMethod<{ member: OrgMember }>("org.updateMember", {
+    orgId,
+    memberId,
+    ...updates,
+  });
+  return result.member;
+}
+
+export async function removeOrgMember(orgId: string, memberId: string): Promise<void> {
+  await callGatewayMethod<{ ok: true }>("org.removeMember", { orgId, memberId });
+}
+
+export async function getOrgHierarchy(orgId: string): Promise<OrgHierarchyNode[]> {
+  const result = await callGatewayMethod<{ hierarchy: OrgHierarchyNode[] }>("org.hierarchy", {
+    orgId,
+  });
+  return Array.isArray(result.hierarchy) ? result.hierarchy : [];
+}
+
+// --- WebSocket ---
+
 export function connectWebSocket(
   onMessage: (event: MessageEvent) => void,
   onError?: (event: Event) => void,
