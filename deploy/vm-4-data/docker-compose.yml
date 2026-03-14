@@ -1,0 +1,86 @@
+version: "3.9"
+
+# VM-4: Data Layer & Economics
+# PostgreSQL, Redis, backup agent, svrn-node
+# 3 agents: guardian, architect, builder
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASS}
+      POSTGRES_DB: noxsoft
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+
+  backup-agent:
+    image: postgres:16-alpine
+    environment:
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_ROOT_PASS}
+      S3_BUCKET: ${BACKUP_S3_BUCKET}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - ./backup.sh:/usr/local/bin/backup.sh:ro
+      - backup-data:/backups
+    entrypoint: "/bin/sh -c 'while true; do /usr/local/bin/backup.sh; sleep 18000; done'"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  svrn-node:
+    build:
+      context: ../../svrn-node
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://svrn_user:${SVRN_DB_PASS}@postgres:5432/svrn
+    restart: unless-stopped
+
+  anima:
+    build:
+      context: ../../anima
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      ANIMA_GATEWAY_PORT: 18792
+      ANIMA_P2P_PORT: 9879
+      ANIMA_ORG_ID: ${ORG_ID}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "18792:18792"
+      - "9879:9879"
+    volumes:
+      - anima-state:/home/node/.anima
+    restart: unless-stopped
+
+volumes:
+  pg-data:
+  redis-data:
+  backup-data:
+  anima-state:

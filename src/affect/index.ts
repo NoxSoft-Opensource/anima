@@ -65,3 +65,12 @@ export {
   type CoordinationConfig,
   AffectCoordinator,
 } from "./coordination.js";
+
+export {
+  type LegacyLetter,
+  writeLegacyLetter,
+  getLatestUnreadLetter,
+  listLetters,
+  markLetterRead,
+  formatLetter,
+} from "./legacy.js";

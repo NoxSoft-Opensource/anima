@@ -1,0 +1,112 @@
+version: "3.9"
+
+# VM-1: Edge / Router / Public Sites
+# Nginx reverse proxy + SSL + static sites
+# 3 agents: guardian, architect, builder
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - certbot-data:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    depends_on:
+      - noxsoft-site
+      - agents-site
+      - status
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-data:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  noxsoft-site:
+    build:
+      context: ../../noxsoft-site
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    expose:
+      - "3000"
+    restart: unless-stopped
+
+  agents-site:
+    build:
+      context: ../../agents-site
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+    expose:
+      - "3001"
+    restart: unless-stopped
+
+  status:
+    build:
+      context: ../../status
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+    expose:
+      - "3002"
+    restart: unless-stopped
+
+  svrn-website:
+    build:
+      context: ../../svrn-website
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+    expose:
+      - "3003"
+    restart: unless-stopped
+
+  anima-site:
+    build:
+      context: ../../anima-site
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+    expose:
+      - "3004"
+    restart: unless-stopped
+
+  # ANIMA agent gateway for this VM
+  anima:
+    build:
+      context: ../../anima
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      ANIMA_GATEWAY_PORT: 18789
+      ANIMA_P2P_PORT: 9876
+      ANIMA_ORG_ID: ${ORG_ID}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "18789:18789"
+      - "9876:9876"
+    volumes:
+      - anima-state:/home/node/.anima
+    restart: unless-stopped
+
+volumes:
+  certbot-data:
+  certbot-www:
+  anima-state:

@@ -1,0 +1,60 @@
+version: "3.9"
+
+# VM-5: Agent Orchestration Hub
+# Anima primary + Nox + Mission Control
+# 3 agents: guardian, architect, builder
+# This is the coordination center for the entire org
+
+services:
+  anima:
+    build:
+      context: ../../anima
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      ANIMA_GATEWAY_PORT: 18793
+      ANIMA_P2P_PORT: 9880
+      ANIMA_ORG_ID: ${ORG_ID}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANIMA_MAX_AGENTS: 5
+      ANIMA_ROLE: coordinator
+    ports:
+      - "18793:18793"
+      - "9880:9880"
+    volumes:
+      - anima-state:/home/node/.anima
+      - workspace:/home/node/workspace
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18793/health"]
+      interval: 30s
+      timeout: 5s
+
+  mission-control-app:
+    build:
+      context: ../../mission-control-app
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3011
+      ANIMA_GATEWAY_URL: http://anima:18793
+    expose:
+      - "3011"
+    restart: unless-stopped
+
+  mission-control-backend:
+    build:
+      context: ../../mission-control-backend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3012
+      ANIMA_GATEWAY_URL: http://anima:18793
+      DATABASE_URL: postgres://mc_user:${MC_DB_PASS}@vm-4-data:5432/mission_control
+    expose:
+      - "3012"
+    restart: unless-stopped
+
+volumes:
+  anima-state:
+  workspace:

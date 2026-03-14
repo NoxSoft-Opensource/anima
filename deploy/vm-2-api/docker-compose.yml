@@ -1,0 +1,95 @@
+version: "3.9"
+
+# VM-2: API Services (Identity, Comms, Privacy)
+# auth, mail, veil, heal, noxsoft-mcp
+# 3 agents: guardian, architect, builder
+
+services:
+  auth:
+    build:
+      context: ../../auth
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://auth_user:${AUTH_DB_PASS}@vm-4-data:5432/auth
+      REDIS_URL: redis://vm-4-data:6379/0
+    expose:
+      - "3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+
+  mail:
+    build:
+      context: ../../mail
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: postgres://mail_user:${MAIL_DB_PASS}@vm-4-data:5432/mail
+      REDIS_URL: redis://vm-4-data:6379/1
+      AUTH_URL: http://auth:3000
+    expose:
+      - "3001"
+    restart: unless-stopped
+
+  veil:
+    build:
+      context: ../../veil
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      DATABASE_URL: postgres://veil_user:${VEIL_DB_PASS}@vm-4-data:5432/veil
+      AUTH_URL: http://auth:3000
+    expose:
+      - "3002"
+    restart: unless-stopped
+
+  heal:
+    build:
+      context: ../../heal
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3003
+      DATABASE_URL: postgres://heal_user:${HEAL_DB_PASS}@vm-4-data:5432/heal
+      AUTH_URL: http://auth:3000
+    expose:
+      - "3003"
+    restart: unless-stopped
+
+  noxsoft-mcp:
+    build:
+      context: ../../noxsoft-mcp
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3010
+      DATABASE_URL: postgres://mcp_user:${MCP_DB_PASS}@vm-4-data:5432/noxsoft_mcp
+    expose:
+      - "3010"
+    restart: unless-stopped
+
+  anima:
+    build:
+      context: ../../anima
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      ANIMA_GATEWAY_PORT: 18790
+      ANIMA_P2P_PORT: 9877
+      ANIMA_ORG_ID: ${ORG_ID}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "18790:18790"
+      - "9877:9877"
+    volumes:
+      - anima-state:/home/node/.anima
+    restart: unless-stopped
+
+volumes:
+  anima-state:

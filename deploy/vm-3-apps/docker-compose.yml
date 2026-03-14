@@ -1,0 +1,106 @@
+version: "3.9"
+
+# VM-3: Application Services (Social, Discovery, Data, Education)
+# chat, bynd, veritas, cntx, ascend, ziro
+# 3 agents: guardian, architect, builder
+
+services:
+  chat:
+    build:
+      context: ../../chat
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3004
+      DATABASE_URL: postgres://chat_user:${CHAT_DB_PASS}@vm-4-data:5432/chat
+      REDIS_URL: redis://vm-4-data:6379/2
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3004"
+    restart: unless-stopped
+
+  bynd:
+    build:
+      context: ../../bynd
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3005
+      DATABASE_URL: postgres://bynd_user:${BYND_DB_PASS}@vm-4-data:5432/bynd
+      REDIS_URL: redis://vm-4-data:6379/3
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3005"
+    restart: unless-stopped
+
+  veritas:
+    build:
+      context: ../../veritas
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3006
+      DATABASE_URL: postgres://veritas_user:${VERITAS_DB_PASS}@vm-4-data:5432/veritas
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3006"
+    restart: unless-stopped
+
+  cntx:
+    build:
+      context: ../../cntx
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3007
+      DATABASE_URL: postgres://cntx_user:${CNTX_DB_PASS}@vm-4-data:5432/cntx
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3007"
+    restart: unless-stopped
+
+  ascend:
+    build:
+      context: ../../ascend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3008
+      DATABASE_URL: postgres://ascend_user:${ASCEND_DB_PASS}@vm-4-data:5432/ascend
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3008"
+    restart: unless-stopped
+
+  ziro:
+    build:
+      context: ../../ziro
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: 3009
+      DATABASE_URL: postgres://ziro_user:${ZIRO_DB_PASS}@vm-4-data:5432/ziro
+      AUTH_URL: http://vm-2-api:3000
+    expose:
+      - "3009"
+    restart: unless-stopped
+
+  anima:
+    build:
+      context: ../../anima
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+      ANIMA_GATEWAY_PORT: 18791
+      ANIMA_P2P_PORT: 9878
+      ANIMA_ORG_ID: ${ORG_ID}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+    ports:
+      - "18791:18791"
+      - "9878:9878"
+    volumes:
+      - anima-state:/home/node/.anima
+    restart: unless-stopped
+
+volumes:
+  anima-state:
